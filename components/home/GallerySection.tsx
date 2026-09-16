@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import styles from "./GallerySection.module.css";
@@ -32,16 +32,6 @@ const galleryData: GalleryItem[] = [
   },
   {
     id: "gal-2",
-    category: "smart-farming",
-    categoryLabel: "Smart Farming",
-    badgeVariant: "success",
-    title: "Greenhouse Cerdas & Sensor Kelembapan",
-    desc: "Perawatan instalasi sayuran hidroponik bebas pestisida berbantuan sensor kelembapan otomatis yang ramah dipantau oleh petani penggerak warga.",
-    imageSrc: "/images/gallery-smart-greenhouse.jpg",
-    imageAlt: "Petani wanita penggerak warga tersenyum memeriksa sensor kelembapan pada instalasi sayuran hijau hidroponik greenhouse",
-  },
-  {
-    id: "gal-3",
     category: "karya-istimewa",
     categoryLabel: "Karya Istimewa",
     badgeVariant: "brand",
@@ -49,6 +39,16 @@ const galleryData: GalleryItem[] = [
     desc: "Koleksi produk olahan siap guna bernilai tinggi dalam kemasan ramah lingkungan, membuktikan limbah menjadi bernilai di tangan yang spesial.",
     imageSrc: "/images/gallery-handcrafted-products.jpg",
     imageAlt: "Deretan lilin aromaterapi dalam toples kaca amber dan sabun batang herbal alami tertata rapi di atas meja kayu",
+  },
+  {
+    id: "gal-3",
+    category: "smart-farming",
+    categoryLabel: "Smart Farming",
+    badgeVariant: "success",
+    title: "Greenhouse Cerdas & Sensor Kelembapan",
+    desc: "Perawatan instalasi sayuran hidroponik bebas pestisida berbantuan sensor kelembapan otomatis yang ramah dipantau oleh petani penggerak warga.",
+    imageSrc: "/images/gallery-smart-greenhouse.jpg",
+    imageAlt: "Petani wanita penggerak warga tersenyum memeriksa sensor kelembapan pada instalasi sayuran hijau hidroponik greenhouse",
   },
   {
     id: "gal-4",
@@ -85,7 +85,7 @@ const galleryData: GalleryItem[] = [
 type FilterType = "semua" | "karya-istimewa" | "smart-farming" | "aksi-warga" | "dampak-berbagi";
 
 const filters: { key: FilterType; label: string }[] = [
-  { key: "semua", label: "Semua Dokumentasi" },
+  { key: "semua", label: "Semua Foto" },
   { key: "karya-istimewa", label: "Karya Istimewa" },
   { key: "smart-farming", label: "Smart Farming" },
   { key: "aksi-warga", label: "Aksi Komunitas" },
@@ -94,27 +94,48 @@ const filters: { key: FilterType; label: string }[] = [
 
 export function GallerySection() {
   const [activeFilter, setActiveFilter] = useState<FilterType>("semua");
-  const [activeModalItem, setActiveModalItem] = useState<GalleryItem | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Handle escape key to close lightbox
+  const filteredItems = activeFilter === "semua"
+    ? galleryData
+    : galleryData.filter((item) => item.category === activeFilter);
+
+  const activeItem = selectedIndex !== null ? filteredItems[selectedIndex] : null;
+
+  const handlePrev = useCallback(() => {
+    if (selectedIndex === null) return;
+    setSelectedIndex((prev) => (prev! > 0 ? prev! - 1 : filteredItems.length - 1));
+  }, [selectedIndex, filteredItems.length]);
+
+  const handleNext = useCallback(() => {
+    if (selectedIndex === null) return;
+    setSelectedIndex((prev) => (prev! < filteredItems.length - 1 ? prev! + 1 : 0));
+  }, [selectedIndex, filteredItems.length]);
+
+  // Handle keyboard navigation for modal (Esc, Left Arrow, Right Arrow)
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape" && activeModalItem) {
-        setActiveModalItem(null);
+      if (selectedIndex === null) return;
+      if (e.key === "Escape") {
+        setSelectedIndex(null);
+      } else if (e.key === "ArrowLeft") {
+        handlePrev();
+      } else if (e.key === "ArrowRight") {
+        handleNext();
       }
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeModalItem]);
+  }, [selectedIndex, handlePrev, handleNext]);
 
-  // Lock scroll when modal is open
+  // Prevent background scroll when modal is open
   useEffect(() => {
-    if (activeModalItem) {
+    if (selectedIndex !== null) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -122,23 +143,37 @@ export function GallerySection() {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [activeModalItem]);
+  }, [selectedIndex]);
 
-  const filteredItems = activeFilter === "semua"
-    ? galleryData
-    : galleryData.filter((item) => item.category === activeFilter);
+  const getTileSpanClass = (index: number, total: number) => {
+    if (total <= 2) return styles.tileSpan7;
+    if (index === 0) return styles.tileSpan7;
+    if (index === 1) return styles.tileSpan5;
+    if (index === 2 || index === 3 || index === 4) return styles.tileSpan4;
+    return styles.tileSpan12;
+  };
 
   return (
     <section id="galeri" className={styles.gallery} aria-labelledby="galeri-title">
       <Container>
-        <SectionHeading
-          eyebrow="Dokumentasi Jejak Nyata"
-          title="Galeri Aktivitas & Mahakarya Komunitas"
-          description="Menyaksikan langsung perjalanan gotong royong warga: dari penampungan limbah, kebun cerdas hidroponik, sentuhan tangan kawan istimewa, hingga berkah panen bersama."
-        />
+        <div className={styles.sectionHeader}>
+          <SectionHeading
+            eyebrow="Kolase Jejak Nyata"
+            title="Galeri Visual & Mahakarya Komunitas"
+            description="Merekam setiap momen autentik dari dapur rumah tangga, ruang karya teman istimewa, kebun cerdas hidroponik, hingga berkah kebersamaan warga."
+          />
+          <div className={styles.hint}>
+            <svg className={styles.hintIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4" />
+              <path d="M12 8h.01" />
+            </svg>
+            <span>Klik pada gambar untuk membaca cerita di baliknya</span>
+          </div>
+        </div>
 
-        {/* Filter Tabs */}
-        <div className={styles.filterGroup} role="tablist" aria-label="Filter Galeri Aktivitas">
+        {/* Filter Bar */}
+        <div className={styles.filterGroup} role="tablist" aria-label="Filter Galeri Kolase">
           {filters.map((f) => (
             <button
               key={f.key}
@@ -146,50 +181,63 @@ export function GallerySection() {
               role="tab"
               aria-selected={activeFilter === f.key}
               className={`${styles.filterBtn} ${activeFilter === f.key ? styles.filterBtnActive : ""}`}
-              onClick={() => setActiveFilter(f.key)}
+              onClick={() => {
+                setActiveFilter(f.key);
+                setSelectedIndex(null);
+              }}
             >
               {f.label}
             </button>
           ))}
         </div>
 
-        {/* Photo Grid */}
-        <div className={styles.grid}>
-          {filteredItems.map((item) => (
+        {/* Collage Mosaic Grid (Pure Images) */}
+        <div className={styles.collageGrid} role="region" aria-label="Kolase Foto Dokumentasi">
+          {filteredItems.map((item, idx) => (
             <button
               key={item.id}
               type="button"
-              className={styles.card}
-              onClick={() => setActiveModalItem(item)}
-              aria-label={`Buka detail foto: ${item.title}`}
+              className={`${styles.tile} ${getTileSpanClass(idx, filteredItems.length)}`}
+              onClick={() => setSelectedIndex(idx)}
+              aria-label={`Buka cerita foto: ${item.title}`}
             >
-              <div className={styles.imageWrapper}>
-                <Image
-                  src={item.imageSrc}
-                  alt={item.imageAlt}
-                  width={600}
-                  height={450}
-                  className={styles.image}
-                  loading="lazy"
-                />
-                <div className={styles.badgeOverlay}>
-                  <Badge variant={item.badgeVariant}>{item.categoryLabel}</Badge>
-                </div>
+              {/* Badge Overlay */}
+              <div className={styles.tileCategoryBadge}>
+                <Badge variant={item.badgeVariant}>{item.categoryLabel}</Badge>
               </div>
-              <div className={styles.content}>
-                <h3 className={styles.cardTitle}>{item.title}</h3>
-                <p className={styles.cardDesc}>{item.desc}</p>
+
+              {/* Pure Image */}
+              <Image
+                src={item.imageSrc}
+                alt={item.imageAlt}
+                fill
+                sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 600px"
+                className={styles.tileImage}
+                loading="lazy"
+              />
+
+              {/* Hover Overlay Hint Pill */}
+              <div className={styles.tileOverlay} aria-hidden="true">
+                <span className={styles.tilePromptPill}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    <line x1="11" y1="8" x2="11" y2="14" />
+                    <line x1="8" y1="11" x2="14" y2="11" />
+                  </svg>
+                  Buka Cerita
+                </span>
               </div>
             </button>
           ))}
         </div>
       </Container>
 
-      {/* Lightbox Modal via Portal */}
-      {mounted && activeModalItem && createPortal(
+      {/* Lightbox Story Modal via Portal */}
+      {mounted && activeItem && createPortal(
         <div
           className={styles.modalBackdrop}
-          onClick={() => setActiveModalItem(null)}
+          onClick={() => setSelectedIndex(null)}
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-image-title"
@@ -198,11 +246,12 @@ export function GallerySection() {
             className={styles.modalContent}
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Close Button */}
             <button
               type="button"
               className={styles.modalCloseBtn}
-              onClick={() => setActiveModalItem(null)}
-              aria-label="Tutup pratinjau gambar"
+              onClick={() => setSelectedIndex(null)}
+              aria-label="Tutup cerita foto"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <line x1="18" y1="6" x2="6" y2="18" />
@@ -210,27 +259,63 @@ export function GallerySection() {
               </svg>
             </button>
 
+            {/* High-res Photo */}
             <div className={styles.modalImageWrapper}>
               <Image
-                src={activeModalItem.imageSrc}
-                alt={activeModalItem.imageAlt}
-                width={1200}
-                height={800}
+                src={activeItem.imageSrc}
+                alt={activeItem.imageAlt}
+                fill
+                sizes="(max-width: 1023px) 100vw, 860px"
                 className={styles.modalImage}
                 priority
               />
             </div>
 
+            {/* Story Details (Revealed Only When Clicked) */}
             <div className={styles.modalBody}>
-              <div style={{ marginBottom: "var(--space-2)" }}>
-                <Badge variant={activeModalItem.badgeVariant}>{activeModalItem.categoryLabel}</Badge>
+              <div className={styles.modalNavRow}>
+                <Badge variant={activeItem.badgeVariant}>{activeItem.categoryLabel}</Badge>
+                <span className={styles.modalCounter}>
+                  {selectedIndex! + 1} dari {filteredItems.length}
+                </span>
               </div>
-              <h3 id="modal-image-title" style={{ fontSize: "var(--font-size-heading-s)", fontWeight: "var(--font-weight-bold)", color: "var(--color-text-primary)", marginBottom: "var(--space-2)" }}>
-                {activeModalItem.title}
+
+              <h3 id="modal-image-title" className={styles.modalTitle}>
+                {activeItem.title}
               </h3>
-              <p style={{ fontSize: "var(--font-size-body-m)", color: "var(--color-text-secondary)", lineHeight: "var(--line-height-body-m)" }}>
-                {activeModalItem.desc}
+
+              <p className={styles.modalDesc}>
+                {activeItem.desc}
               </p>
+
+              {/* Navigation Arrows */}
+              <div className={styles.modalNavButtons}>
+                <button
+                  type="button"
+                  className={styles.modalNavBtn}
+                  onClick={handlePrev}
+                  aria-label="Foto sebelumnya"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <line x1="19" y1="12" x2="5" y2="12" />
+                    <polyline points="12 19 5 12 12 5" />
+                  </svg>
+                  Sebelumnya
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.modalNavBtn}
+                  onClick={handleNext}
+                  aria-label="Foto selanjutnya"
+                >
+                  Selanjutnya
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>,
