@@ -1,0 +1,106 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+  min-height: 44px; /* Accessible touch target */
+  white-space: nowrap;
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Sizes */
+.sizeSm {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-body-s);
+  min-height: 36px;
+}
+
+.sizeMd {
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--font-size-body-m);
+  min-height: 44px;
+}
+
+.sizeLg {
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--font-size-body-l);
+  min-height: 52px;
+}
+
+/* Variants */
+.variantPrimary {
+  background-color: var(--color-brand-primary);
+  color: var(--color-brand-primary-fg);
+  border-color: var(--color-brand-primary);
+}
+
+.variantPrimary:hover:not(:disabled) {
+  background-color: var(--color-brand-primary-hover);
+  border-color: var(--color-brand-primary-hover);
+}
+
+.variantSecondary {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-default);
+}
+
+.variantSecondary:hover:not(:disabled) {
+  background-color: var(--color-bg-subtle);
+  border-color: var(--color-border-strong);
+}
+
+.variantTertiary {
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  border-color: transparent;
+}
+
+.variantTertiary:hover:not(:disabled) {
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+}
+
+.variantDestructive {
+  background-color: var(--color-danger-fg);
+  color: var(--color-paper-0);
+  border-color: var(--color-danger-fg);
+}
+
+.variantDestructive:hover:not(:disabled) {
+  background-color: #722421;
+  border-color: #722421;
+}
+
+/* Full width */
+.fullWidth {
+  width: 100%;
+}
+
+/* Spinner */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 600ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

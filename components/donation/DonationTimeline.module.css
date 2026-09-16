@@ -1,0 +1,111 @@
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: var(--space-4) 0;
+}
+
+.timelineItem {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: auto;
+  gap: 0 var(--space-4);
+  position: relative;
+}
+
+.connector {
+  position: absolute;
+  left: 13px;
+  top: 28px;
+  bottom: -16px;
+  width: 2px;
+  background-color: var(--color-border-default);
+  z-index: 0;
+}
+
+.connectorCompleted {
+  background-color: var(--color-brand-primary);
+}
+
+.dot {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-border-default);
+  background-color: var(--color-bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: var(--space-1);
+  transition: border-color var(--transition-base), background-color var(--transition-base);
+}
+
+.completed .dot {
+  border-color: var(--color-brand-primary);
+  background-color: var(--color-brand-primary);
+  color: white;
+}
+
+.current .dot {
+  border-color: var(--color-brand-primary);
+  background-color: var(--color-green-100);
+}
+
+.pending .dot {
+  border-color: var(--color-border-subtle);
+  background-color: var(--color-bg-subtle);
+}
+
+.dotPulse {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-brand-primary);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+.itemContent {
+  padding-bottom: var(--space-8);
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding-top: var(--space-1);
+}
+
+.itemLabel {
+  font-size: var(--font-size-body-m);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-body-m);
+}
+
+.pending .itemLabel {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-regular);
+}
+
+.itemTimestamp {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.itemDescription {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body-s);
+  margin-top: var(--space-2);
+}

@@ -1,0 +1,108 @@
+.footer {
+  background-color: var(--color-bg-subtle);
+  border-top: 1px solid var(--color-border-default);
+  padding-top: var(--space-16);
+  padding-bottom: var(--space-12);
+  margin-top: var(--space-20);
+}
+
+.topGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-10);
+  margin-bottom: var(--space-12);
+}
+
+@media (min-width: 768px) {
+  .topGrid {
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  }
+}
+
+.brandCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.brandTitle {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-green-800);
+}
+
+.brandTagline {
+  font-size: var(--font-size-body-s);
+  color: var(--color-brand-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.brandStatement {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-body-m);
+  color: var(--color-text-primary);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-bg-surface);
+  border-left: 3px solid var(--color-brand-primary);
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-2);
+}
+
+.navCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.colTitle {
+  font-size: var(--font-size-body-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.navList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.navItem {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.navItem:hover {
+  color: var(--color-green-800);
+}
+
+.contactInfo {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body-s);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.bottomBar {
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 768px) {
+  .bottomBar {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}

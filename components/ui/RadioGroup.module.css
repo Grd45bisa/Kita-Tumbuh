@@ -1,0 +1,130 @@
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.groupLabel {
+  font-size: var(--font-size-body-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-body-s);
+}
+
+.required {
+  color: var(--color-danger-fg);
+  margin-left: var(--space-1);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.options.horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.option {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--color-bg-surface);
+  border: 1.5px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.option:hover {
+  border-color: var(--color-brand-primary);
+  background-color: var(--color-green-100);
+}
+
+.option.selected {
+  border-color: var(--color-brand-primary);
+  background-color: var(--color-green-100);
+}
+
+.option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.radioIndicator {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  transition: border-color var(--transition-fast);
+}
+
+.option.selected .radioIndicator {
+  border-color: var(--color-brand-primary);
+}
+
+.radioIndicator::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background-color: transparent;
+  transition: background-color var(--transition-fast);
+}
+
+.option.selected .radioIndicator::after {
+  background-color: var(--color-brand-primary);
+}
+
+.radio:focus-visible ~ .radioIndicator {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.optionContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.optionLabel {
+  font-size: var(--font-size-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-body-m);
+}
+
+.optionDescription {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body-s);
+  margin-top: var(--space-1);
+}
+
+.error {
+  font-size: var(--font-size-caption);
+  color: var(--color-danger-fg);
+  line-height: var(--line-height-caption);
+}
+
+.hint {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-caption);
+}
