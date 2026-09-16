@@ -7,6 +7,7 @@ import { EcosystemSection } from "@/components/home/EcosystemSection";
 import { WasteCategorySection } from "@/components/home/WasteCategorySection";
 import { SocialImpactSection } from "@/components/home/SocialImpactSection";
 import { ProductPreviewSection } from "@/components/home/ProductPreviewSection";
+import { GallerySection } from "@/components/home/GallerySection";
 import { TransparencyPreview } from "@/components/home/TransparencyPreview";
 import { FinalCtaSection } from "@/components/home/FinalCtaSection";
 import { env } from "@/lib/env";
@@ -78,7 +79,10 @@ export default function HomePage() {
       {/* 8. Transformed Product & Harvest Preview */}
       <ProductPreviewSection />
 
-      {/* 9. Transparency & Traceability Preview */}
+      {/* 9. Visual Gallery & Community Craft Showcase */}
+      <GallerySection />
+
+      {/* 10. Transparency & Traceability Preview */}
       <TransparencyPreview />
 
       {/* 10. Final Call to Action */}

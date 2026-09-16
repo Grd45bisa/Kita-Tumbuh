@@ -78,6 +78,9 @@ export function Header() {
               <Link href="#produk" className={styles.navLink}>
                 Produk
               </Link>
+              <Link href="#galeri" className={styles.navLink}>
+                Galeri
+              </Link>
               <Link href="#transparansi" className={styles.navLink}>
                 Transparansi
               </Link>
@@ -222,6 +225,11 @@ export function Header() {
                   <li>
                     <Link href="#produk" className={styles.drawerLink} onClick={closeDrawer}>
                       Produk Olahan & Pangan
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="#galeri" className={styles.drawerLink} onClick={closeDrawer}>
+                      Galeri Dokumentasi
                     </Link>
                   </li>
                   <li>

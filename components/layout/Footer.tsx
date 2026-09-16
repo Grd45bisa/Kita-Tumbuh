@@ -79,6 +79,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="#galeri" className={styles.navItem}>
+                  Galeri Dokumentasi
+                </Link>
+              </li>
+              <li>
                 <Link href="#transparansi" className={styles.navItem}>
                   Audit Jejak & Data Terbuka
                 </Link>
