@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/Badge";
 
 interface GalleryItem {
   id: string;
-  category: "karya-istimewa" | "smart-farming" | "aksi-warga" | "dampak-berbagi";
   categoryLabel: string;
   badgeVariant: "brand" | "success" | "neutral";
   title: string;
@@ -22,7 +21,6 @@ interface GalleryItem {
 const galleryData: GalleryItem[] = [
   {
     id: "gal-1",
-    category: "karya-istimewa",
     categoryLabel: "Karya Istimewa",
     badgeVariant: "brand",
     title: "Meracik Lilin Aromaterapi Bersama Teman Istimewa",
@@ -32,7 +30,6 @@ const galleryData: GalleryItem[] = [
   },
   {
     id: "gal-2",
-    category: "karya-istimewa",
     categoryLabel: "Karya Istimewa",
     badgeVariant: "brand",
     title: "Mahakarya Lilin & Sabun Alami Bernilai Tinggi",
@@ -42,7 +39,6 @@ const galleryData: GalleryItem[] = [
   },
   {
     id: "gal-3",
-    category: "smart-farming",
     categoryLabel: "Smart Farming",
     badgeVariant: "success",
     title: "Greenhouse Cerdas & Sensor Kelembapan",
@@ -52,7 +48,6 @@ const galleryData: GalleryItem[] = [
   },
   {
     id: "gal-4",
-    category: "dampak-berbagi",
     categoryLabel: "Dampak & Berbagi",
     badgeVariant: "success",
     title: "Penyaluran Panen Segar ke Warga & Lansia",
@@ -62,7 +57,6 @@ const galleryData: GalleryItem[] = [
   },
   {
     id: "gal-5",
-    category: "aksi-warga",
     categoryLabel: "Aksi Komunitas",
     badgeVariant: "neutral",
     title: "Penyetoran & Penimbangan Jelantah di Pos Warga",
@@ -72,7 +66,6 @@ const galleryData: GalleryItem[] = [
   },
   {
     id: "gal-6",
-    category: "smart-farming",
     categoryLabel: "Smart Farming",
     badgeVariant: "neutral",
     title: "Pusat Pengolahan & Bedengan Bio-Kompos",
@@ -82,18 +75,7 @@ const galleryData: GalleryItem[] = [
   },
 ];
 
-type FilterType = "semua" | "karya-istimewa" | "smart-farming" | "aksi-warga" | "dampak-berbagi";
-
-const filters: { key: FilterType; label: string }[] = [
-  { key: "semua", label: "Semua Foto" },
-  { key: "karya-istimewa", label: "Karya Istimewa" },
-  { key: "smart-farming", label: "Smart Farming" },
-  { key: "aksi-warga", label: "Aksi Komunitas" },
-  { key: "dampak-berbagi", label: "Dampak & Berbagi" },
-];
-
 export function GallerySection() {
-  const [activeFilter, setActiveFilter] = useState<FilterType>("semua");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -101,21 +83,17 @@ export function GallerySection() {
     setMounted(true);
   }, []);
 
-  const filteredItems = activeFilter === "semua"
-    ? galleryData
-    : galleryData.filter((item) => item.category === activeFilter);
-
-  const activeItem = selectedIndex !== null ? filteredItems[selectedIndex] : null;
+  const activeItem = selectedIndex !== null ? galleryData[selectedIndex] : null;
 
   const handlePrev = useCallback(() => {
     if (selectedIndex === null) return;
-    setSelectedIndex((prev) => (prev! > 0 ? prev! - 1 : filteredItems.length - 1));
-  }, [selectedIndex, filteredItems.length]);
+    setSelectedIndex((prev) => (prev! > 0 ? prev! - 1 : galleryData.length - 1));
+  }, [selectedIndex]);
 
   const handleNext = useCallback(() => {
     if (selectedIndex === null) return;
-    setSelectedIndex((prev) => (prev! < filteredItems.length - 1 ? prev! + 1 : 0));
-  }, [selectedIndex, filteredItems.length]);
+    setSelectedIndex((prev) => (prev! < galleryData.length - 1 ? prev! + 1 : 0));
+  }, [selectedIndex]);
 
   // Handle keyboard navigation for modal (Esc, Left Arrow, Right Arrow)
   useEffect(() => {
@@ -145,8 +123,7 @@ export function GallerySection() {
     };
   }, [selectedIndex]);
 
-  const getTileSpanClass = (index: number, total: number) => {
-    if (total <= 2) return styles.tileSpan7;
+  const getTileSpanClass = (index: number) => {
     if (index === 0) return styles.tileSpan7;
     if (index === 1) return styles.tileSpan5;
     if (index === 2 || index === 3 || index === 4) return styles.tileSpan4;
@@ -172,32 +149,13 @@ export function GallerySection() {
           </div>
         </div>
 
-        {/* Filter Bar */}
-        <div className={styles.filterGroup} role="tablist" aria-label="Filter Galeri Kolase">
-          {filters.map((f) => (
-            <button
-              key={f.key}
-              type="button"
-              role="tab"
-              aria-selected={activeFilter === f.key}
-              className={`${styles.filterBtn} ${activeFilter === f.key ? styles.filterBtnActive : ""}`}
-              onClick={() => {
-                setActiveFilter(f.key);
-                setSelectedIndex(null);
-              }}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Collage Mosaic Grid (Pure Images) */}
+        {/* Collage Mosaic Grid (Pure Images - 2 cols on mobile) */}
         <div className={styles.collageGrid} role="region" aria-label="Kolase Foto Dokumentasi">
-          {filteredItems.map((item, idx) => (
+          {galleryData.map((item, idx) => (
             <button
               key={item.id}
               type="button"
-              className={`${styles.tile} ${getTileSpanClass(idx, filteredItems.length)}`}
+              className={`${styles.tile} ${getTileSpanClass(idx)}`}
               onClick={() => setSelectedIndex(idx)}
               aria-label={`Buka cerita foto: ${item.title}`}
             >
@@ -211,7 +169,7 @@ export function GallerySection() {
                 src={item.imageSrc}
                 alt={item.imageAlt}
                 fill
-                sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 600px"
+                sizes="(max-width: 639px) 50vw, (max-width: 1023px) 50vw, 600px"
                 className={styles.tileImage}
                 loading="lazy"
               />
@@ -276,7 +234,7 @@ export function GallerySection() {
               <div className={styles.modalNavRow}>
                 <Badge variant={activeItem.badgeVariant}>{activeItem.categoryLabel}</Badge>
                 <span className={styles.modalCounter}>
-                  {selectedIndex! + 1} dari {filteredItems.length}
+                  {selectedIndex! + 1} dari {galleryData.length}
                 </span>
               </div>
 

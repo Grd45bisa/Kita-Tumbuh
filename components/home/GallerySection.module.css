@@ -14,7 +14,7 @@
 .sectionHeader {
   text-align: center;
   max-width: 760px;
-  margin: 0 auto var(--space-8);
+  margin: 0 auto var(--space-10);
 }
 
 .hint {
@@ -34,57 +34,21 @@
   width: 16px;
   height: 16px;
   color: var(--color-green-700);
+  flex-shrink: 0;
 }
 
-/* Filter Bar */
-.filterGroup {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-bottom: var(--space-8);
-}
-
-.filterBtn {
-  font-family: var(--font-sans);
-  font-size: var(--font-size-body-s);
-  font-weight: var(--font-weight-medium);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-border-default);
-  background-color: var(--color-bg-canvas);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
-}
-
-.filterBtn:hover {
-  background-color: var(--color-bg-subtle);
-  color: var(--color-text-primary);
-  border-color: var(--color-border-strong);
-}
-
-.filterBtnActive {
-  background-color: var(--color-green-800);
-  color: #ffffff;
-  border-color: var(--color-green-800);
-}
-
-.filterBtnActive:hover {
-  background-color: var(--color-green-900);
-  color: #ffffff;
-  border-color: var(--color-green-900);
-}
-
-/* Collage Mosaic Grid */
+/* ==========================================================================
+   Collage Mosaic Grid
+   Desktop: 12-column bento mosaic
+   Tablet & Mobile: Dynamic 2-column collage grid with featured span tiles
+   ========================================================================== */
 .collageGrid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: var(--space-4);
 }
 
-/* Individual Mosaic Tile Sizes */
+/* Desktop Tile Spans */
 .tileSpan7 {
   grid-column: span 7;
   height: 380px;
@@ -105,15 +69,14 @@
   height: 320px;
 }
 
-/* Responsive Grid Overrides */
+/* Tablet Overrides (768px - 1023px) */
 @media (max-width: 1023px) {
   .collageGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-3);
   }
 
-  .tileSpan7,
-  .tileSpan12 {
+  .tileSpan7 {
     grid-column: span 2;
     height: 320px;
   }
@@ -121,22 +84,43 @@
   .tileSpan5,
   .tileSpan4 {
     grid-column: span 1;
-    height: 260px;
+    height: 240px;
+  }
+
+  .tileSpan12 {
+    grid-column: span 2;
+    height: 280px;
   }
 }
 
-@media (max-width: 639px) {
-  .collageGrid {
-    grid-template-columns: 1fr;
-    gap: var(--space-3);
+/* Mobile 2-Column Collage Overrides (< 768px) */
+@media (max-width: 767px) {
+  .sectionHeader {
+    margin-bottom: var(--space-6);
   }
 
-  .tileSpan7,
+  .collageGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+  }
+
+  /* Hero tile on mobile spans both columns */
+  .tileSpan7 {
+    grid-column: span 2;
+    height: 220px;
+  }
+
+  /* Side-by-side tiles in 2-column mobile grid */
   .tileSpan5,
-  .tileSpan4,
-  .tileSpan12 {
+  .tileSpan4 {
     grid-column: span 1;
-    height: 240px;
+    height: 160px;
+  }
+
+  /* Panoramic bottom tile on mobile spans both columns */
+  .tileSpan12 {
+    grid-column: span 2;
+    height: 190px;
   }
 }
 
@@ -195,6 +179,12 @@
   opacity: 1;
 }
 
+@media (max-width: 767px) {
+  .tileOverlay {
+    padding: var(--space-2);
+  }
+}
+
 .tilePromptPill {
   display: inline-flex;
   align-items: center;
@@ -210,13 +200,30 @@
   box-shadow: var(--elevation-1);
 }
 
+@media (max-width: 767px) {
+  .tilePromptPill {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    gap: 4px;
+  }
+}
+
 .tileCategoryBadge {
   position: absolute;
   top: var(--space-3);
   left: var(--space-3);
   z-index: 2;
-  opacity: 0.9;
+  opacity: 0.92;
   transition: opacity var(--transition-fast);
+}
+
+@media (max-width: 767px) {
+  .tileCategoryBadge {
+    top: var(--space-2);
+    left: var(--space-2);
+    transform: scale(0.9);
+    transform-origin: top left;
+  }
 }
 
 .tile:hover .tileCategoryBadge {
