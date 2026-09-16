@@ -7,33 +7,33 @@ import { Badge } from "@/components/ui/Badge";
 const steps = [
   {
     step: "01",
-    title: "Donasi Diserahkan",
-    desc: "Warga menyetorkan minyak jelantah atau limbah organik terpilah ke Collection Point komunitas atau melalui jadwal penjemputan berkala.",
+    title: "Donasi Diterima",
+    desc: "Warga menyetorkan minyak jelantah atau limbah organik terpilah ke Pos Komunitas atau melalui jadwal penjemputan berkala.",
   },
   {
     step: "02",
-    title: "Verifikasi & Penimbangan",
-    desc: "Petugas memeriksa kemurnian limbah, mencatat berat riil tervalidasi ke dalam sistem, dan memberikan tanda terima transparan bagi donatur.",
+    title: "Verifikasi & Apresiasi",
+    desc: "Tim memeriksa kondisi bahan, mencatat timbangan riil tervalidasi ke dalam sistem terbuka, dan memberikan tanda terima bagi donatur.",
   },
   {
     step: "03",
     title: "Pemilahan & Preparasi",
-    desc: "Minyak disaring dari kotoran kasar; sisa organik dicacah untuk mempersiapkan proses fermentasi dan biokonversi alami.",
+    desc: "Minyak disaring bertahap dari residu kasar; biomassa organik dicacah rapi untuk menyongsong proses bio-konversi alami.",
   },
   {
     step: "04",
-    title: "Pengolahan Sirkular",
-    desc: "Organik diolah menjadi pupuk kompos bio-organik dan pakan maggot BSF; minyak jelantah diformulasi menjadi lilin aromaterapi dan sabun ramah lingkungan.",
+    title: "Karya di Tangan Spesial",
+    desc: "Dengan ketelitian dan ketelatenan kawan-kawan disabilitas, jelantah diracik menjadi lilin aromaterapi dan sabun ramah lingkungan, sementara organik menjadi bio-kompos kaya nutrisi.",
   },
   {
     step: "05",
     title: "Kebun Smart Farming",
-    desc: "Pupuk bio-kompos menyuburkan instalasi sayuran hidroponik dan bedengan tanah warga dengan sensor pemantau kelembapan cerdas.",
+    desc: "Bio-kompos menyuburkan instalasi sayuran hidroponik komunitas yang dipantau dengan teknologi sensor kelembapan cerdas ramah warga.",
   },
   {
     step: "06",
-    title: "Dampak & Alokasi Sosial",
-    desc: "Hasil panen sayur segar dibagikan gratis kepada keluarga lansia pra-sejahtera, dan hasil penjualan produk mendanai program beasiswa kampung.",
+    title: "Kemandirian & Kebahagiaan",
+    desc: "Sayuran segar dibagikan untuk nutrisi keluarga dan lansia sekitar, serta membuka ruang kemandirian ekonomi bagi kawan-kawan istimewa.",
   },
 ];
 

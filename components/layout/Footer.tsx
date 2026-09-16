@@ -30,7 +30,7 @@ export function Footer() {
             </div>
             <span className={styles.brandTagline}>Dari Limbah, Tumbuh Manfaat.</span>
             <p style={{ fontSize: "var(--font-size-body-s)", color: "var(--color-text-secondary)" }}>
-              Platform sirkular sosial yang mengubah limbah rumah tangga menjadi pupuk, pakan, produk bernilai, dan pangan segar berbasis smart farming untuk mendanai program sosial keluarga sekitar.
+              Platform sirkular sosial yang mengubah limbah rumah tangga menjadi produk bernilai tinggi dan sayuran segar kebun pintar melalui ketelatenan kawan-kawan istimewa untuk kemandirian komunitas.
             </p>
             <div className={styles.brandStatement}>
               &ldquo;SAMPAH KALIAN SANGAT BERARTI BAGI KAMI&rdquo;

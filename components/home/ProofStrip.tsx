@@ -5,23 +5,23 @@ import { Badge } from "@/components/ui/Badge";
 const metrics = [
   {
     value: "3.420 L",
-    label: "Minyak Jelantah Terkumpul",
-    note: "Disaring & diolah menjadi bahan lilin aromaterapi dan sabun ramah lingkungan",
+    label: "Minyak Jelantah Diberdayakan",
+    note: "Menjadi lilin aromaterapi dan sabun ramah lingkungan di tangan kawan-kawan istimewa",
   },
   {
     value: "12,8 Ton",
-    label: "Limbah Organik Terolah",
-    note: "Dikonversi menjadi pupuk bio-kompos dan pakan maggot berprotein tinggi",
+    label: "Biomassa Organik Terolah",
+    note: "Dikonversi menjadi pupuk bio-kompos penyubur kebun sayuran hidroponik komunitas",
   },
   {
     value: "148 Paket",
-    label: "Pangan & Sayur Didistribusikan",
-    note: "Dibagikan langsung kepada keluarga lansia dan prasejahtera sekitar kampung",
+    label: "Pangan Segar Berbagi Berkah",
+    note: "Hasil panen sehat didistribusikan untuk nutrisi lansia dan keluarga sekitar",
   },
   {
     value: "100%",
-    label: "Jejak Tervalidasi Terbuka",
-    note: "Setiap timbangan limbah dan alokasi dana dapat ditelusuri secara berkala",
+    label: "Jejak Kebaikan Terbuka",
+    note: "Setiap timbangan limbah dan alokasi manfaat tercatat transparan dapat ditelusuri",
   },
 ];
 

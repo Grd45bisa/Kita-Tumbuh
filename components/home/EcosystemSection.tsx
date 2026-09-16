@@ -15,14 +15,14 @@ const pillars = [
     desc: "Biomassa sisa pangkas kebun masuk kembali ke reaktor vermikompos. Hasilnya adalah pupuk cair bio-fermentasi dan pupuk kasgot yang kaya mikroorganisme penyubur.",
   },
   {
-    tag: "Ekonomi Warga",
-    title: "Produksi Lokal Kelompok Tani",
-    desc: "Kader ibu rumah tangga dan pemuda kampung memproses minyak jelantah tersaring menjadi sabun alami dan mengemas pupuk siap pakai bernilai jual.",
+    tag: "Karya Tangan Spesial",
+    title: "Kreasi Inklusif & Bernilai Tinggi",
+    desc: "Kawan-kawan disabilitas dan penggerak komunitas mengolah minyak jelantah menjadi produk lilin dan sabun herbal berkelas, membuktikan ketelatenan istimewa melahirkan karya bernilai tinggi.",
   },
   {
     tag: "Martabat Komunitas",
-    title: "Kemandirian Pangan & Sosial",
-    desc: "Kebun menjadi lumbung hidup warga. Sebagian panen disalurkan ke dapur keluarga yang membutuhkan, memangkas beban biaya hidup harian masyarakat.",
+    title: "Kemandirian Pangan & Gotong Royong",
+    desc: "Kebun pintar menjadi ruang tumbuh bersama. Hasil panen sayuran segar dinikmati keluarga dan lansia sekitar, merajut kebersamaan tanpa sekat dan saling memuliakan.",
   },
 ];
 

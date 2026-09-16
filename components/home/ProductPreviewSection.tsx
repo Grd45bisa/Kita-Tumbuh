@@ -8,23 +8,23 @@ const products = [
   {
     name: "Pupuk Bio-Organik Super",
     category: "Sumber Daya Kompos",
-    origin: "Dari limbah sisa sayur, buah, dan dedaunan dapur terpilah",
+    origin: "Dari biomassa sisa sayur, buah, dan dedaunan dapur terpilah",
     benefit: "Kaya mikroba tanah pelarut fosfat dan penambat nitrogen alami. Memperbaiki struktur tanah dan menyuburkan tanaman.",
-    impactShare: "Menyuburkan kebun warga & dijual untuk operasional pos kompos",
+    impactShare: "Menyuburkan kebun warga & mendukung operasional rumah kompos komunitas",
   },
   {
     name: "Sayuran Segar Hidroponik",
     category: "Hasil Pangan Kebun",
     origin: "Ditanam di greenhouse pintar berbantuan sensor kelembapan",
     benefit: "Bebas residu pestisida beracun, panen harian segar, kaya antioksidan dan serat bernutrisi tinggi.",
-    impactShare: "60% didistribusikan gratis bagi lansia & warga prasejahtera",
+    impactShare: "Didistribusikan untuk program nutrisi lansia & keluarga warga sekitar",
   },
   {
-    name: "Sabun Cuci & Lilin Jelantah",
-    category: "Produk Olahan Upcycle",
-    origin: "Dari minyak jelantah terfiltrasi karbon aktif & minyak atsiri serai",
-    benefit: "Formula lembut ampuh melarutkan lemak peralatan masak dan lilin penerangan ramah lingkungan tanpa asap hitam.",
-    impactShare: "100% hasil penjualan masuk ke kas beasiswa tunas kampung",
+    name: "Lilin Aromaterapi & Sabun Alami",
+    category: "Karya Tangan Spesial",
+    origin: "Minyak jelantah terfiltrasi karbon aktif & minyak atsiri aromatik",
+    benefit: "Dibuat dengan ketelitian dan ketelatenan istimewa oleh kawan-kawan disabilitas. Lilin wangi menenangkan dan sabun lembut yang ramah lingkungan.",
+    impactShare: "100% pendapatan mendukung ruang karya kawan istimewa & kemandirian komunitas",
   },
 ];
 

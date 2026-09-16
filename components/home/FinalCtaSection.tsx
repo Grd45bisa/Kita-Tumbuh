@@ -53,7 +53,7 @@ export function FinalCtaSection() {
               maxWidth: "680px",
             }}
           >
-            Limbah Anda Hari Ini, Harapan dan Pangan Segar Esok Hari
+            Limbah Anda Hari Ini, Mahakarya dan Harapan Nyata Esok Hari
           </h2>
 
           <blockquote
@@ -78,7 +78,7 @@ export function FinalCtaSection() {
               marginBottom: "var(--space-8)",
             }}
           >
-            Mulai pisahkan minyak jelantah dan sisa dapur di rumah. Bawa ke pos pengumpulan terdekat kami, atau hubungi kader penggerak kampung untuk panduan penjemputan.
+            Mulai pisahkan minyak jelantah dan sisa dapur di rumah. Percayakan bahan-bahan tersebut ke tangan kawan-kawan istimewa untuk bertransformasi menjadi karya penuh manfaat bagi sesama.
           </p>
 
           <div

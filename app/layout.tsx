@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: "%s | KITA TUMBUH — Kampung Smart Farming",
   },
   description:
-    "KITA TUMBUH — Platform ekonomi sirkular sosial Kampung Smart Farming. Mengubah limbah menjadi produk bernilai dan dampak sosial nyata bagi masyarakat. Sampah kalian sangat berarti bagi kami.",
+    "KITA TUMBUH — Platform ekonomi sirkular sosial Kampung Smart Farming. Mengubah limbah menjadi karya bernilai di tangan yang spesial dan menghadirkan dampak sosial nyata bagi masyarakat. Sampah kalian sangat berarti bagi kami.",
   keywords: [
     "KITA TUMBUH",
     "Kampung Smart Farming",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     siteName: "KITA TUMBUH — Kampung Smart Farming",
     title: "KITA TUMBUH — Kampung Smart Farming | Dari Limbah, Tumbuh Manfaat",
     description:
-      "KITA TUMBUH — Platform ekonomi sirkular sosial Kampung Smart Farming. Mengubah limbah menjadi produk bernilai dan dampak sosial nyata bagi masyarakat. Sampah kalian sangat berarti bagi kami.",
+      "KITA TUMBUH — Platform ekonomi sirkular sosial Kampung Smart Farming. Mengubah limbah menjadi karya bernilai di tangan yang spesial dan menghadirkan dampak sosial nyata bagi masyarakat. Sampah kalian sangat berarti bagi kami.",
   },
   twitter: {
     card: "summary_large_image",

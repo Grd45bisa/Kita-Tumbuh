@@ -15,9 +15,9 @@ export function WhyItMatters() {
     >
       <Container>
         <SectionHeading
-          eyebrow="Mengapa Ini Penting"
-          title="Sesuatu yang tidak lagi kamu butuhkan, masih memiliki nilai besar bagi orang lain."
-          description="Masalah sampah bukan semata soal kebersihan, melainkan potensi tersembunyi yang terbuang sia-sia dan merusak lingkungan."
+          eyebrow="Dari Tersisih Menjadi Istimewa"
+          title="Menjadi Bernilai di Tangan yang Spesial"
+          description="Sesuatu yang sering dipandang sebelah mata dapat melahirkan karya luar biasa saat bertemu dengan ketelatenan dan cinta kawan-kawan istimewa."
         />
 
         <div
@@ -28,20 +28,20 @@ export function WhyItMatters() {
             marginTop: "var(--space-8)",
           }}
         >
-          {/* Card 1: Jika Dibuang Begitu Saja */}
-          <Card padded subtle style={{ borderLeft: "4px solid var(--color-danger-fg)" }}>
+          {/* Card 1: Sudut Pandang Biasa */}
+          <Card padded subtle style={{ borderLeft: "4px solid var(--color-earth-400)" }}>
             <span
               style={{
                 fontSize: "var(--font-size-caption)",
                 fontWeight: "var(--font-weight-semibold)",
                 textTransform: "uppercase",
                 letterSpacing: "0.05em",
-                color: "var(--color-danger-fg)",
+                color: "var(--color-earth-600)",
                 display: "block",
                 marginBottom: "var(--space-2)",
               }}
             >
-              Jika Dibuang Begitu Saja
+              Sudut Pandang Biasa
             </span>
             <h3
               style={{
@@ -50,7 +50,7 @@ export function WhyItMatters() {
                 color: "var(--color-text-primary)",
               }}
             >
-              Beban Lingkungan & Biaya Sosial
+              Dianggap Sisa Tanpa Makna
             </h3>
             <p
               style={{
@@ -60,7 +60,7 @@ export function WhyItMatters() {
                 marginBottom: "var(--space-3)",
               }}
             >
-              Satu liter minyak jelantah yang dituang ke saluran air dapat mencemari ribuan liter air tanah dan menyumbat pipa pemukiman. Sisa makanan yang membusuk tak terkelola di TPA melepas gas metana dan menciptakan bau tak sedap.
+              Di banyak rumah, minyak jelantah dan potongan sayur kerap dibuang begitu saja ke saluran pembuangan karena dianggap sudah tidak memiliki kegunaan dan hanya merepotkan.
             </p>
             <p
               style={{
@@ -68,11 +68,11 @@ export function WhyItMatters() {
                 color: "var(--color-text-muted)",
               }}
             >
-              Dampaknya dirasakan bersama: saluran mampet, air sumur tercemar, dan timbulan sampah perkotaan yang kian menumpuk.
+              Padahal, di balik bahan yang tersisa tersebut, tersimpan potensi besar yang menunggu untuk dihidupkan kembali.
             </p>
           </Card>
 
-          {/* Card 2: Jika Dialirkan ke Kampung Smart Farming */}
+          {/* Card 2: Di Tangan yang Spesial */}
           <Card padded style={{ borderLeft: "4px solid var(--color-green-700)" }}>
             <span
               style={{
@@ -94,7 +94,7 @@ export function WhyItMatters() {
                 color: "var(--color-text-primary)",
               }}
             >
-              Bahan Baku Kesuburan & Dana Sosial
+              Mahakarya di Tangan yang Spesial
             </h3>
             <p
               style={{
@@ -104,7 +104,7 @@ export function WhyItMatters() {
                 marginBottom: "var(--space-3)",
               }}
             >
-              Minyak jelantah difiltrasi menjadi lilin aromaterapi dan sabun ramah lingkungan. Sisa sayur dan kulit buah diurai menjadi bio-kompos padat dan cair yang menyuburkan sayuran hidroponik bebas pestisida di kebun warga.
+              Di tangan kawan-kawan disabilitas dan kader komunitas, jelantah disaring dengan telaten menjadi lilin aromaterapi dan sabun ramah lingkungan premium. Sisa organik difermentasi menjadi pupuk bio-nutrisi yang menumbuhkan sayuran segar kebun cerdas.
             </p>
             <p
               style={{
@@ -113,7 +113,7 @@ export function WhyItMatters() {
                 fontWeight: "var(--font-weight-medium)",
               }}
             >
-              Hasil penjualan dan panen langsung dialokasikan ke kas sosial untuk membantu pangan keluarga pra-sejahtera dan beasiswa anak warga.
+              Bukan sekadar daur ulang—ini adalah ruang ekspresi martabat, kebanggaan berkarya, dan kemandirian nyata bagi teman-teman istimewa kita.
             </p>
           </Card>
         </div>

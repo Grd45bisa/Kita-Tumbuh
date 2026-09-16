@@ -30,7 +30,7 @@ export function HeroSection() {
             </blockquote>
 
             <p className={styles.description}>
-              Limbah rumah tangga seperti minyak jelantah dan sisa dapur tidak berakhir mencemari selokan. Kami mengolahnya menjadi nutrisi tanah, bio-kompos, dan energi penggerak kebun smart farming komunitas yang hasilnya langsung membiayai program pangan dan sosial keluarga sekitar.
+              Sesuatu yang sering dianggap tak berguna berubah menjadi luar biasa dan bernilai di tangan yang spesial. Bersama kawan-kawan disabilitas dan penggerak komunitas, kami mengolah minyak jelantah dan limbah dapur menjadi produk bernilai tinggi, bio-kompos, serta sayuran segar kebun pintar yang menghidupkan kemandirian bersama.
             </p>
 
             <div className={styles.ctaGroup}>

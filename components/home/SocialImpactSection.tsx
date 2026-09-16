@@ -7,19 +7,19 @@ import { Badge } from "@/components/ui/Badge";
 
 const programs = [
   {
-    title: "Program Pangan & Nutrisi Keluarga",
-    beneficiaries: "Keluarga Lansia & Prasejahtera",
-    desc: "Distribusi berkala sayuran hidroponik segar bebas pestisida (selada, pakcoy, kangkung) langsung dari greenhouse komunitas ke meja makan warga yang membutuhkan.",
+    title: "Ruang Karya Teman Istimewa",
+    beneficiaries: "Kawan-Kawan Disabilitas",
+    desc: "Pusat kreasi pembuatan lilin aromaterapi dan sabun alami ramah lingkungan yang dikelola dengan dedikasi dan ketelatenan tinggi oleh teman-teman disabilitas.",
   },
   {
-    title: "Beasiswa Tunas Kampung",
-    beneficiaries: "Anak-Anak Petani & Kader Lingkungan",
-    desc: "Bantuan perlengkapan belajar, seragam, dan dana pembinaan pendidikan yang bersumber dari surplus penjualan produk sirkular dan pupuk olahan warga.",
+    title: "Program Pangan Sehat & Nutrisi",
+    beneficiaries: "Lansia & Keluarga Warga Sekitar",
+    desc: "Distribusi berkala sayuran hidroponik segar bebas pestisida (selada, pakcoy, kangkung) langsung dari greenhouse komunitas untuk menunjang gizi harian warga.",
   },
   {
-    title: "Pelatihan Kemandirian Warga",
-    beneficiaries: "Pemuda & Kelompok Wanita Tani",
-    desc: "Pendidikan keterampilan budidaya smart farming terapan dan formulasi produk sabun/lilin agar warga memiliki kapasitas usaha mandiri yang berdaya tahan.",
+    title: "Tunas Mandiri & Beasiswa Belajar",
+    beneficiaries: "Generasi Muda & Kader Lingkungan",
+    desc: "Dukungan sarana belajar, pembinaan bakat, dan pendidikan keterampilan sirkular yang didanai dari surplus karya olahan bernilai tinggi.",
   },
 ];
 
@@ -35,9 +35,9 @@ export function SocialImpactSection() {
     >
       <Container>
         <SectionHeading
-          eyebrow="Dampak Sosial & Martabat"
-          title="Nilai Ekonomi Limbah yang Mengalir Menjadi Kekuatan Komunitas"
-          description="Kami tidak menjalankan pendekatan belas kasihan. Setiap bantuan sosial lahir dari kerja nyata ekosistem sirkular yang terhormat dan mandiri."
+          eyebrow="Dampak Positif & Ruang Inklusif"
+          title="Menjadi Bernilai di Tangan yang Spesial"
+          description="Bukan belas kasihan yang kami tawarkan, melainkan panggung bagi setiap potensi. Kawan-kawan disabilitas dan warga membuktikan bahwa ketelatenan istimewa mampu melahirkan karya berkualitas tinggi dan manfaat yang membanggakan."
         />
 
         {/* Impact Photo & Narrative Banner */}
@@ -85,10 +85,10 @@ export function SocialImpactSection() {
                   color: "var(--color-text-primary)",
                 }}
               >
-                Kemandirian, Bukan Ketergantungan
+                Karya Bermartabat, Menginspirasi Sesama
               </p>
               <p style={{ fontSize: "var(--font-size-caption)", color: "var(--color-text-secondary)", marginTop: "var(--space-1)" }}>
-                Dari limbah minyak dan sisa sayur dapur yang disetor donatur, warga menghasilkan sayuran segar berkualitas tinggi dan pupuk organik mandiri tanpa pupuk kimia sintetis.
+                Dari minyak jelantah dan sisa dapur yang Anda percayakan, kawan-kawan istimewa dan komunitas kami merajut karya bernilai tinggi dan menghadirkan panen pangan segar bagi lingkungan sekitar.
               </p>
             </div>
           </div>
