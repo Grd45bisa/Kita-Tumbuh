@@ -85,7 +85,7 @@ export function WhyItMatters() {
                 marginBottom: "var(--space-2)",
               }}
             >
-              Di Kampung Smart Farming
+              Di Kampung Setara Smart Farming
             </span>
             <h3
               style={{

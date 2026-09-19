@@ -23,55 +23,55 @@ const galleryData: GalleryItem[] = [
     id: "gal-1",
     categoryLabel: "Karya Istimewa",
     badgeVariant: "brand",
-    title: "Meracik Lilin Aromaterapi Bersama Teman Istimewa",
-    desc: "Kawan disabilitas meracik lilin beraroma herbal dan sabun alami dari minyak jelantah terfiltrasi dengan ketelatenan tinggi di bengkel kerja komunitas.",
-    imageSrc: "/images/gallery-inclusive-workshop.jpg",
-    imageAlt: "Kawan disabilitas sedang dengan telaten menuangkan lilin aromaterapi dan meracik sabun alami di meja workshop komunitas",
+    title: "Workshop Kreasi Mandiri Anak-Anak Difabel",
+    desc: "Anak-anak dan kawan difabel meracik lilin aromaterapi dan sabun ramah lingkungan dari minyak jelantah dengan ketelatenan tinggi di bengkel kerja komunitas.",
+    imageSrc: "/images/data-difabel-workshop-jelantah.jpg",
+    imageAlt: "Anak-anak difabel bekerja sama dengan teliti dan gembira di workshop pembuatan lilin dan sabun alami",
   },
   {
     id: "gal-2",
-    categoryLabel: "Karya Istimewa",
-    badgeVariant: "brand",
-    title: "Mahakarya Lilin & Sabun Alami Bernilai Tinggi",
-    desc: "Koleksi produk olahan siap guna bernilai tinggi dalam kemasan ramah lingkungan, membuktikan limbah menjadi bernilai di tangan yang spesial.",
-    imageSrc: "/images/gallery-handcrafted-products.jpg",
-    imageAlt: "Deretan lilin aromaterapi dalam toples kaca amber dan sabun batang herbal alami tertata rapi di atas meja kayu",
+    categoryLabel: "Smart Farming",
+    badgeVariant: "success",
+    title: "Greenhouse Hidroponik Inklusif & Cerdas",
+    desc: "Anak-anak difabel merawat instalasi sayuran hidroponik dengan ceria di kebun cerdas modern Kampung Setara Smart Farming.",
+    imageSrc: "/images/hero-difabel-smart-farming.jpg",
+    imageAlt: "Anak-anak difabel dengan ceria merawat sayuran hidroponik di greenhouse modern",
   },
   {
     id: "gal-3",
-    categoryLabel: "Smart Farming",
-    badgeVariant: "success",
-    title: "Greenhouse Cerdas & Sensor Kelembapan",
-    desc: "Perawatan instalasi sayuran hidroponik bebas pestisida berbantuan sensor kelembapan otomatis yang ramah dipantau oleh petani penggerak warga.",
-    imageSrc: "/images/gallery-smart-greenhouse.jpg",
-    imageAlt: "Petani wanita penggerak warga tersenyum memeriksa sensor kelembapan pada instalasi sayuran hijau hidroponik greenhouse",
+    categoryLabel: "Dampak & Panen",
+    badgeVariant: "brand",
+    title: "Senyum Bangga Panen Sayuran Segar",
+    desc: "Kebahagiaan dan kebanggaan anak-anak difabel memegang keranjang sayuran hidroponik segar hasil rawatan mereka sendiri.",
+    imageSrc: "/images/data-difabel-panen-hidroponik.jpg",
+    imageAlt: "Anak-anak difabel tersenyum lebar dan bangga memegang keranjang sayuran segar hidroponik hasil panen",
   },
   {
     id: "gal-4",
-    categoryLabel: "Dampak & Berbagi",
+    categoryLabel: "Edukasi Sirkular",
     badgeVariant: "success",
-    title: "Penyaluran Panen Segar ke Warga & Lansia",
-    desc: "Kebahagiaan kader dan warga saat membagikan keranjang sayuran hidroponik segar hasil panen kebun kepada para lansia sekitar tanpa sekat.",
-    imageSrc: "/images/gallery-harvest-distribution.jpg",
-    imageAlt: "Kader sukarelawan muda dengan penuh hormat menyerahkan keranjang sayuran segar hidroponik kepada seorang nenek di depan beranda rumahnya",
+    title: "Edukasi Tunas Tani & Pupuk Bio-Kompos",
+    desc: "Anak-anak difabel belajar mencampur bio-kompos organik dan menanam bibit sayuran di kebun komunitas dengan penuh kegembiraan.",
+    imageSrc: "/images/data-difabel-kompos-tanaman.jpg",
+    imageAlt: "Anak-anak difabel tertawa ceria saat belajar merawat tanah dan bibit tanaman sayur dengan pupuk kompos alami",
   },
   {
     id: "gal-5",
-    categoryLabel: "Aksi Komunitas",
+    categoryLabel: "Teknologi Setara",
     badgeVariant: "neutral",
-    title: "Penyetoran & Penimbangan Jelantah di Pos Warga",
-    desc: "Warga menyetorkan jeriken minyak jelantah bersih ke pos pengumpulan terpadu untuk ditimbang dan dicatat transparan ke dalam sistem terbuka.",
-    imageSrc: "/images/gallery-waste-collection.jpg",
-    imageAlt: "Ibu warga menyerahkan jeriken minyak jelantah kepada petugas relawan di meja penimbangan pos pengumpulan komunitas",
+    title: "Pemantauan Sensor Pintar Kebun Cerdas",
+    desc: "Anak difabel didampingi instruktur memantau grafik kelembapan dan nutrisi sayuran hidroponik melalui tablet cerdas di greenhouse.",
+    imageSrc: "/images/data-difabel-smart-monitoring.jpg",
+    imageAlt: "Anak difabel di kursi roda memantau sensor cerdas kelembapan tanah hidroponik melalui layar digital tablet",
   },
   {
     id: "gal-6",
-    categoryLabel: "Smart Farming",
+    categoryLabel: "Kemandirian Warga",
     badgeVariant: "neutral",
-    title: "Pusat Pengolahan & Bedengan Bio-Kompos",
-    desc: "Fasilitas swadaya warga untuk pemilahan jelantah dan fermentasi biokompos organik yang menjadi sumber nutrisi kebun hidroponik mandiri.",
-    imageSrc: "/images/waste-transformation-process.jpg",
-    imageAlt: "Fasilitas pemilahan limbah jelantah dan rumah kompos bio-organik warga Kampung Smart Farming",
+    title: "Potret Kebersamaan & Gotong Royong Tanpa Sekat",
+    desc: "Momen kebersamaan anak-anak difabel, pemuda desa, dan kader relawan membuktikan kemandirian sirkular lahir dari gotong royong yang setara.",
+    imageSrc: "/images/impact-difabel-komunitas.jpg",
+    imageAlt: "Anak-anak difabel bersama para relawan komunitas berpose bersama dengan bangga di kebun hidroponik Kampung Setara Smart Farming",
   },
 ];
 
@@ -136,8 +136,8 @@ export function GallerySection() {
         <div className={styles.sectionHeader}>
           <SectionHeading
             eyebrow="Kolase Jejak Nyata"
-            title="Galeri Visual & Mahakarya Komunitas"
-            description="Merekam setiap momen autentik dari dapur rumah tangga, ruang karya teman istimewa, kebun cerdas hidroponik, hingga berkah kebersamaan warga."
+            title="Galeri Visual & Mahakarya Anak-Anak Difabel"
+            description="Merekam setiap momen autentik dari bengkel kerja kreatif anak-anak istimewa, greenhouse cerdas hidroponik, hingga berkah kebersamaan warga Kampung Setara Smart Farming."
           />
           <div className={styles.hint}>
             <svg className={styles.hintIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

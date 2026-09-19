@@ -46,7 +46,7 @@ export function WasteCategorySection() {
       <Container>
         <SectionHeading
           eyebrow="Panduan Penerimaan Bahan Baku"
-          title="Kategori Limbah yang Diterima di Kampung Smart Farming"
+          title="Kategori Limbah yang Diterima di Kampung Setara Smart Farming"
           description="Demi menjaga kemurnian nutrisi pupuk dan keamanan para kader pengolah, kami menerapkan standardisasi pemilahan yang ketat."
         />
 

@@ -98,7 +98,7 @@ export const breakpoints = {
 } as const;
 
 export const brand = {
-  name: "KAMPUNG SMART FARMING",
+  name: "KAMPUNG SETARA SMART FARMING",
   tagline: "Dari Limbah, Tumbuh Manfaat.",
   statement: "SAMPAH KALIAN SANGAT BERARTI BAGI KAMI",
 } as const;

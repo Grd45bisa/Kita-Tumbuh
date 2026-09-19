@@ -6,14 +6,14 @@ import { getCollectionPoints } from "@/lib/domain/collection-points";
 import { env } from "@/lib/env";
 
 export const metadata: Metadata = {
-  title: "Donasikan Limbah — Kampung Smart Farming",
+  title: "Donasikan Limbah — Kampung Setara Smart Farming",
   description:
-    "Donasikan minyak jelantah, limbah organik, atau plastik dapur kamu. Limbahmu akan kami olah menjadi produk bernilai dan manfaat sosial nyata bagi komunitas.",
+    "Donasikan minyak jelantah, limbah organik, atau plastik dapur kamu. Limbahmu akan kami olah bersama anak-anak difabel menjadi produk bernilai dan manfaat sosial nyata bagi komunitas.",
   alternates: {
     canonical: `${env.siteUrl}/donasikan`,
   },
   openGraph: {
-    title: "Donasikan Limbah — Kampung Smart Farming",
+    title: "Donasikan Limbah — Kampung Setara Smart Farming",
     description:
       "Mulai donasi limbah dapur kamu. Gratis, mudah, dan langsung berdampak.",
     url: `${env.siteUrl}/donasikan`,
@@ -55,7 +55,7 @@ export default async function DonasikanPage() {
               margin: "0 0 var(--space-3)",
             }}
           >
-            KITA TUMBUH — KAMPUNG SMART FARMING
+            KITA TUMBUH — KAMPUNG SETARA SMART FARMING
           </p>
           <h1
             style={{

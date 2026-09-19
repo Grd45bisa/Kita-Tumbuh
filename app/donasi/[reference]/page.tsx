@@ -13,7 +13,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { reference } = await params;
   return {
-    title: `Donasi ${reference} — Kampung Smart Farming`,
+    title: `Donasi ${reference} — Kampung Setara Smart Farming`,
     description: `Lacak status donasi limbahmu dengan referensi ${reference}.`,
     alternates: {
       canonical: `${env.siteUrl}/donasi/${reference}`,

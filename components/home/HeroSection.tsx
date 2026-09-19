@@ -14,11 +14,11 @@ export function HeroSection() {
           <div className={styles.contentCol}>
             <div className={styles.eyebrowBadge}>
               <Badge variant="brand">KITA TUMBUH</Badge>
-              <Badge variant="neutral">Ekosistem Mandiri</Badge>
+              <Badge variant="neutral">Ekosistem Mandiri Inklusif</Badge>
             </div>
 
             <h1 id="hero-title" className={styles.brandHeadline}>
-              KAMPUNG SMART FARMING
+              KAMPUNG SETARA SMART FARMING
             </h1>
 
             <p className={styles.brandTagline}>
@@ -30,7 +30,7 @@ export function HeroSection() {
             </blockquote>
 
             <p className={styles.description}>
-              Sesuatu yang sering dianggap tak berguna berubah menjadi luar biasa dan bernilai di tangan yang spesial. Bersama kawan-kawan disabilitas dan penggerak komunitas, kami mengolah minyak jelantah dan limbah dapur menjadi produk bernilai tinggi, bio-kompos, serta sayuran segar kebun pintar yang menghidupkan kemandirian bersama.
+              Sesuatu yang sering dianggap tak berguna bersemi menjadi luar biasa di tangan anak-anak istimewa. Bersama anak-anak difabel dan penggerak komunitas, kami mengolah minyak jelantah serta limbah dapur menjadi produk bernilai tinggi, pupuk bio-kompos, dan sayuran hidroponik kebun cerdas yang memupuk martabat dan kemandirian nyata.
             </p>
 
             <div className={styles.ctaGroup}>
@@ -46,12 +46,12 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Right: Human & Smart Farming Photo Frame */}
+          {/* Right: Human & Smart Farming Photo Frame focusing on children with disabilities */}
           <div className={styles.imageCol}>
             <div className={styles.imageFrame}>
               <Image
-                src="/images/hero-community-farm.jpg"
-                alt="Warga dan petani lokal merawat kebun sayur hidroponik dan irigasi cerdas di greenhouse Kampung Smart Farming"
+                src="/images/hero-difabel-smart-farming.jpg"
+                alt="Anak-anak difabel dengan ceria dan penuh semangat merawat tanaman sayur hidroponik cerdas di greenhouse Kampung Setara Smart Farming"
                 width={800}
                 height={500}
                 priority
@@ -60,7 +60,7 @@ export function HeroSection() {
               <div className={styles.imageCaption}>
                 <span className={styles.captionDot} aria-hidden="true" />
                 <span>
-                  Greenhouse Kebun Komunitas: Memanfaatkan pupuk bio-organik hasil olahan limbah warga.
+                  Greenhouse Edukasi Inklusif: Anak-anak difabel berdaya merawat sayuran hidroponik cerdas dengan pupuk bio-kompos hasil olahan limbah warga.
                 </span>
               </div>
             </div>

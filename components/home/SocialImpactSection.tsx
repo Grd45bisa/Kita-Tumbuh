@@ -60,14 +60,14 @@ export function SocialImpactSection() {
             }}
           >
             <Image
-              src="/images/community-harvest-impact.jpg"
-              alt="Warga kader komunitas dengan bangga memegang hasil panen sayuran segar dan pupuk bio-organik olahan limbah"
+              src="/images/impact-difabel-komunitas.jpg"
+              alt="Anak-anak difabel bersama penggerak komunitas tersenyum bangga di kebun hidroponik cerdas Kampung Setara Smart Farming memegang hasil panen segar"
               width={1200}
               height={640}
               style={{
                 width: "100%",
                 height: "auto",
-                maxHeight: "440px",
+                maxHeight: "480px",
                 objectFit: "cover",
               }}
             />
@@ -88,7 +88,7 @@ export function SocialImpactSection() {
                 Karya Bermartabat, Menginspirasi Sesama
               </p>
               <p style={{ fontSize: "var(--font-size-caption)", color: "var(--color-text-secondary)", marginTop: "var(--space-1)" }}>
-                Dari minyak jelantah dan sisa dapur yang Anda percayakan, kawan-kawan istimewa dan komunitas kami merajut karya bernilai tinggi dan menghadirkan panen pangan segar bagi lingkungan sekitar.
+                Dari minyak jelantah dan sisa dapur yang Anda donasikan, anak-anak dan kawan difabel bersama komunitas kami merajut karya bernilai tinggi dan menghadirkan panen pangan segar bagi lingkungan sekitar.
               </p>
             </div>
           </div>

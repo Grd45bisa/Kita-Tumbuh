@@ -14,19 +14,58 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 66px;
-  gap: var(--space-4);
+  height: 60px;
+  gap: var(--space-2);
+}
+
+@media (min-width: 480px) {
+  .inner {
+    height: 64px;
+    gap: var(--space-3);
+  }
+}
+
+@media (min-width: 768px) {
+  .inner {
+    height: 70px;
+    gap: var(--space-4);
+  }
+}
+
+@media (min-width: 1024px) {
+  .inner {
+    height: 76px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .inner {
+    height: 84px;
+  }
 }
 
 /* Brand Wordmark */
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   text-decoration: none;
   min-width: 0;
-  flex-shrink: 0;
+  flex-shrink: 1;
   transition: opacity 0.2s ease;
+}
+
+@media (min-width: 480px) {
+  .brand {
+    gap: 10px;
+  }
+}
+
+@media (min-width: 768px) {
+  .brand {
+    gap: 12px;
+    flex-shrink: 0;
+  }
 }
 
 .brand:hover {
@@ -34,12 +73,34 @@
 }
 
 .brandLogo {
-  width: 38px;
-  height: 38px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 7px;
   flex-shrink: 0;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 480px) {
+  .brandLogo {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+  }
+}
+
+@media (min-width: 768px) {
+  .brandLogo {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .brandLogo {
+    width: 42px;
+    height: 42px;
+  }
 }
 
 .brand:hover .brandLogo {
@@ -55,29 +116,84 @@
 
 .brandTitle {
   font-family: var(--font-sans);
-  font-size: 1.05rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   color: var(--color-green-800);
   line-height: 1.2;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40vw;
 }
 
 .brandSubtitle {
-  font-size: 0.72rem;
+  font-size: 0.6rem;
   color: var(--color-earth-600);
   font-weight: 500;
   letter-spacing: 0.01em;
   margin-top: 1px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40vw;
 }
 
-@media (max-width: 480px) {
+@media (min-width: 400px) {
   .brandTitle {
     font-size: 0.92rem;
+    max-width: none;
   }
   .brandSubtitle {
-    font-size: 0.68rem;
+    font-size: 0.66rem;
+    max-width: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .brandTitle {
+    font-size: 1rem;
+  }
+  .brandSubtitle {
+    font-size: 0.7rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .brandTitle {
+    font-size: 1.05rem;
+  }
+  .brandSubtitle {
+    font-size: 0.72rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .brandTitle {
+    font-size: 1.15rem;
+  }
+  .brandSubtitle {
+    font-size: 0.76rem;
+  }
+}
+
+/* Tablet Navigation (compact icons-less links, shown 768–1023px) */
+.tabletNav {
+  display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tabletNav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex: 1;
+    justify-content: center;
+  }
+  .tabletNav::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -85,24 +201,45 @@
 .desktopNav {
   display: none;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 @media (min-width: 1024px) {
   .desktopNav {
     display: flex;
+    gap: 2px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .desktopNav {
+    gap: 4px;
   }
 }
 
 .navLink {
-  font-size: 0.875rem;
+  font-size: 0.82rem;
   font-weight: 500;
   color: var(--color-text-secondary);
   text-decoration: none;
-  padding: 8px 14px;
+  padding: 7px 10px;
   border-radius: var(--radius-full);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  .navLink {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .navLink {
+    font-size: 0.875rem;
+    padding: 8px 14px;
+  }
 }
 
 .navLink:hover {
@@ -119,6 +256,7 @@
   .desktopCta {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
   }
 }
 
@@ -126,16 +264,30 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 18px;
+  padding: 8px 16px;
   background-color: var(--color-brand-primary);
   color: #FFFFFF;
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: 0.82rem;
   font-weight: 600;
   border-radius: var(--radius-full);
   box-shadow: 0 2px 8px rgba(23, 59, 42, 0.15);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
+}
+
+@media (min-width: 1280px) {
+  .ctaButton {
+    padding: 9px 18px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .ctaButton {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
 }
 
 .ctaButton:hover {
@@ -146,10 +298,45 @@
 
 .ctaButton svg {
   transition: transform 0.2s ease;
+  flex-shrink: 0;
 }
 
 .ctaButton:hover svg {
   transform: translateX(2px);
+}
+
+/* Tablet CTA (compact, icon-only pill shown 768–1023px) */
+.tabletCta {
+  display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tabletCta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+}
+
+.tabletCtaButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background-color: var(--color-brand-primary);
+  color: #FFFFFF;
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 8px rgba(23, 59, 42, 0.15);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tabletCtaButton:hover {
+  background-color: var(--color-brand-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(23, 59, 42, 0.25);
 }
 
 /* Mobile Toggle Button */
@@ -157,8 +344,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   padding: 0;
   background-color: rgba(23, 59, 42, 0.04);
   border: 1px solid rgba(226, 218, 203, 0.85);
@@ -166,6 +353,14 @@
   color: var(--color-green-800);
   cursor: pointer;
   transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+@media (min-width: 480px) {
+  .mobileToggle {
+    width: 42px;
+    height: 42px;
+  }
 }
 
 .mobileToggle:hover,
@@ -174,7 +369,7 @@
   border-color: var(--color-green-700);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .mobileToggle {
     display: none;
   }

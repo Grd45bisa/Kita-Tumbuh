@@ -46,7 +46,7 @@ export function Header() {
         <Container>
           <div className={styles.inner}>
             {/* Brand Wordmark with Logo */}
-            <Link href="/" className={styles.brand} aria-label="Beranda Kampung Smart Farming">
+            <Link href="/" className={styles.brand} aria-label="Beranda KITA TUMBUH">
               <Image
                 src="/images/Logo.png"
                 alt="Logo KITA TUMBUH"
@@ -56,27 +56,21 @@ export function Header() {
                 priority
               />
               <div className={styles.brandText}>
-                <span className={styles.brandTitle}>KAMPUNG SMART FARMING</span>
-                <span className={styles.brandSubtitle}>KITA TUMBUH &bull; Dari Limbah, Tumbuh Manfaat.</span>
+                <span className={styles.brandTitle}>KITA TUMBUH</span>
+                <span className={styles.brandSubtitle}>KAMPUNG SETARA SMART FARMING</span>
               </div>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className={styles.desktopNav} aria-label="Navigasi Utama">
+            {/* Tablet Navigation (compact links, 768–1023px) */}
+            <nav className={styles.tabletNav} aria-label="Navigasi Utama">
               <Link href="#cara-kerja" className={styles.navLink}>
                 Cara Kerja
               </Link>
               <Link href="#kategori-limbah" className={styles.navLink}>
-                Kategori Limbah
-              </Link>
-              <Link href="#smart-farming" className={styles.navLink}>
-                Smart Farming
+                Donasi
               </Link>
               <Link href="#dampak-sosial" className={styles.navLink}>
-                Dampak Sosial
-              </Link>
-              <Link href="#produk" className={styles.navLink}>
-                Produk
+                Dampak
               </Link>
               <Link href="#galeri" className={styles.navLink}>
                 Galeri
@@ -86,7 +80,26 @@ export function Header() {
               </Link>
             </nav>
 
-            {/* Primary CTA (Desktop & Tablet) */}
+            {/* Desktop Navigation */}
+            <nav className={styles.desktopNav} aria-label="Navigasi Utama">
+              <Link href="#cara-kerja" className={styles.navLink}>
+                Cara Kerja
+              </Link>
+              <Link href="#kategori-limbah" className={styles.navLink}>
+                Bisa Didonasikan
+              </Link>
+              <Link href="#dampak-sosial" className={styles.navLink}>
+                Dampak
+              </Link>
+              <Link href="#galeri" className={styles.navLink}>
+                Galeri
+              </Link>
+              <Link href="#transparansi" className={styles.navLink}>
+                Transparansi
+              </Link>
+            </nav>
+
+            {/* Primary CTA (Desktop, >=1024px) */}
             <div className={styles.desktopCta}>
               <Link href="/donasikan" className={styles.ctaButton}>
                 Donasikan Limbah
@@ -102,6 +115,29 @@ export function Header() {
                   aria-hidden="true"
                 >
                   <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+
+            {/* Compact CTA (Tablet, 768–1023px) */}
+            <div className={styles.tabletCta}>
+              <Link
+                href="/donasikan"
+                className={styles.tabletCtaButton}
+                aria-label="Donasikan Limbah"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M12 5v14M5 12h14" />
                 </svg>
               </Link>
             </div>
@@ -171,8 +207,8 @@ export function Header() {
                     className={styles.drawerLogo}
                   />
                   <div>
-                    <span className={styles.drawerBrandTitle}>KAMPUNG SMART FARMING</span>
-                    <span className={styles.drawerBrandSubtitle}>KITA TUMBUH</span>
+                    <span className={styles.drawerBrandTitle}>KITA TUMBUH</span>
+                    <span className={styles.drawerBrandSubtitle}>Kampung Setara Smart Farming</span>
                   </div>
                 </div>
                 <button
@@ -204,37 +240,27 @@ export function Header() {
                 <ul className={styles.drawerList}>
                   <li>
                     <Link href="#cara-kerja" className={styles.drawerLink} onClick={closeDrawer}>
-                      Cara Kerja Sirkular
+                      Cara Kerja
                     </Link>
                   </li>
                   <li>
                     <Link href="#kategori-limbah" className={styles.drawerLink} onClick={closeDrawer}>
-                      Kategori Limbah
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#smart-farming" className={styles.drawerLink} onClick={closeDrawer}>
-                      Smart Farming Komunitas
+                      Bisa Didonasikan
                     </Link>
                   </li>
                   <li>
                     <Link href="#dampak-sosial" className={styles.drawerLink} onClick={closeDrawer}>
-                      Dampak Sosial
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="#produk" className={styles.drawerLink} onClick={closeDrawer}>
-                      Produk Olahan & Pangan
+                      Dampak untuk Anak Difabel
                     </Link>
                   </li>
                   <li>
                     <Link href="#galeri" className={styles.drawerLink} onClick={closeDrawer}>
-                      Galeri Dokumentasi
+                      Galeri Kegiatan
                     </Link>
                   </li>
                   <li>
                     <Link href="#transparansi" className={styles.drawerLink} onClick={closeDrawer}>
-                      Transparansi & Alur Jejak
+                      Transparansi
                     </Link>
                   </li>
                 </ul>
@@ -247,7 +273,7 @@ export function Header() {
                   className={styles.drawerCtaButton}
                   onClick={closeDrawer}
                 >
-                  Donasikan Limbah Sekarang
+                  Donasikan Sampahmu
                   <svg
                     width="16"
                     height="16"
@@ -263,7 +289,7 @@ export function Header() {
                   </svg>
                 </Link>
                 <p className={styles.drawerNote}>
-                  Inisiatif gerakan sirkular gotong royong warga mandiri.
+                  Tidak harus banyak. Mulai dari yang ada di rumah.
                 </p>
               </div>
             </div>

@@ -1,30 +1,28 @@
 import type { Metadata } from "next";
 import "@/styles/globals.css";
-import { SkipLink } from "@/components/ui/SkipLink";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: {
-    default: "KITA TUMBUH — Kampung Smart Farming | Dari Limbah, Tumbuh Manfaat",
-    template: "%s | KITA TUMBUH — Kampung Smart Farming",
+    default: "KITA TUMBUH — Dari Limbah, Tumbuh Manfaat",
+    template: "%s | KITA TUMBUH",
   },
   description:
-    "KITA TUMBUH — Platform ekonomi sirkular sosial Kampung Smart Farming. Mengubah limbah menjadi karya bernilai di tangan yang spesial dan menghadirkan dampak sosial nyata bagi masyarakat. Sampah kalian sangat berarti bagi kami.",
+    "Gerakan donasi sampah terpilah yang mengubah minyak jelantah, sampah organik, dan plastik menjadi karya bernilai untuk mendukung anak-anak difabel.",
   keywords: [
     "KITA TUMBUH",
-    "Kampung Smart Farming",
+    "donasi sampah",
+    "donasi minyak jelantah",
+    "anak difabel berdaya",
     "ekonomi sirkular",
-    "donasi limbah",
-    "minyak jelantah",
-    "dampak sosial",
-    "smart farming",
-    "pemberdayaan masyarakat",
+    "pengolahan sampah organik",
+    "Kampung Setara Smart Farming",
   ],
-  authors: [{ name: "KITA TUMBUH — Kampung Smart Farming" }],
-  creator: "KITA TUMBUH — Kampung Smart Farming",
-  publisher: "KITA TUMBUH — Kampung Smart Farming",
+  authors: [{ name: "KITA TUMBUH" }],
+  creator: "KITA TUMBUH",
+  publisher: "KITA TUMBUH",
   icons: {
     icon: "/images/Logo.png",
     shortcut: "/images/Logo.png",
@@ -39,16 +37,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     url: "/",
-    siteName: "KITA TUMBUH — Kampung Smart Farming",
-    title: "KITA TUMBUH — Kampung Smart Farming | Dari Limbah, Tumbuh Manfaat",
+    siteName: "KITA TUMBUH",
+    title: "KITA TUMBUH — Dari Limbah, Tumbuh Manfaat",
     description:
-      "KITA TUMBUH — Platform ekonomi sirkular sosial Kampung Smart Farming. Mengubah limbah menjadi karya bernilai di tangan yang spesial dan menghadirkan dampak sosial nyata bagi masyarakat. Sampah kalian sangat berarti bagi kami.",
+      "Ubah sampah terpilah dari rumah menjadi karya bernilai dan ruang tumbuh bagi anak-anak difabel.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "KITA TUMBUH — Kampung Smart Farming | Dari Limbah, Tumbuh Manfaat",
+    title: "KITA TUMBUH — Dari Limbah, Tumbuh Manfaat",
     description:
-      "KITA TUMBUH — Platform ekonomi sirkular sosial Kampung Smart Farming. Mengubah limbah menjadi produk bernilai dan dampak sosial nyata.",
+      "Ubah sampah terpilah dari rumah menjadi karya bernilai dan ruang tumbuh bagi anak-anak difabel.",
   },
   robots: {
     index: true,
@@ -64,18 +62,9 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body>
-        <SkipLink targetId="main-content" />
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            minHeight: "100vh",
-          }}
-        >
+        <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
           <Header />
-          <main id="main-content" style={{ flex: 1 }}>
-            {children}
-          </main>
+          <main id="main-content" style={{ flex: 1 }}>{children}</main>
           <Footer />
         </div>
       </body>

@@ -4,7 +4,6 @@ export * from "./Badge";
 export * from "./Card";
 export * from "./Input";
 export * from "./Container";
-export * from "./SkipLink";
 export * from "./Select";
 export * from "./Textarea";
 export * from "./RadioGroup";
