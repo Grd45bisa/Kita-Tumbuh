@@ -63,17 +63,17 @@ export function Header() {
 
             {/* Tablet Navigation (compact links, 768–1023px) */}
             <nav className={styles.tabletNav} aria-label="Navigasi Utama">
-              <Link href="#cara-kerja" className={styles.navLink}>
-                Cara Kerja
+              <Link href="#galeri" className={styles.navLink}>
+                Galeri
               </Link>
               <Link href="#kategori-limbah" className={styles.navLink}>
                 Donasi
               </Link>
+              <Link href="#cara-kerja" className={styles.navLink}>
+                Cara Kerja
+              </Link>
               <Link href="#dampak-sosial" className={styles.navLink}>
                 Dampak
-              </Link>
-              <Link href="#galeri" className={styles.navLink}>
-                Galeri
               </Link>
               <Link href="#transparansi" className={styles.navLink}>
                 Transparansi
@@ -82,17 +82,17 @@ export function Header() {
 
             {/* Desktop Navigation */}
             <nav className={styles.desktopNav} aria-label="Navigasi Utama">
-              <Link href="#cara-kerja" className={styles.navLink}>
-                Cara Kerja
+              <Link href="#galeri" className={styles.navLink}>
+                Galeri
               </Link>
               <Link href="#kategori-limbah" className={styles.navLink}>
                 Bisa Didonasikan
               </Link>
+              <Link href="#cara-kerja" className={styles.navLink}>
+                Cara Kerja
+              </Link>
               <Link href="#dampak-sosial" className={styles.navLink}>
                 Dampak
-              </Link>
-              <Link href="#galeri" className={styles.navLink}>
-                Galeri
               </Link>
               <Link href="#transparansi" className={styles.navLink}>
                 Transparansi
@@ -239,8 +239,8 @@ export function Header() {
                 <div className={styles.drawerSectionTitle}>Menu Navigasi</div>
                 <ul className={styles.drawerList}>
                   <li>
-                    <Link href="#cara-kerja" className={styles.drawerLink} onClick={closeDrawer}>
-                      Cara Kerja
+                    <Link href="#galeri" className={styles.drawerLink} onClick={closeDrawer}>
+                      Galeri Kegiatan
                     </Link>
                   </li>
                   <li>
@@ -249,13 +249,13 @@ export function Header() {
                     </Link>
                   </li>
                   <li>
-                    <Link href="#dampak-sosial" className={styles.drawerLink} onClick={closeDrawer}>
-                      Dampak untuk Anak Difabel
+                    <Link href="#cara-kerja" className={styles.drawerLink} onClick={closeDrawer}>
+                      Cara Kerja
                     </Link>
                   </li>
                   <li>
-                    <Link href="#galeri" className={styles.drawerLink} onClick={closeDrawer}>
-                      Galeri Kegiatan
+                    <Link href="#dampak-sosial" className={styles.drawerLink} onClick={closeDrawer}>
+                      Dampak untuk Anak Difabel
                     </Link>
                   </li>
                   <li>

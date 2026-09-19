@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "@/styles/globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { IntroLoader } from "@/components/layout/IntroLoader";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
@@ -62,6 +63,7 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body>
+        <IntroLoader />
         <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
           <Header />
           <main id="main-content" style={{ flex: 1 }}>{children}</main>

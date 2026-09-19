@@ -796,6 +796,14 @@ Gunakan max content width agar halaman tidak terasa kosong atau melebar tanpa ba
 
 # 17. UX States
 
+### Intro kunjungan pertama
+
+- Layar tulang dengan satu daun hijau berurat yang melayang mengikuti lintasan angin melingkar, identitas KITA TUMBUH, dan teks status singkat.
+- Tampil sekali per sesi tab, minimal 2 detik. Jika halaman masih memuat, animasi terus berulang hingga event load browser selesai, tanpa batas waktu otomatis. Setelah kedua syarat terpenuhi, overlay memudar selama 350 ms. Satu putaran daun berlangsung 2 detik; daun berukuran 60% dari ilustrasi awal.
+- Escape dapat melewati intro. Selama overlay tampil, halaman di belakangnya tidak menerima fokus atau scroll; keduanya dipulihkan setelah intro selesai.
+- Preferensi reduced motion melewati intro. Loading rute memakai ilustrasi daun yang sama dalam keadaan diam untuk preferensi tersebut.
+- Tanpa JavaScript, intro tidak menutupi konten halaman.
+
 Setiap feature wajib memiliki minimal:
 
 ```text

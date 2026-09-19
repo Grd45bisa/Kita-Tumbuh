@@ -1,0 +1,78 @@
+.loader {
+  width: min(100%, 340px);
+  margin-inline: auto;
+  text-align: center;
+}
+
+.scene { width: 100%; height: auto; overflow: visible; }
+.blade { fill: var(--color-green-500); stroke: var(--color-green-800); stroke-width: 1.8; }
+.fold { fill: var(--color-green-600); opacity: .45; }
+.veins { stroke: var(--color-green-800); stroke-width: 1.2; opacity: .65; }
+.stem { stroke: var(--color-green-800); stroke-width: 2.5; }
+.shadow { fill: var(--color-green-200); animation: shadowBreathe 2s ease-in-out infinite; }
+.trail {
+  stroke: var(--color-green-300);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-dasharray: 32 68;
+  animation: windTrail 2s linear infinite;
+}
+.breeze { stroke: var(--color-green-200); stroke-width: 1.8; stroke-linecap: round; }
+.flyingLeaf {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  animation: leafFlight 2s linear infinite;
+}
+.tumblingLeaf {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: leafTumble 2s linear infinite;
+}
+.stillLeaf { display: none; }
+.brand { margin: .3rem 0 .4rem; color: var(--color-green-800); font-size: .9rem; font-weight: 750; letter-spacing: .2em; }
+.tagline { color: var(--color-earth-700); font: italic 1rem/1.5 var(--font-serif); }
+.caption { margin-top: 1.65rem; color: var(--color-text-secondary); font-size: .75rem; }
+.dots { display: inline-block; width: 1em; text-align: left; }
+
+@keyframes windTrail {
+  0% { stroke-dashoffset: 32; opacity: 0; }
+  20% { opacity: .8; }
+  80% { opacity: .65; }
+  100% { stroke-dashoffset: -100; opacity: 0; }
+}
+@keyframes leafFlight {
+  0% { transform: translate(38px, 132px); opacity: 0; }
+  10% { transform: translate(70px, 130px); opacity: 1; }
+  22% { transform: translate(112px, 103px); }
+  34% { transform: translate(137px, 61px); }
+  45% { transform: translate(182px, 45px); }
+  55% { transform: translate(217px, 77px); }
+  64% { transform: translate(192px, 119px); }
+  73% { transform: translate(145px, 116px); }
+  82% { transform: translate(151px, 78px); }
+  91% { transform: translate(211px, 78px); opacity: 1; }
+  100% { transform: translate(284px, 107px); opacity: 0; }
+}
+@keyframes leafTumble {
+  0% { transform: rotate(0deg); }
+  8% { transform: rotate(-8deg); }
+  20% { transform: rotate(6deg); }
+  /* rolling loop as the leaf crosses the spiral in the middle of the path */
+  38% { transform: rotate(0deg); }
+  55% { transform: rotate(360deg); }
+  64% { transform: rotate(360deg); }
+  /* settles back into a gentle glide for the rest of the flight */
+  78% { transform: rotate(345deg); }
+  91% { transform: rotate(352deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes shadowBreathe {
+  0%, 100% { opacity: .5; }
+  50% { opacity: .15; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flyingLeaf, .trail, .breeze { display: none; }
+  .stillLeaf { display: block; }
+  .shadow { animation: none; }
+}

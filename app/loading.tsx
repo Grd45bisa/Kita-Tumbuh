@@ -1,4 +1,5 @@
 import { Container } from "@/components/ui/Container";
+import { LeafLoader } from "@/components/ui/LeafLoader";
 
 export default function Loading() {
   return (
@@ -13,34 +14,9 @@ export default function Loading() {
           gap: "var(--space-4)",
           textAlign: "center",
         }}
-        aria-live="polite"
-        aria-busy="true"
       >
-        <div
-          style={{
-            width: "32px",
-            height: "32px",
-            border: "3px solid var(--color-border-default)",
-            borderTopColor: "var(--color-brand-primary)",
-            borderRadius: "var(--radius-full)",
-            animation: "spin 0.8s linear infinite",
-          }}
-          aria-hidden="true"
-        />
-        <p
-          style={{
-            fontSize: "var(--font-size-body-m)",
-            color: "var(--color-text-secondary)",
-          }}
-        >
-          Memuat halaman...
-        </p>
+        <LeafLoader />
       </div>
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </Container>
   );
 }
