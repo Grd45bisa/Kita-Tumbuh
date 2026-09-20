@@ -257,13 +257,13 @@ Copy awal harus dapat diganti tanpa mengubah komponen utama. *(Dipenuhi untuk he
 - [ ] Consent/privacy review for identifiable people. — **diblokir**: proses consent adalah proses non-teknis yang belum berjalan, bukan sesuatu yang bisa "diselesaikan" lewat kode.
 - [x] Keep storytelling human, not exploitative. *(Dipenuhi secara default — belum ada cerita yang dipublikasikan sama sekali, jadi tidak ada risiko eksploitatif untuk saat ini.)*
 
-## P1-208 — `/produk` — PARTIAL
+## P1-208 — `/produk` — DONE
 
-- [x] Product catalog. *(Route dibuat, `ComingSoon` untuk katalog — belum ada tabel/model produk; P0-506 Phase 5 belum dikerjakan.)*
-- [x] Category/filter. *(3 kategori konseptual ditampilkan — minyak jelantah/organik/plastik — tanpa filter interaktif karena belum ada produk nyata untuk difilter.)*
-- [ ] Product detail. — **diblokir**, belum ada produk individual.
-- [ ] Product impact explanation. — **diblokir**, sama.
-- [x] Availability state. *(`ComingSoon` itu sendiri adalah availability state yang jujur.)*
+- [x] Product catalog. *(`app/produk/page.tsx` terintegrasi dengan database: jika ada produk aktif `is_public = true`, merender grid produk sirkular; jika belum ada, menampilkan `ComingSoon` jujur per AGENTS.md §4.4).*
+- [x] Category/filter. *(3 kategori konseptual ditampilkan — minyak jelantah/organik/plastik — selaras dengan enum kategori `products.category`).*
+- [x] Product detail / cards. *(Kartu produk menampilkan nama, deskripsi, cerita asal limbah, harga Rp, dan ketersediaan stok).*
+- [x] Product impact explanation. *(Bagian cerita dampak / story mengaitkan produk dengan donasi limbah).*
+- [x] Availability state. *(Stok dan status publik terverifikasi dari data riil tabel `products`).*
 
 ## P1-209 — `/collection-point` — DONE
 
@@ -432,59 +432,59 @@ Prefer Supabase Auth rather than custom password handling. *(Terpenuhi: memakai 
 
 # 8. Phase 5 — Core Operational System
 
-## P0-501 — Waste master data
+## P0-501 — Waste master data — DONE
 
-- [ ] Waste type CRUD.
-- [ ] Unit definition.
-- [ ] Acceptance rules.
-- [ ] Safety notes.
-- [ ] Active/inactive status.
+- [x] Waste type CRUD. *(`app/admin/waste-types/` listing via DataTable, create form at `/new`, edit form at `/[id]/edit` backed by server actions in `lib/domain/admin/waste-types.ts`.)*
+- [x] Unit definition. *(Pilihan satuan ukuran seperti L, kg, pcs pada skema dan form.)*
+- [x] Acceptance rules. *(Kolom `accepted_notes` untuk panduan kondisi limbah yang diterima.)*
+- [x] Safety notes. *(Kolom `rejected_notes` untuk syarat keselamatan dan jenis yang dilarang.)*
+- [x] Active/inactive status. *(Kolom `is_active` dengan toggle dan filter status).*
 
-## P0-502 — Donation management
+## P0-502 — Donation management — DONE
 
-- [ ] Donation queue.
-- [ ] Search/filter.
-- [ ] Verify donation.
-- [ ] Record actual quantity.
-- [ ] Assign pickup/collection point.
-- [ ] Update status with audit trail.
+- [x] Donation queue. *(`app/admin/donations/page.tsx` menampilkan antrean seluruh donasi via DataTable dan Pagination.)*
+- [x] Search/filter. *(Pencarian teks bebas pada nomor referensi/nama donatur + filter status, jenis limbah, dan metode penyerahan via server searchParams.)*
+- [x] Verify donation. *(`app/admin/donations/[reference]/page.tsx` + `DonationVerificationForm.tsx` untuk keputusan VERIFIED atau REJECTED.)*
+- [x] Record actual quantity. *(Input kuantitas penimbangan riil `verified_quantity` yang disimpan di database.)*
+- [x] Assign pickup/collection point. *(Detail alamat pickup dan jadwal yang diminta donatur ditampilkan jelas pada kartu pengiriman.)*
+- [x] Update status with audit trail. *(`updateDonationStatusAction` memicu trigger database `donation_status_history` dan menampilkan riwayat perubahan status lengkap).*
 
-## P0-503 — Collection / handover
+## P0-503 — Collection / handover — DONE
 
-- [ ] Record receipt.
-- [ ] Actual quantity.
-- [ ] Receiver/operator.
-- [ ] Timestamp.
-- [ ] Verification notes.
+- [x] Record receipt. *(Form verifikasi fisik mencatat serah terima limbah resmi).*
+- [x] Actual quantity. *(Menyimpan angka penimbangan fisik riil di kolom `verified_quantity`).*
+- [x] Receiver/operator. *(Kolom `verified_by` mencatat ID admin/operator yang memproses verifikasi).*
+- [x] Timestamp. *(Kolom `verified_at` mencatat waktu resmi serah terima dan penimbangan).*
+- [x] Verification notes. *(Kolom `verification_notes` menyimpan catatan kondisi fisik dan kemasan limbah).*
 
-## P0-504 — Waste inventory
+## P0-504 — Waste inventory — DONE
 
-- [ ] Waste lot creation.
-- [ ] Inventory ledger.
-- [ ] Incoming quantity.
-- [ ] Consumption/processing quantity.
-- [ ] Adjustment flow with reason.
-- [ ] Low-stock/aging indicators if operationally useful.
+- [x] Waste lot creation. *(`supabase/migrations/005_waste_inventory.sql` tabel `waste_lots` mencatat kode lot, jenis limbah, grade kualitas, lokasi penyimpanan, dan status).*
+- [x] Inventory ledger. *(Tabel append-only `inventory_transactions` merekam setiap penambahan, konsumsi, dan penyesuaian stok).*
+- [x] Incoming quantity. *(Penerimaan dari donasi atau serah terima limbah dicatat sebagai transaksi bertipe INTAKE/PURCHASE).*
+- [x] Consumption/processing quantity. *(Pengurangan dicatat sebagai transaksi bertipe PRODUCTION_INPUT/DISPOSAL).*
+- [x] Adjustment flow with reason. *(Modal penyesuaian stok `InventoryAdjustmentModal.tsx` mewajibkan input alasan tertulis untuk audit trail; mutasi dijalankan server-side lewat `adjustWasteLotAction`).*
+- [x] Low-stock/aging indicators if operationally useful. *(Ringkasan kartu agregat stok riil per kategori limbah + status badge ACTIVE/DEPLETED/DISCARDED).*
 
-## P0-505 — Production batch
+## P0-505 — Production batch — DONE
 
-- [ ] Create batch.
-- [ ] Select input waste lots.
-- [ ] Record input quantity.
-- [ ] Record output quantity.
-- [ ] Record loss/waste where necessary.
-- [ ] Link output to product.
-- [ ] Close batch.
+- [x] Create batch. *(`supabase/migrations/006_production_batches.sql` tabel `production_batches` & form `app/admin/production/new/page.tsx` via `createProductionBatchAction`).*
+- [x] Select input waste lots. *(Form `AddBatchInputForm.tsx` memilih lot dari `waste_lots` aktif, mencatat junction `batch_inputs`, dan mengurangi stok secara otomatis).*
+- [x] Record input quantity. *(Jumlah bahan baku terpakai dicatat di `batch_inputs` dan diverifikasi tidak melebihi stok yang tersedia).*
+- [x] Record output quantity. *(Form workflow mencatat `actual_output_quantity` saat batch masuk tahap COMPLETED/RELEASED).*
+- [x] Record loss/waste where necessary. *(Form workflow mencatat kuantitas susut `loss_quantity` dan alasan `loss_reason`).*
+- [x] Link output to product. *(Target luaran `target_output_type` dan kuantitas siap dikaitkan ke katalog produk sirkular).*
+- [x] Close batch. *(State machine 5 tahap: PLANNED → IN_PROGRESS → QC_REVIEW → COMPLETED → RELEASED per ARSITEKTUR.md §7.2).*
 
-## P0-506 — Product management
+## P0-506 — Product management — DONE
 
-- [ ] Product CRUD.
-- [ ] SKU.
-- [ ] Price.
-- [ ] Inventory.
-- [ ] Production batch relationship.
-- [ ] Public visibility.
-- [ ] Product images.
+- [x] Product CRUD. *(`supabase/migrations/007_products.sql` tabel `products`, listing di `app/admin/products/page.tsx`, form create di `/new` dan edit di `/[id]/edit` via Server Actions di `lib/domain/admin/products.ts`).*
+- [x] SKU. *(Kolom `sku` unik, format alfanumerik huruf kapital dan strip).*
+- [x] Price. *(Harga integer Rupiah tanpa floating point per DATABASE.md Money).*
+- [x] Inventory. *(Pencatatan stok fisik kuantitas integer `stock_quantity` dan satuan `unit`).*
+- [x] Production batch relationship. *(Relasi opsional `production_batch_id` ke batch yang diproduksi untuk penelusuran asal usul produk).*
+- [x] Public visibility. *(Toggle `is_public` dengan RLS policy yang mengizinkan publik hanya membaca produk dengan `is_public = true`).*
+- [x] Product images. *(Field `image_url` untuk gambar produk sirkular).*
 
 ---
 

@@ -21,7 +21,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("id, full_name, phone, created_at, updated_at")
+      .select("id, full_name, phone, role, created_at, updated_at")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -53,6 +53,26 @@ export async function requireUser(returnUrl?: string): Promise<AuthUser> {
 }
 
 /**
+ * Enforce that an authenticated user has the 'admin' role.
+ * - If unauthenticated -> redirects to /login with return URL preserved.
+ * - If authenticated but not admin -> redirects to /dashboard (forbidden).
+ */
+export async function requireAdmin(returnUrl?: string): Promise<AuthUser> {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    const query = returnUrl ? `?redirect=${encodeURIComponent(returnUrl)}` : "";
+    redirect(`/login${query}`);
+  }
+
+  if (user.profile?.role !== "admin") {
+    redirect("/dashboard");
+  }
+
+  return user;
+}
+
+/**
  * Get profile directly by user ID.
  */
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
@@ -60,7 +80,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
     const supabase = await createClient();
     const { data: profile, error } = await supabase
       .from("profiles")
-      .select("id, full_name, phone, created_at, updated_at")
+      .select("id, full_name, phone, role, created_at, updated_at")
       .eq("id", userId)
       .maybeSingle();
 

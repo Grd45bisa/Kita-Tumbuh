@@ -6,11 +6,7 @@ import { MemberLayout } from "@/components/member/MemberLayout";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
-import {
-  DONATION_STATUS_LABELS,
-  WASTE_TYPE_LABELS,
-  type DonationStatus,
-} from "@/types/donation";
+import { DONATION_STATUS_LABELS, type DonationStatus } from "@/types/donation";
 import styles from "@/components/member/MemberArea.module.css";
 
 export const metadata: Metadata = {
@@ -48,10 +44,18 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
 
   const supabase = await createClient();
 
+  // Waste types for the filter dropdown — fetched from the DB rather than
+  // a hardcoded label map, so filter values always match real waste_type
+  // slugs (see lib/domain/waste-types.ts for the same source of truth).
+  const { data: wasteTypes } = await supabase
+    .from("waste_types")
+    .select("slug, name")
+    .order("sort_order", { ascending: true });
+
   let query = supabase
     .from("donations")
     .select(
-      "id, reference_number, waste_type, delivery_method, status, estimated_quantity, verified_quantity, unit, created_at",
+      "id, reference, waste_type_slug, waste_type_name, method, status, estimated_quantity, verified_quantity, unit, created_at",
       { count: "exact" }
     )
     .eq("user_id", user.id);
@@ -60,10 +64,10 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
     query = query.eq("status", currentStatus);
   }
   if (currentWasteType) {
-    query = query.eq("waste_type", currentWasteType);
+    query = query.eq("waste_type_slug", currentWasteType);
   }
   if (currentMethod) {
-    query = query.eq("delivery_method", currentMethod);
+    query = query.eq("method", currentMethod);
   }
   if (currentFrom) {
     query = query.gte("created_at", `${currentFrom}T00:00:00.000Z`);
@@ -138,9 +142,9 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
             className={styles.filterSelect}
           >
             <option value="">Semua Jenis</option>
-            {Object.entries(WASTE_TYPE_LABELS).map(([k, label]) => (
-              <option key={k} value={k}>
-                {label}
+            {(wasteTypes || []).map((wt) => (
+              <option key={wt.slug} value={wt.slug}>
+                {wt.name}
               </option>
             ))}
           </select>
@@ -219,13 +223,13 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
         <>
           <div className={styles.donationList}>
             {donations.map((d) => (
-              <Link key={d.id} href={`/donasi/${d.reference_number}`} className={styles.donationItem}>
+              <Link key={d.id} href={`/donasi/${d.reference}`} className={styles.donationItem}>
                 <div className={styles.donationMain}>
-                  <div className={styles.donationRef}>#{d.reference_number}</div>
+                  <div className={styles.donationRef}>#{d.reference}</div>
                   <div className={styles.donationMeta}>
-                    <span>{WASTE_TYPE_LABELS[d.waste_type] || d.waste_type}</span>
+                    <span>{d.waste_type_name}</span>
                     <span>•</span>
-                    <span>{d.delivery_method === "PICKUP" ? "Jemput (Pickup)" : "Antar Mandiri"}</span>
+                    <span>{d.method === "PICKUP" ? "Jemput (Pickup)" : "Antar Mandiri"}</span>
                     <span>•</span>
                     <span>
                       {new Date(d.created_at).toLocaleDateString("id-ID", {

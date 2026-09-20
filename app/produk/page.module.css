@@ -78,3 +78,95 @@
   line-height: var(--line-height-body-s);
   margin: 0;
 }
+
+.productGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  margin-top: var(--space-8);
+}
+
+@media (min-width: 640px) {
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .productGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.productCard {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--elevation-1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.productCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-2);
+}
+
+.productCategory {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-brand-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.productName {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2);
+}
+
+.productDescription {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body-s);
+  margin: 0 0 var(--space-4);
+  flex-grow: 1;
+}
+
+.productStory {
+  padding: var(--space-3);
+  background-color: var(--color-paper-50);
+  border-left: 3px solid var(--color-brand-primary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
+  font-style: italic;
+}
+
+.productFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: var(--space-4);
+  margin-top: auto;
+}
+
+.productPrice {
+  font-size: var(--font-size-heading-s);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brand-primary);
+}
+
+.productStock {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+

@@ -276,6 +276,25 @@ KITA TUMBUH
 
 ---
 
+## ADR-018 — Admin Role and Operational Security Architecture (Phase 5)
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** The platform requires an operational back-office under `/admin` for waste intake, verification, inventory, and production management. Full 5-role RBAC (`SUPER_ADMIN`, `OPERATOR`, `FINANCE`, `SOCIAL_OFFICER`, `MEMBER`) is planned for Phase 9.
+
+**Decision:** Add a single `role` column to `public.profiles` (`TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('member', 'admin'))`). Operational routes live strictly under `/admin/*`. Use a three-tier defense-in-depth model:
+1. `middleware.ts`: checks session presence on `/admin/*` routes;
+2. `lib/auth/session.ts` `requireAdmin()`: checks `user.profile.role === 'admin'` on Server Components and mutations, redirecting non-admins to `/dashboard`;
+3. Database RLS: `public.is_admin()` security-definer helper grants full write/read access to domain tables (`donations`, `waste_types`, `pickup_requests`, `inventory_transactions`, etc.).
+
+**Why:** Using `TEXT` with a `CHECK` constraint avoids rigid PostgreSQL `ENUM` alteration locks, enabling straightforward expansion into multi-role RBAC in Phase 9 without data migrations or downtime.
+
+**Consequences:** Role assignments are set directly in database by project owners. Member area (`/dashboard`, `/riwayat`, `/profil`) remains strictly separated from `/admin`. Non-admin members attempting to access `/admin` are redirected to `/dashboard` rather than receiving a deceptive login prompt.
+
+---
+
 ## Agent Rule
 
 Before introducing a major architectural change, search this document first.

@@ -12,6 +12,7 @@ export const STATUS_LABELS: Record<DonationStatus, string> = {
   PROCESSED: "Sedang Diproses",
   CONVERTED: "Menjadi Produk",
   IMPACTED: "Dampak Tercatat",
+  REJECTED: "Donasi Ditolak",
 };
 
 const STATUS_ORDER: DonationStatus[] = [
@@ -36,6 +37,7 @@ const STATUS_DESCRIPTIONS: Record<DonationStatus, string> = {
   CONVERTED:
     "Pengolahan selesai. Batch material telah berhasil ditransformasikan menjadi produk bermanfaat yang siap dimanfaatkan atau didistribusikan.",
   IMPACTED: "Dampak dari donasi ini telah dicatat berdasarkan data yang terverifikasi.",
+  REJECTED: "Limbah tidak memenuhi syarat penerimaan atau kondisi melebihi batas toleransi pengolahan.",
 };
 
 interface DonationTimelineProps {

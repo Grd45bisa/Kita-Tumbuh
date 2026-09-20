@@ -9,6 +9,7 @@ export interface UserProfile {
   id: string;
   full_name: string;
   phone: string;
+  role: "member" | "admin";
   created_at: string;
   updated_at: string;
 }

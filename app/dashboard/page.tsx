@@ -6,7 +6,7 @@ import { MemberLayout } from "@/components/member/MemberLayout";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { DONATION_STATUS_LABELS, WASTE_TYPE_LABELS, type DonationStatus } from "@/types/donation";
+import { DONATION_STATUS_LABELS, type DonationStatus } from "@/types/donation";
 import styles from "@/components/member/MemberArea.module.css";
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default async function DashboardPage() {
   // Query donations belonging strictly to this user
   const { data: rawDonations } = await supabase
     .from("donations")
-    .select("id, reference_number, waste_type, delivery_method, status, estimated_quantity, verified_quantity, unit, created_at")
+    .select("id, reference, waste_type_name, method, status, estimated_quantity, verified_quantity, unit, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -43,10 +43,10 @@ export default async function DashboardPage() {
     const isVerified = d.verified_quantity !== null && d.verified_quantity !== undefined;
     if (isVerified) hasVerifiedData = true;
 
-    if (d.unit === "LITER") {
+    if (d.unit === "L") {
       if (isVerified) totalVerifiedLiters += Number(d.verified_quantity);
       else totalEstimatedLiters += Number(d.estimated_quantity);
-    } else if (d.unit === "KG") {
+    } else if (d.unit === "kg") {
       if (isVerified) totalVerifiedKg += Number(d.verified_quantity);
       else totalEstimatedKg += Number(d.estimated_quantity);
     }
@@ -54,7 +54,7 @@ export default async function DashboardPage() {
 
   // Active pickups
   const activePickup = donations.find(
-    (d) => d.delivery_method === "PICKUP" && ["SUBMITTED", "SCHEDULED"].includes(d.status)
+    (d) => d.method === "PICKUP" && ["SUBMITTED", "SCHEDULED"].includes(d.status)
   );
 
   const displayName = user.profile?.full_name || user.email.split("@")[0];
@@ -72,14 +72,14 @@ export default async function DashboardPage() {
         <div className={styles.activePickupBanner}>
           <div className={styles.pickupBannerInfo}>
             <div className={styles.pickupBannerTitle}>
-              Jadwal Penjemputan Aktif — #{activePickup.reference_number}
+              Jadwal Penjemputan Aktif — #{activePickup.reference}
             </div>
             <div className={styles.pickupBannerDesc}>
-              Limbah {WASTE_TYPE_LABELS[activePickup.waste_type] || activePickup.waste_type} sedang
+              Limbah {activePickup.waste_type_name} sedang
               dalam antrean penjemputan (Status: {DONATION_STATUS_LABELS[activePickup.status as DonationStatus]}).
             </div>
           </div>
-          <Link href={`/donasi/${activePickup.reference_number}`}>
+          <Link href={`/donasi/${activePickup.reference}`}>
             <Button variant="secondary" size="sm">
               Pantau Status
             </Button>
@@ -154,13 +154,13 @@ export default async function DashboardPage() {
       ) : (
         <div className={styles.donationList}>
           {donations.slice(0, 5).map((d) => (
-            <Link key={d.id} href={`/donasi/${d.reference_number}`} className={styles.donationItem}>
+            <Link key={d.id} href={`/donasi/${d.reference}`} className={styles.donationItem}>
               <div className={styles.donationMain}>
-                <div className={styles.donationRef}>#{d.reference_number}</div>
+                <div className={styles.donationRef}>#{d.reference}</div>
                 <div className={styles.donationMeta}>
-                  <span>{WASTE_TYPE_LABELS[d.waste_type] || d.waste_type}</span>
+                  <span>{d.waste_type_name}</span>
                   <span>•</span>
-                  <span>{d.delivery_method === "PICKUP" ? "Jemput (Pickup)" : "Antar Mandiri"}</span>
+                  <span>{d.method === "PICKUP" ? "Jemput (Pickup)" : "Antar Mandiri"}</span>
                   <span>•</span>
                   <span>
                     {new Date(d.created_at).toLocaleDateString("id-ID", {

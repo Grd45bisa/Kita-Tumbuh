@@ -1,0 +1,112 @@
+.header {
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  font-size: var(--font-size-heading-m);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.subtitle {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.statCard {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.statLabel {
+  font-size: var(--font-size-caption);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-brand-primary);
+}
+
+.statValue {
+  font-size: var(--font-size-heading-l);
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.statHint {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+.quickActionsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.actionCard {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--transition-fast);
+}
+
+.actionCard:hover {
+  border-color: var(--color-green-200, #bbf7d0);
+  box-shadow: var(--elevation-1);
+  transform: translateY(-2px);
+}
+
+.actionTitle {
+  font-size: var(--font-size-body-m);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.actionDesc {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.actionLinkText {
+  font-size: var(--font-size-caption);
+  font-weight: 600;
+  color: var(--color-brand-primary);
+  margin-top: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

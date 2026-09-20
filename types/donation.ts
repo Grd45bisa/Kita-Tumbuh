@@ -10,7 +10,8 @@ export type DonationStatus =
   | "SORTED"
   | "PROCESSED"
   | "CONVERTED"
-  | "IMPACTED";
+  | "IMPACTED"
+  | "REJECTED";
 
 export const DONATION_STATUS_LABELS: Record<DonationStatus, string> = {
   SUBMITTED: "Terkirim",
@@ -21,6 +22,7 @@ export const DONATION_STATUS_LABELS: Record<DonationStatus, string> = {
   PROCESSED: "Diproses",
   CONVERTED: "Dikonversi",
   IMPACTED: "Berdampak Sosial",
+  REJECTED: "Ditolak",
 };
 
 export const WASTE_TYPE_LABELS: Record<string, string> = {
@@ -45,6 +47,7 @@ export interface WasteType {
   accepted_notes: string | null;
   rejected_notes: string | null;
   sort_order: number;
+  is_active?: boolean;
 }
 
 export interface CollectionPoint {

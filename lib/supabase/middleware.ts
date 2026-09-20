@@ -50,15 +50,16 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // 1. Protected Member Area Routes
-  const isMemberRoute =
+  // 1. Protected Member Area and Admin Routes (require session)
+  const isProtectedRoute =
+    pathname.startsWith("/admin") ||
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/riwayat") ||
     pathname.startsWith("/profil") ||
     pathname.startsWith("/impact") ||
     pathname.startsWith("/pickup");
 
-  if (isMemberRoute && !user) {
+  if (isProtectedRoute && !user) {
     const redirectUrl = new URL("/login", request.url);
     const returnPath = pathname + request.nextUrl.search;
     redirectUrl.searchParams.set("redirect", returnPath);
