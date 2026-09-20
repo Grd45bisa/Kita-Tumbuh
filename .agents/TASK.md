@@ -733,172 +733,149 @@ Avoid storing sensitive values unnecessarily.
 
 ---
 
-# 13. Phase 10 — SEO & AI Discoverability
+# 13. Phase 10 — SEO & AI Discoverability ✅
 
-## P0-1001 — Metadata foundation
+## P0-1001 — Metadata foundation ✅
 
-- [ ] Unique title per indexable page.
-- [ ] Useful description.
-- [ ] Canonical URL.
-- [ ] Open Graph image/title/description.
-- [ ] Correct robots policy.
+- [x] Unique title per indexable page. *(Sudah ada di seluruh halaman publik sejak Phase 0-9; audit menemukan homepage `app/page.tsx` kehilangan `alternates.canonical`/`openGraph` sama sekali — diperbaiki.)*
+- [x] Useful description.
+- [x] Canonical URL. *(Ditambahkan ke `app/page.tsx`; sudah ada di 10 halaman publik lain.)*
+- [x] Open Graph image/title/description. *(Ditambahkan ke `app/page.tsx`, `app/cerita`, `app/produk`, `app/program`, `app/produk/[slug]`, `app/program/[slug]` yang sebelumnya tidak punya `openGraph` sama sekali. Tidak menambahkan field `images` karena tidak ada asset OG image nyata — anti-fabrikasi berlaku juga di sini.)*
+- [x] Correct robots policy. *(`app/robots.ts` **diperbaiki**: `disallow` sebelumnya menyebut `/member/` — rute yang TIDAK PERNAH ADA di sistem — dan tidak menyertakan rute member nyata `/riwayat`, `/profil`, `/impact`, `/pickup`, `/checkout` yang sebenarnya auth-gated di `lib/supabase/middleware.ts`. Sekarang disallow list dicocokkan langsung terhadap middleware, dijaga test `tests/seo-structured-data.test.mjs`.)*
 
-## P0-1002 — Sitemap
+## P0-1002 — Sitemap ✅
 
-- [ ] Generate dynamic sitemap for public indexable routes.
-- [ ] Exclude authenticated/admin pages.
-- [ ] Exclude duplicate/temporary URLs.
+- [x] Generate dynamic sitemap for public indexable routes. *(`app/sitemap.ts`, sudah ada sejak Phase 2, diperluas tiap phase publik baru.)*
+- [x] Exclude authenticated/admin pages. *(Tidak ada satu pun rute admin/member di sitemap.)*
+- [x] Exclude duplicate/temporary URLs.
 
-## P0-1003 — Robots
+## P0-1003 — Robots ✅
 
-- [ ] Public pages crawlable.
-- [ ] Private routes blocked appropriately.
-- [ ] Do not accidentally block CSS/critical assets.
+- [x] Public pages crawlable.
+- [x] Private routes blocked appropriately. *(Lihat perbaikan P0-1001 di atas.)*
+- [x] Do not accidentally block CSS/critical assets. *(Next.js menyajikan CSS/JS dari `_next/`, tidak disentuh oleh `disallow` list.)*
 
-## P0-1004 — Structured data
+## P0-1004 — Structured data ✅
 
-Implement only schema types actually supported by page content, such as:
+- [x] Organization. *(`app/page.tsx`, sudah ada.)*
+- [x] WebSite. *(**Ditambahkan** — belum ada sebelumnya, hanya `Organization`.)*
+- [x] BreadcrumbList. *(**Ditambahkan** ke 11 halaman publik yang memakai komponen `<Breadcrumb>` — sebelumnya **tidak satu pun** punya BreadcrumbList JSON-LD meski komentar di `components/ui/Breadcrumb.tsx` sendiri sudah menyebutkan pola ini seharusnya dipasang. Dibuat lewat helper terpusat `lib/content/structured-data.ts` `buildBreadcrumbJsonLd()` yang menerima array `breadcrumbItems` yang SAMA dengan yang dirender visual, agar tidak mungkin drift. Dijaga test regresi.)*
+- [x] FAQPage where eligible and genuinely represented. *(`app/faq/page.tsx`, sudah ada sejak sebelumnya, tidak diduplikasi ke halaman lain.)*
+- [x] Product for product detail pages where data is complete. *(**Ditambahkan** ke `app/produk/[slug]/page.tsx` — nama, deskripsi, SKU, harga, currency, dan ketersediaan stok, semua genuinely dari data produk nyata yang dirender di halaman, bukan diciptakan.)*
+- [ ] Article — **tidak diterapkan**, `/cerita` masih ComingSoon (Phase 7 P1-704 belum dikerjakan), tidak ada konten Article nyata untuk direpresentasikan.
 
-- [ ] Organization.
-- [ ] WebSite.
-- [ ] BreadcrumbList.
-- [ ] FAQPage where eligible and genuinely represented.
-- [ ] Product for product detail pages where data is complete.
-- [ ] Article where story/article content meets the structure.
+## P0-1005 — Semantic content ✅
 
-## P0-1005 — Semantic content
+- [x] One meaningful H1 per primary page. *(Diverifikasi: 2 halaman yang awalnya terdeteksi >1 `<h1>` — `checkout`, `pesanan/[reference]` — ternyata early-return bercabang mutually exclusive, hanya 1 H1 genuinely dirender per request.)*
+- [x] Logical H2/H3 hierarchy.
+- [x] Important information in crawlable HTML. *(Server Components by default sejak Phase 0.)*
+- [x] Image alt text based on actual image purpose. *(Diaudit seluruh `<Image>` di `app/`/`components/` — semua punya `alt` deskriptif spesifik, tidak ada yang generik/kosong.)*
+- [x] Descriptive anchor text.
+- [x] Internal links between conceptually related pages.
 
-- [ ] One meaningful H1 per primary page.
-- [ ] Logical H2/H3 hierarchy.
-- [ ] Important information in crawlable HTML.
-- [ ] Image alt text based on actual image purpose.
-- [ ] Descriptive anchor text.
-- [ ] Internal links between conceptually related pages.
+## P1-1006 — AI-friendly information architecture ✅
 
-## P1-1006 — AI-friendly information architecture
-
-- [ ] Clear organization identity page.
-- [ ] Explicit explanation of accepted waste.
-- [ ] Explicit explanation of operational flow.
-- [ ] Public definitions for impact metrics.
-- [ ] FAQ with direct factual answers.
-- [ ] Stable URLs.
-- [ ] Consistent entity naming across pages.
-- [ ] Avoid keyword stuffing and synthetic filler.
+- [x] Clear organization identity page. *(`/tentang-kami`.)*
+- [x] Explicit explanation of accepted waste. *(`/cara-kerja`, `/faq`.)*
+- [x] Explicit explanation of operational flow. *(`/cara-kerja`, `/dampak` "Perjalanan Limbah ke Dampak".)*
+- [x] Public definitions for impact metrics. *(`lib/domain/impact/definitions.ts`, Phase 8.)*
+- [x] FAQ with direct factual answers.
+- [x] Stable URLs.
+- [x] Consistent entity naming across pages.
+- [x] Avoid keyword stuffing and synthetic filler.
 
 ---
 
-# 14. Phase 11 — Performance
+# 14. Phase 11 — Performance ✅
 
-## P0-1101 — Core page performance
+## P0-1101 — Core page performance ✅
 
-- [ ] Optimize hero imagery.
-- [ ] Avoid unnecessary client-side JavaScript.
-- [ ] Prefer Server Components for static/public content.
-- [ ] Use Client Components only when interaction requires them.
-- [ ] Lazy-load below-the-fold heavy media when appropriate.
-- [ ] Avoid oversized dependencies.
+- [x] Optimize hero imagery. *(`next/image` dipakai konsisten.)*
+- [x] Avoid unnecessary client-side JavaScript. *(Diaudit: 28 client component di `components/`, semua punya bukti interaktivitas nyata — state/event handler — tidak ada kandidat downgrade ke Server Component.)*
+- [x] Prefer Server Components for static/public content. *(Konsisten sejak Phase 0.)*
+- [x] Use Client Components only when interaction requires them.
+- [x] Lazy-load below-the-fold heavy media when appropriate. *(`next/image` lazy-load default kecuali `priority`.)*
+- [x] Avoid oversized dependencies. *(Hanya 5 dependency produksi: `@supabase/ssr`, `@supabase/supabase-js`, `next`, `react`, `react-dom`, `zod` — tidak ada library UI/date/chart besar yang tidak perlu.)*
 
-## P0-1102 — Data fetching strategy
+## P0-1102 — Data fetching strategy ✅
 
-- [ ] Public content: server-side fetch where appropriate.
-- [ ] User data: authenticated server-side access where possible.
-- [ ] Mutations: Server Actions or Route Handlers based on use case.
-- [ ] Avoid fetching sensitive data into client components unnecessarily.
+- [x] Public content: server-side fetch where appropriate.
+- [x] User data: authenticated server-side access where possible.
+- [x] Mutations: Server Actions or Route Handlers based on use case.
+- [x] Avoid fetching sensitive data into client components unnecessarily. *(Diverifikasi: tidak ada satu pun `.tsx` di `app/`/`components/` yang menyentuh `createAdminClient()`/service-role key secara langsung — semua lewat `lib/domain/*`.)*
 
-## P1-1103 — Image strategy
+## P1-1103 — Image strategy ✅
 
-- [ ] Use optimized image delivery.
-- [ ] Explicit dimensions/aspect ratios.
-- [ ] Avoid layout shift.
-- [ ] Define focal crop for editorial imagery.
+- [x] Use optimized image delivery. *(`next/image`, semua gambar lokal di `public/`, tidak butuh konfigurasi `remotePatterns`.)*
+- [x] Explicit dimensions/aspect ratios. *(Diaudit: setiap `<Image>` punya `width`+`height` ATAU `fill`+`sizes` — tidak ada yang `fill` tanpa `sizes`.)*
+- [x] Avoid layout shift. *(Container `fill` selalu punya `position: relative` + `height` eksplisit di CSS.)*
+- [x] Define focal crop for editorial imagery. *(`object-fit`/`object-position` dipakai di CSS terkait.)*
 
-## P1-1104 — Loading performance verification
+## P1-1104 — Loading performance verification — **BELUM DAPAT DIKERJAKAN**
 
-- [ ] Measure key pages with Lighthouse/PageSpeed in staging.
-- [ ] Identify LCP/CLS/INP issues.
-- [ ] Fix actual bottlenecks instead of blindly optimizing.
-
----
-
-# 15. Phase 12 — Accessibility
-
-## P0-1201 — Keyboard accessibility
-
-- [ ] All interactive controls keyboard reachable.
-- [ ] Visible focus state.
-- [ ] Logical tab order.
-- [ ] Dialog focus management.
-- [ ] Escape behavior where relevant.
-
-## P0-1202 — Forms
-
-- [ ] Labels linked to controls.
-- [ ] Error messages associated with fields.
-- [ ] Required state announced correctly.
-- [ ] Do not rely on color alone.
-
-## P0-1203 — Visual accessibility
-
-- [ ] Sufficient contrast.
-- [ ] Text remains readable on mobile.
-- [ ] Focus state visible.
-- [ ] Motion is restrained and can respect reduced-motion preferences.
+- [ ] Measure key pages with Lighthouse/PageSpeed in staging. — **Butuh environment staging nyata (deployment publik) untuk diukur; tidak bisa disimulasikan dari audit kode statis.** Semua item struktural yang bisa diverifikasi dari kode (P0-1101, P0-1102, P1-1103) sudah solid — item ini murni menunggu staging deployment.
+- [ ] Identify LCP/CLS/INP issues. — sama, butuh staging.
+- [ ] Fix actual bottlenecks instead of blindly optimizing. — sama, butuh data pengukuran nyata dulu.
 
 ---
 
-# 16. Phase 13 — Security & Data Integrity
+# 15. Phase 12 — Accessibility ✅
 
-## P0-1301 — Authorization
+## P0-1201 — Keyboard accessibility ✅
 
-- [ ] Every privileged mutation checks authorization server-side.
-- [ ] Admin routes protected.
-- [ ] Member routes protected.
-- [ ] Role escalation prevented.
+- [x] All interactive controls keyboard reachable.
+- [x] Visible focus state. *(`:focus-visible` global di `styles/globals.css`, sudah ada.)*
+- [x] Logical tab order.
+- [x] Dialog focus management. *(**Bug ditemukan & diperbaiki**: satu-satunya modal di aplikasi, `InventoryAdjustmentModal`, punya `role="dialog"`+`aria-modal="true"` tapi TIDAK ADA focus trap, initial focus, atau focus restoration. Diperbaiki: fokus otomatis ke field pertama saat dibuka, Tab focus-trap di dalam dialog, fokus dikembalikan ke trigger element saat ditutup — trigger di-capture lewat lazy-init `useRef` sekali di mount, bukan di `useEffect` yang bisa re-run keliru.)*
+- [x] Escape behavior where relevant. *(**Ditambahkan** — sebelumnya tidak ada listener Escape sama sekali di modal tersebut.)*
 
-## P0-1302 — Supabase Row Level Security
+## P0-1202 — Forms ✅
 
-- [ ] Define RLS policies for user-owned records.
-- [ ] Define staff/admin access policies.
-- [ ] Test unauthorized reads/writes.
-- [ ] Keep service-role credentials server-only.
+- [x] Labels linked to controls. *(`htmlFor`, sudah ada di `Input`/`Select`/`Textarea`.)*
+- [x] Error messages associated with fields. *(`aria-describedby`, sudah ada.)*
+- [x] Required state announced correctly. *(**Bug ditemukan & diperbaiki**: `Select.tsx` dan `Textarea.tsx` mendestructure prop `required` untuk menampilkan tanda `*` visual, tapi TIDAK PERNAH meneruskannya balik ke elemen `<select>`/`<textarea>` asli — screen reader tidak pernah diberi tahu field itu wajib meski tampak wajib secara visual. `Input.tsx` punya gap serupa lewat prop `isRequired` terpisah yang tak pernah dipakai satupun form di codebase. Diperbaiki ketiganya agar `required` native attribute genuinely diteruskan.)*
+- [x] Do not rely on color alone. *(Status pakai Badge dengan label teks, bukan warna saja.)*
 
-## P0-1303 — Input validation
+## P0-1203 — Visual accessibility ✅
 
-- [ ] Validate all externally supplied data.
-- [ ] Validate enums/status transitions.
-- [ ] Validate quantity/unit combinations.
-- [ ] Sanitize rich text/content where applicable.
+- [x] Sufficient contrast. *(**Bug ditemukan & diperbaiki**: `--color-ink-500` [dasar `--color-text-muted`, dipakai luas di 30 file CSS pada ukuran caption/12px dan body-s/14px — keduanya "normal text" WCAG] hanya mencapai rasio kontras 3.71:1 terhadap putih — GAGAL WCAG AA [butuh 4.5:1]. Diperbaiki dari `#7E8780` menjadi `#6B766E`, mencapai 4.73:1 di atas putih dan 4.60:1 di atas `--color-bg-canvas`. Token semantik status [success/warning/danger/info fg-on-bg] diverifikasi semuanya sudah lolos AA sejak awal.)*
+- [x] Text remains readable on mobile.
+- [x] Focus state visible.
+- [x] Motion is restrained and can respect reduced-motion preferences. *(**Gap ditemukan & diperbaiki**: animasi `pulse` di `DonationTimeline` berjalan `infinite` terus-menerus selama halaman terbuka [bukan loading singkat seperti spinner], tapi tidak dihormati `prefers-reduced-motion` — berbeda dari 2 spinner loading pendek lain di codebase yang tidak masalah. Ditambahkan guard.)*
 
-Use a runtime schema validation library such as Zod when appropriate.
+---
 
-## P0-1304 — Mutation integrity
+# 16. Phase 13 — Security & Data Integrity ✅
 
-For important operations use transactional logic where necessary:
+## P0-1301 — Authorization ✅
 
-```text
-Order paid
-   ↓
-Verify payment
-   ↓
-Reserve/decrement inventory
-   ↓
-Record financial event
-```
+- [x] Every privileged mutation checks authorization server-side. *(Fondasi RBAC Phase 9 + audit lanjutan ini.)*
+- [x] Admin routes protected.
+- [x] Member routes protected.
+- [x] Role escalation prevented.
+- [x] **Open redirect ditemukan & diperbaiki (2 lokasi)**: `app/auth/confirm/route.ts` (`?next=`) dan `components/auth/LoginForm.tsx` (`?redirect=`) mengambil parameter query yang bisa dikontrol penyerang lalu menginterpolasikannya langsung ke redirect target pasca-autentikasi TANPA validasi — link phishing `?next=https://evil.example` bisa menukar PKCE code/login genuinely sah lalu mengarahkan korban ke situs jahat. Diperbaiki dengan fungsi sanitasi yang hanya mengizinkan path relatif same-origin (menolak URL absolut, protocol-relative `//`, dan skema tersemat). Dijaga test regresi `tests/open-redirect.test.mjs`.
 
-Similarly:
+## P0-1302 — Supabase Row Level Security ✅
 
-```text
-Production completed
-   ↓
-Consume waste inventory
-   ↓
-Create output inventory
-   ↓
-Record batch completion
-```
+- [x] Define RLS policies for user-owned records.
+- [x] Define staff/admin access policies. *(RBAC granular Phase 9.)*
+- [x] Test unauthorized reads/writes. *(`tests/rbac-permissions.test.mjs`, `tests/rpc-grant-hardening.test.mjs`.)*
+- [x] Keep service-role credentials server-only. *(Diverifikasi ulang: nihil di `app/`/`components/`.)*
 
-Avoid partially successful state transitions.
+## P0-1303 — Input validation ✅
+
+- [x] Validate all externally supplied data. *(Zod di semua Server Action; open redirect fix di atas menutup 2 titik yang luput dari pola Zod karena berupa query param sederhana, bukan form payload.)*
+- [x] Validate enums/status transitions.
+- [x] Validate quantity/unit combinations.
+- [x] Sanitize rich text/content where applicable. *(Tidak ada rich text/HTML input di aplikasi ini — semua teks bebas disimpan sebagai plain text dan di-escape otomatis oleh React saat render, tidak ada `dangerouslySetInnerHTML` untuk konten user kecuali JSON-LD yang datanya selalu server-controlled.)*
+
+## P0-1304 — Mutation integrity ✅
+
+- [x] Order paid → Verify payment → Reserve/decrement inventory → Record financial event. *(`execute_order_payment_confirmation` RPC, Phase 6, diperkuat audit Phase 9.)*
+- [x] Production completed → Consume waste inventory → Create output inventory → Record batch completion. *(**Bug ditemukan & diperbaiki**: `adjustWasteLotAction` [inventory.ts] dan `addBatchInputAction` [production.ts] KEDUANYA memutasi `waste_lots.current_quantity` lewat pola read-then-write klasik tanpa row lock — TOCTOU race condition yang sama persis dengan bug yang sudah ditemukan & diperbaiki 3× sebelumnya di tempat lain [stok order/ADR-020, saldo alokasi sosial, saldo distribusi/ADR-024]. Diperbaiki dengan RPC atomik baru `execute_waste_lot_mutation` [`021_waste_lot_mutation_hardening.sql`] yang mengunci baris `waste_lots` `FOR UPDATE`, memvalidasi kecukupan stok, menerapkan perubahan, dan mencatat ledger — semua dalam satu transaksi. "Create output inventory" dari diagram TASK.md **bukan otomatis**: pembuatan entri produk [`createProductAction`] adalah keputusan bisnis admin yang sengaja manual [nama, harga, deskripsi produk], bukan proses yang bisa/harus otomatis dari `actual_output_quantity` batch — dicatat sebagai desain, bukan gap.)*
+- [x] Avoid partially successful state transitions. *(Divalidasi lewat pola RPC `SECURITY DEFINER` atomik di seluruh sistem: 6 RPC finansial/inventori kritis sekarang konsisten memakai row-lock+transaksi tunggal.)*
+
+**Keterbatasan eksplisit dicatat, bukan ditutup dengan patch dangkal:** `products.stock_quantity` tidak divalidasi silang terhadap `production_batches.actual_output_quantity` — satu produk katalog bisa menerima stok dari banyak batch produksi berbeda seiring waktu, dan `ARSITEKTUR.md §5.8` sendiri menyebut entitas `Product Lot / Inventory` terpisah [memisahkan katalog dari stok fisik per-batch] sebagai desain masa depan yang belum dibangun. Menutup ini dengan asumsi 1:1 produk↔batch akan salah secara model data — ditunda sampai entitas itu genuinely dibangun.
 
 ---
 

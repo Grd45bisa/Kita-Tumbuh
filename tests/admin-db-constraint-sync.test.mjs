@@ -75,22 +75,25 @@ function extractEnumValues(migrationSources, typeName) {
   return values;
 }
 
-test("waste_lots.status values sent by admin code exist in the migration 005 CHECK constraint", () => {
-  const migration = readSource("supabase/migrations/005_waste_inventory.sql");
-  const validStatuses = extractCheckConstraintValues(migration, "status");
+test("waste_lots.status values sent by the atomic mutation RPC exist in the migration 005 CHECK constraint", () => {
+  const migration005 = readSource("supabase/migrations/005_waste_inventory.sql");
+  const validStatuses = extractCheckConstraintValues(migration005, "status");
 
-  const productionSource = readSource("lib/domain/admin/production.ts");
-  // Every string literal assigned as a waste_lots.status value in application
-  // code, e.g. the two branches of `const newLotStatus = cond ? "DEPLETED" : "AVAILABLE"`.
-  const newLotStatusLine = productionSource.match(/const newLotStatus\s*=[^\n]*/);
-  assert.ok(newLotStatusLine, "Expected to find the newLotStatus assignment in production.ts");
-  const usedStatuses = [...newLotStatusLine[0].matchAll(/"([A-Z_]+)"/g)].map((m) => m[1]);
+  // Since the Phase 13 audit (021_waste_lot_mutation_hardening.sql),
+  // waste_lots.status is computed inside the atomic execute_waste_lot_mutation
+  // RPC (v_new_status := CASE ... END), not in application TypeScript
+  // (lib/domain/admin/production.ts / inventory.ts no longer compute or send
+  // a status value directly — they only call the RPC).
+  const rpcSource = readSource("supabase/migrations/021_waste_lot_mutation_hardening.sql");
+  const newStatusLine = rpcSource.match(/v_new_status\s*:=[^\n]*/);
+  assert.ok(newStatusLine, "Expected to find the v_new_status assignment in 021_waste_lot_mutation_hardening.sql");
+  const usedStatuses = [...newStatusLine[0].matchAll(/'([A-Z_]+)'/g)].map((m) => m[1]);
 
-  assert.ok(usedStatuses.length > 0, "Expected to find waste_lots.status literals in production.ts");
+  assert.ok(usedStatuses.length > 0, "Expected to find waste_lots.status literals in the RPC's v_new_status assignment");
   for (const status of usedStatuses) {
     assert.ok(
       validStatuses.includes(status),
-      `production.ts uses waste_lots.status "${status}" which is not in the migration 005 CHECK constraint: [${validStatuses.join(", ")}]`
+      `execute_waste_lot_mutation uses waste_lots.status "${status}" which is not in the migration 005 CHECK constraint: [${validStatuses.join(", ")}]`
     );
   }
 });
@@ -99,17 +102,47 @@ test("inventory_transactions.transaction_type values sent by admin code exist in
   const migration = readSource("supabase/migrations/005_waste_inventory.sql");
   const validTypes = extractCheckConstraintValues(migration, "transaction_type");
 
-  const productionSource = readSource("lib/domain/admin/production.ts");
-  const usedTypes = [...productionSource.matchAll(/transaction_type:\s*"([A-Z_]+)"/g)]
-    .map((m) => m[1]);
+  // Since the Phase 13 audit, most transaction_type values are sent as the
+  // p_transaction_type parameter to the execute_waste_lot_mutation RPC
+  // (021_waste_lot_mutation_hardening.sql), not as a direct
+  // inventory_transactions insert field — except createWasteLotAction's
+  // INTAKE record, which still inserts directly because it accompanies a
+  // brand-new lot (no existing row to race against).
+  const sources = [
+    readSource("lib/domain/admin/production.ts"),
+    readSource("lib/domain/admin/inventory.ts"),
+  ].join("\n");
 
-  assert.ok(usedTypes.length > 0, "Expected to find transaction_type literals in production.ts");
+  const usedTypes = [
+    ...new Set([
+      ...[...sources.matchAll(/transaction_type:\s*"([A-Z_]+)"/g)].map((m) => m[1]),
+      ...[...sources.matchAll(/p_transaction_type:\s*"([A-Z_]+)"/g)].map((m) => m[1]),
+    ]),
+  ];
+
+  assert.ok(usedTypes.length > 0, "Expected to find transaction_type literals in production.ts/inventory.ts");
   for (const type of usedTypes) {
     assert.ok(
       validTypes.includes(type),
-      `production.ts uses inventory_transactions.transaction_type "${type}" which is not in the migration 005 CHECK constraint: [${validTypes.join(", ")}]`
+      `production.ts/inventory.ts uses inventory_transactions.transaction_type "${type}" which is not in the migration 005 CHECK constraint: [${validTypes.join(", ")}]`
     );
   }
+});
+
+test("execute_waste_lot_mutation only accepts transaction_type values from the migration 005 CHECK constraint", () => {
+  const migration005 = readSource("supabase/migrations/005_waste_inventory.sql");
+  const validTypes = extractCheckConstraintValues(migration005, "transaction_type");
+
+  const rpcSource = readSource("supabase/migrations/021_waste_lot_mutation_hardening.sql");
+  const guardMatch = rpcSource.match(/IF p_transaction_type NOT IN \(([^)]+)\)/);
+  assert.ok(guardMatch, "Expected execute_waste_lot_mutation to validate p_transaction_type against an allowlist");
+
+  const guardedTypes = guardMatch[1].split(",").map((v) => v.trim().replace(/^'|'$/g, ""));
+  assert.deepEqual(
+    [...guardedTypes].sort(),
+    [...validTypes].sort(),
+    "execute_waste_lot_mutation's transaction_type allowlist must exactly match the migration 005 CHECK constraint"
+  );
 });
 
 test("donation_status values in UpdateDonationStatusSchema exist in the donation_status enum across all migrations", () => {

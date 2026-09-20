@@ -459,6 +459,38 @@ This directly undermined the page's own stated purpose ("every number here is re
 
 ---
 
+## ADR-029 — Atomic Waste Lot Mutation: The Fourth Instance of the Locked-RPC Pattern
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** The Phase 13 audit found `adjustWasteLotAction` (`lib/domain/admin/inventory.ts`) and `addBatchInputAction` (`lib/domain/admin/production.ts`) both mutating `waste_lots.current_quantity` via an application-level read-then-write: `SELECT current_quantity`, compute the new value and sufficiency check in JavaScript, then `UPDATE` — with no row lock in between. This is the same TOCTOU race class already found and fixed three times before this audit (order stock decrement, ADR-020's implementation-note correction; `execute_social_allocation`'s revenue balance; `execute_distribution`'s allocation balance, ADR-024) — except this time in the waste inventory domain, which is arguably the highest-contention table in the system (donation verification, production allocation, and manual adjustment can all touch the same lot in quick succession).
+
+**Decision:** `supabase/migrations/021_waste_lot_mutation_hardening.sql` adds `execute_waste_lot_mutation`, a single `SECURITY DEFINER` RPC that locks the `waste_lots` row (`FOR UPDATE`), validates the resulting quantity would not go negative, applies the update, and appends the `inventory_transactions` ledger entry — all within one transaction. It follows ADR-028's pattern from the start: explicit `REVOKE`/`GRANT` to `authenticated` plus an in-function `has_permission('waste_inventory', 'write')` guard. Both `adjustWasteLotAction` and `addBatchInputAction` were refactored to call this RPC instead of mutating the table directly. `createWasteLotAction` (which inserts a brand-new lot, not mutating an existing one) was intentionally left unchanged — there is no existing row to race against.
+
+**Why:** Same reasoning as ADR-024, now proven out a fourth time: an application-level check-then-write against a value multiple concurrent admin sessions can touch is never safe without a database-level lock, and a `SECURITY DEFINER` RPC is the established, auditable way to get one while still keeping the operation's business rules (sufficiency, status transition, ledger append) in one reviewable place.
+
+**Consequences:** `tests/mutation-integrity.test.mjs` guards against `waste_lots.current_quantity` ever being written via a direct `.update()` call from `lib/domain/admin/inventory.ts` or `lib/domain/admin/production.ts` again, and asserts both files call the RPC instead. This is now the fourth instance of this exact pattern in the codebase (order stock, social allocation, distribution, waste lot) — ADR-024's consequence note stands confirmed: any future code that checks a derived balance/quantity before writing a dependent record should default to this shape from the start.
+
+---
+
+## ADR-030 — Post-Authentication Redirect Targets Must Be Sanitized to Same-Origin Relative Paths
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** The Phase 13 audit found two open-redirect vulnerabilities: `app/auth/confirm/route.ts` (the PKCE code-exchange callback used by password-reset/email-confirmation links) read a `next` query parameter and interpolated it directly into a `NextResponse.redirect()` target; `components/auth/LoginForm.tsx` did the same with a `redirect` query parameter (set by middleware when bouncing an unauthenticated visitor to `/login`, but readable/settable by anyone via a crafted link) before calling `router.push()`. In both cases, a link like `/login?redirect=https://evil.example` or `/auth/confirm?code=<valid>&next=https://evil.example` would complete a genuine authentication step against the real site — the PKCE code exchange or the login itself both genuinely succeed — and only then send the user on to an attacker-controlled destination, which is what makes an open redirect dangerous in a phishing context: the victim's browser shows the real domain for the security-sensitive part of the flow.
+
+**Decision:** Both call sites now run the query parameter through a local `sanitizePath`/`sanitizeNextPath`/`sanitizeRedirectPath` function before using it: the value must start with exactly one `/` (rejecting absolute URLs and protocol-relative `//` URLs) and must not contain a backslash or a colon (rejecting embedded schemes like `javascript:` and Windows-style backslash tricks). Anything that fails the check falls back to a safe default (`/` for the confirm route, `/dashboard` for login).
+
+**Why:** Every current caller in the codebase only ever sends a hardcoded, server-controlled string for these parameters (see `requestPasswordResetAction` in `lib/auth/actions.ts`) — but that does not make the receiving endpoint safe, since neither endpoint can distinguish "this request genuinely came from our own code" from "this request came from a crafted link with the same query shape." The validation belongs at the point where the untrusted value is consumed, not as an invariant assumed from how the codebase currently happens to call it.
+
+**Consequences:** Any future code that builds a post-auth (or any post-privileged-action) redirect from a client-supplied query parameter must apply the same same-origin-relative-path check. `tests/open-redirect.test.mjs` guards both fixed call sites and independently verifies the sanitization logic rejects the standard payload shapes (absolute URL, protocol-relative, backslash, embedded scheme).
+
+---
+
 ## Agent Rule
 
 Before introducing a major architectural change, search this document first.

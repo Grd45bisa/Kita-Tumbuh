@@ -32,13 +32,14 @@ function readAllMigrations() {
     .map((f) => ({ file: f, sql: readFileSync(resolve(migrationsDir, f), "utf8") }));
 }
 
-// Functions that mutate sensitive financial/beneficiary/order data and MUST
-// never be reachable by an unauthorized session.
+// Functions that mutate sensitive financial/beneficiary/order/inventory data
+// and MUST never be reachable by an unauthorized session.
 const CRITICAL_WRITE_RPCS = [
   "execute_social_allocation",
   "execute_order_payment_confirmation",
   "execute_distribution",
   "update_revenue_reconciliation",
+  "execute_waste_lot_mutation",
 ];
 
 test("every critical write RPC has an explicit REVOKE ... FROM PUBLIC somewhere in the migration set", () => {

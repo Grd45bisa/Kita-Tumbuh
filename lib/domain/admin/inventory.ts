@@ -45,74 +45,38 @@ export async function adjustWasteLotAction(
   try {
     const supabase = await createClient();
 
-    // 1. Fetch current lot
-    const { data: lot, error: fetchErr } = await supabase
-      .from("waste_lots")
-      .select("id, waste_type_id, current_quantity, unit, lot_code")
-      .eq("id", parse.data.waste_lot_id)
-      .single();
-
-    if (fetchErr || !lot) {
-      return { success: false, error: "Data lot limbah tidak ditemukan." };
-    }
-
-    const prevQty = Number(lot.current_quantity);
     const adjQty = Number(parse.data.quantity);
+    const quantityChange = parse.data.adjustment_type === "SUBTRACT" ? -adjQty : adjQty;
 
-    let newQty = prevQty;
-    let changeQty = adjQty;
+    // Atomic: locks the waste_lots row, validates sufficiency, applies the
+    // change, and appends the ledger entry in a single transaction — see
+    // execute_waste_lot_mutation (021_waste_lot_mutation_hardening.sql).
+    // Found during the Phase 13 audit: the previous implementation read
+    // current_quantity, computed the new value in JavaScript, then wrote it
+    // back with no row lock — a TOCTOU race between two concurrent
+    // adjustments on the same lot.
+    const { error } = await supabase.rpc("execute_waste_lot_mutation", {
+      p_waste_lot_id: parse.data.waste_lot_id,
+      p_transaction_type: "ADJUSTMENT",
+      p_quantity_change: quantityChange,
+      p_reason: parse.data.reason,
+      p_reference_id: `ADJ-${Date.now()}`,
+      p_operator_id: admin.id,
+    });
 
-    if (parse.data.adjustment_type === "SUBTRACT") {
-      if (prevQty < adjQty) {
-        return {
-          success: false,
-          error: `Sisa stok tidak mencukupi untuk pengurangan (stok saat ini: ${prevQty} ${lot.unit}).`,
-        };
+    if (error) {
+      console.error("[admin/inventory] execute_waste_lot_mutation error:", error.message);
+      if (error.code === "PGRST202" || error.message?.includes("does not exist")) {
+        return { success: false, error: "Fungsi mutasi inventaris belum tersedia di database. Jalankan migration 021 terlebih dahulu." };
       }
-      newQty = prevQty - adjQty;
-      changeQty = -adjQty;
-    } else {
-      newQty = prevQty + adjQty;
-      changeQty = adjQty;
-    }
-
-    const nextStatus = newQty === 0 ? "DEPLETED" : "AVAILABLE";
-    const now = new Date().toISOString();
-
-    // 2. Update waste_lots
-    const { error: updateErr } = await supabase
-      .from("waste_lots")
-      .update({
-        current_quantity: newQty,
-        status: nextStatus,
-        updated_at: now,
-      })
-      .eq("id", lot.id);
-
-    if (updateErr) {
-      console.error("[admin/inventory] update lot error:", updateErr.message);
-      return { success: false, error: "Gagal memperbarui saldo lot limbah." };
-    }
-
-    // 3. Append to inventory_transactions ledger
-    const { error: txErr } = await supabase
-      .from("inventory_transactions")
-      .insert({
-        waste_lot_id: lot.id,
-        waste_type_id: lot.waste_type_id,
-        transaction_type: "ADJUSTMENT",
-        quantity_change: changeQty,
-        previous_quantity: prevQty,
-        new_quantity: newQty,
-        unit: lot.unit,
-        reason: parse.data.reason,
-        reference_id: `ADJ-${Date.now()}`,
-        operator_id: admin.id,
-      });
-
-    if (txErr) {
-      console.error("[admin/inventory] ledger error:", txErr.message);
-      return { success: false, error: "Gagal mencatat mutasi ke buku besar inventaris." };
+      return {
+        success: false,
+        error: error.message?.includes("tidak mencukupi")
+          ? error.message
+          : error.message?.includes("tidak ditemukan")
+            ? "Data lot limbah tidak ditemukan."
+            : "Gagal menyesuaikan stok lot limbah.",
+      };
     }
 
     revalidatePath("/admin/inventory");

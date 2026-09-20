@@ -19,10 +19,35 @@ import { env } from "@/lib/env";
  * `next` param the caller supplied when building the original redirectTo
  * URL (see lib/auth/actions.ts requestPasswordResetAction).
  */
+
+/**
+ * `next` reaches this route as a raw, attacker-controllable URL query
+ * parameter — every caller in this codebase currently only ever sends a
+ * hardcoded server-side string (see requestPasswordResetAction), but the
+ * route itself has no way to know that a given request genuinely came from
+ * that path rather than a crafted link. Found during the Phase 13 audit:
+ * without this check, `next` was interpolated directly into the redirect
+ * URL, so a link like
+ * `/auth/confirm?code=<real-code>&next=https://evil.example/phish` would
+ * exchange a real PKCE code (making the request look legitimate) and then
+ * send the user on to an attacker-controlled destination — an open
+ * redirect. Only allow same-origin, relative paths.
+ */
+function sanitizeNextPath(rawNext: string | null): string {
+  const fallback = "/";
+  if (!rawNext) return fallback;
+  // Must start with exactly one "/" — rejects absolute URLs
+  // (https://evil.example), protocol-relative URLs (//evil.example), and
+  // anything with an embedded scheme.
+  if (!rawNext.startsWith("/") || rawNext.startsWith("//")) return fallback;
+  if (rawNext.includes("\\") || rawNext.toLowerCase().includes(":")) return fallback;
+  return rawNext;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const next = sanitizeNextPath(searchParams.get("next"));
 
   if (code) {
     const supabase = await createClient();

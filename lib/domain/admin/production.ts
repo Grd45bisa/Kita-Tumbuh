@@ -108,7 +108,9 @@ export async function addBatchInputAction(
     };
   }
 
-  // 2. Fetch lot info
+  // 2. Fetch lot info (only for lot_code in the batch_inputs insert below —
+  // the actual quantity check + decrement happens atomically in the RPC
+  // call in step 4, which re-validates sufficiency itself under a row lock)
   const { data: lot, error: lotError } = await supabase
     .from("waste_lots")
     .select("id, lot_code, waste_type_id, current_quantity, unit, status")
@@ -119,18 +121,7 @@ export async function addBatchInputAction(
     return { success: false, error: "Lot limbah tidak ditemukan." };
   }
 
-  const currentQty = Number(lot.current_quantity);
   const qtyUsed = parsed.data.quantity_used;
-
-  if (currentQty < qtyUsed) {
-    return {
-      success: false,
-      error: `Stok lot ${lot.lot_code} tidak mencukupi. Tersedia: ${currentQty} ${lot.unit}, diminta: ${qtyUsed} ${parsed.data.unit}.`,
-    };
-  }
-
-  const newQty = Math.max(0, currentQty - qtyUsed);
-  const newLotStatus = newQty === 0 ? "DEPLETED" : "AVAILABLE";
 
   // 3. Insert batch_inputs
   const { data: inputRecord, error: inputError } = await supabase
@@ -152,49 +143,45 @@ export async function addBatchInputAction(
     };
   }
 
-  // 4. Update waste lot stock
-  const { error: updateLotError } = await supabase
-    .from("waste_lots")
-    .update({
-      current_quantity: newQty,
-      status: newLotStatus,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", lot.id);
-
-  if (updateLotError) {
-    return {
-      success: false,
-      error: `Gagal memperbarui kuantitas lot: ${updateLotError.message}`,
-    };
-  }
-
-  // 5. Append inventory ledger transaction (Audit trail per DATABASE.md & AGENTS.md §12)
-  const { error: ledgerError } = await supabase.from("inventory_transactions").insert({
-    waste_lot_id: lot.id,
-    waste_type_id: lot.waste_type_id,
-    transaction_type: "PRODUCTION_CONSUMPTION",
-    quantity_change: -qtyUsed,
-    previous_quantity: currentQty,
-    new_quantity: newQty,
-    unit: lot.unit,
-    reason: `Alokasi bahan baku ke batch produksi ${batch.batch_number} (${parsed.data.notes || "tanpa catatan tambahan"})`,
-    operator_id: admin.id,
+  // 4. Atomically decrement the lot and append the ledger entry. Locks the
+  // waste_lots row, re-validates sufficiency under that lock, and writes
+  // both the lot update and the ledger insert in a single transaction — see
+  // execute_waste_lot_mutation (021_waste_lot_mutation_hardening.sql).
+  // Found during the Phase 13 audit: the previous implementation read
+  // current_quantity, computed the new value in JavaScript, then wrote it
+  // back with no row lock — a TOCTOU race between two concurrent batch
+  // input allocations (or an allocation racing a manual stock adjustment)
+  // against the same lot.
+  const { error: mutationError } = await supabase.rpc("execute_waste_lot_mutation", {
+    p_waste_lot_id: lot.id,
+    p_transaction_type: "PRODUCTION_CONSUMPTION",
+    p_quantity_change: -qtyUsed,
+    p_reason: `Alokasi bahan baku ke batch produksi ${batch.batch_number} (${parsed.data.notes || "tanpa catatan tambahan"})`,
+    p_reference_id: batch.id,
+    p_operator_id: admin.id,
   });
 
-  if (ledgerError) {
-    // The lot quantity was already decremented (step 4) — this failure
-    // means the append-only audit trail is now inconsistent with the lot's
-    // current_quantity. Surface it loudly rather than silently returning
-    // success, per AGENTS.md §12 (financial/inventory integrity).
+  if (mutationError) {
+    // batch_inputs (step 3) was already inserted — this failure means that
+    // record is now inconsistent with the lot's current_quantity (the
+    // decrement never happened, or the sufficiency check failed under
+    // lock). Surface it loudly rather than silently returning success, per
+    // AGENTS.md §12 (financial/inventory integrity).
     console.error(
-      `[admin/production] ledger insert failed after lot ${lot.id} was decremented:`,
-      ledgerError.message
+      `[admin/production] execute_waste_lot_mutation failed after batch_inputs row ${inputRecord?.id} was inserted:`,
+      mutationError.message
     );
+    if (mutationError.code === "PGRST202" || mutationError.message?.includes("does not exist")) {
+      return {
+        success: false,
+        error: "Fungsi mutasi inventaris belum tersedia di database. Jalankan migration 021 terlebih dahulu.",
+      };
+    }
     return {
       success: false,
-      error:
-        "Bahan baku sudah dialokasikan dan stok lot sudah berkurang, tetapi gagal mencatat jejak audit ledger. Hubungi administrator teknis untuk memeriksa konsistensi data sebelum melanjutkan.",
+      error: mutationError.message?.includes("tidak mencukupi")
+        ? `${mutationError.message} Catatan alokasi bahan baku sudah tersimpan namun stok lot BELUM berkurang — hubungi administrator teknis untuk memeriksa konsistensi data.`
+        : "Bahan baku sudah tercatat namun gagal memutasi stok lot. Hubungi administrator teknis untuk memeriksa konsistensi data sebelum melanjutkan.",
     };
   }
 

@@ -8,10 +8,29 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import styles from "./AuthForm.module.css";
 
+/**
+ * `redirect` reaches this component as a raw, attacker-controllable query
+ * parameter (middleware sets it to the original path when bouncing an
+ * unauthenticated visitor to /login, but a crafted link can set it to
+ * anything). Found during the Phase 13 audit alongside the identical issue
+ * in app/auth/confirm/route.ts: an unvalidated redirect target here is an
+ * open-redirect vector — a link like `/login?redirect=https://evil.example`
+ * would have the victim genuinely authenticate against the real site and
+ * then get sent on to an attacker-controlled page. Only allow same-origin,
+ * relative paths.
+ */
+function sanitizeRedirectPath(raw: string | null): string {
+  const fallback = "/dashboard";
+  if (!raw) return fallback;
+  if (!raw.startsWith("/") || raw.startsWith("//")) return fallback;
+  if (raw.includes("\\") || raw.toLowerCase().includes(":")) return fallback;
+  return raw;
+}
+
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get("redirect") || "/dashboard";
+  const redirectUrl = sanitizeRedirectPath(searchParams.get("redirect"));
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
