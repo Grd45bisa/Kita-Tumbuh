@@ -4,7 +4,6 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./MemberNav.module.css";
-import { signOutAction } from "@/lib/auth/actions";
 import type { AuthUser } from "@/types/user";
 
 interface MemberNavProps {
@@ -22,7 +21,7 @@ export function MemberNav({ user }: MemberNavProps) {
 
   const navItems: NavItem[] = [
     {
-      label: "Dashboard",
+      label: "Beranda",
       href: "/dashboard",
       icon: (active) => (
         <svg
@@ -44,7 +43,7 @@ export function MemberNav({ user }: MemberNavProps) {
       ),
     },
     {
-      label: "Riwayat Donasi",
+      label: "Riwayat",
       href: "/riwayat",
       icon: (active) => (
         <svg
@@ -64,7 +63,7 @@ export function MemberNav({ user }: MemberNavProps) {
       ),
     },
     {
-      label: "Dampak Saya",
+      label: "Dampak",
       href: "/impact",
       icon: (active) => (
         <svg
@@ -83,7 +82,7 @@ export function MemberNav({ user }: MemberNavProps) {
       ),
     },
     {
-      label: "Profil Akun",
+      label: "Profil",
       href: "/profil",
       icon: (active) => (
         <svg
@@ -108,7 +107,6 @@ export function MemberNav({ user }: MemberNavProps) {
 
   return (
     <aside className={styles.navShell} aria-label="Navigasi Area Member">
-      {/* Member Profile Summary in Sidebar */}
       <div className={styles.userCard}>
         <div className={styles.userAvatar} aria-hidden="true">
           {displayName.charAt(0).toUpperCase()}
@@ -119,7 +117,6 @@ export function MemberNav({ user }: MemberNavProps) {
         </div>
       </div>
 
-      {/* Primary Donation CTA */}
       <div className={styles.ctaWrapper}>
         <Link href="/donasikan" className={styles.donateCta}>
           <svg
@@ -135,11 +132,10 @@ export function MemberNav({ user }: MemberNavProps) {
           >
             <path d="M12 5v14M5 12h14" />
           </svg>
-          <span>Donasikan Limbah</span>
+          <span>Donasi limbah</span>
         </Link>
       </div>
 
-      {/* Main Navigation Links */}
       <nav className={styles.linksNav}>
         <ul className={styles.navList}>
           {navItems.map((item) => {
@@ -160,29 +156,6 @@ export function MemberNav({ user }: MemberNavProps) {
         </ul>
       </nav>
 
-      {/* Sign Out Button */}
-      <div className={styles.navFooter}>
-        <form action={signOutAction}>
-          <button type="submit" className={styles.logoutBtn} aria-label="Keluar dari akun">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-            <span>Keluar</span>
-          </button>
-        </form>
-      </div>
     </aside>
   );
 }

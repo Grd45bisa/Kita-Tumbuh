@@ -16,7 +16,7 @@ export function AdminNav({ user }: AdminNavProps) {
 
   const navItems: Array<{ label: string; href: string; exact?: boolean; module: AdminModule; icon: React.ReactNode }> = [
     {
-      label: "Overview",
+      label: "Ringkasan",
       href: "/admin",
       exact: true,
       module: "dashboard",
@@ -30,7 +30,7 @@ export function AdminNav({ user }: AdminNavProps) {
       ),
     },
     {
-      label: "Master Limbah",
+      label: "Jenis Limbah",
       href: "/admin/waste-types",
       module: "waste_inventory",
       icon: (
@@ -44,7 +44,7 @@ export function AdminNav({ user }: AdminNavProps) {
       ),
     },
     {
-      label: "Donasi & Verifikasi",
+      label: "Donasi",
       href: "/admin/donations",
       module: "donations",
       icon: (
@@ -56,7 +56,7 @@ export function AdminNav({ user }: AdminNavProps) {
       ),
     },
     {
-      label: "Inventaris Limbah",
+      label: "Inventaris",
       href: "/admin/inventory",
       module: "waste_inventory",
       icon: (
@@ -69,7 +69,7 @@ export function AdminNav({ user }: AdminNavProps) {
       ),
     },
     {
-      label: "Batch Produksi",
+      label: "Produksi",
       href: "/admin/production",
       module: "production",
       icon: (
@@ -81,7 +81,7 @@ export function AdminNav({ user }: AdminNavProps) {
       ),
     },
     {
-      label: "Produk Sirkular",
+      label: "Produk",
       href: "/admin/products",
       module: "product_catalog",
       icon: (
@@ -93,7 +93,7 @@ export function AdminNav({ user }: AdminNavProps) {
       ),
     },
     {
-      label: "Pesanan Produk",
+      label: "Pesanan",
       href: "/admin/orders",
       module: "orders_sales",
       icon: (
@@ -105,7 +105,7 @@ export function AdminNav({ user }: AdminNavProps) {
       ),
     },
     {
-      label: "Keuangan & Alokasi",
+      label: "Keuangan",
       href: "/admin/finance",
       module: "finance",
       icon: (
@@ -116,7 +116,7 @@ export function AdminNav({ user }: AdminNavProps) {
       ),
     },
     {
-      label: "Program & Penerima Manfaat",
+      label: "Program Sosial",
       href: "/admin/social",
       module: "social_programs",
       icon: (
@@ -129,7 +129,7 @@ export function AdminNav({ user }: AdminNavProps) {
       ),
     },
     {
-      label: "Manajemen Akun",
+      label: "Pengguna",
       href: "/admin/users",
       module: "user_roles",
       icon: (
@@ -142,7 +142,7 @@ export function AdminNav({ user }: AdminNavProps) {
       ),
     },
     {
-      label: "Audit Log",
+      label: "Audit",
       href: "/admin/audit-log",
       module: "audit_log",
       icon: <span className={styles.navIcon} aria-hidden="true">≡</span>,
@@ -161,12 +161,13 @@ export function AdminNav({ user }: AdminNavProps) {
             <span className={styles.brandTitle}>KITA TUMBUH</span>
             <span className={styles.brandBadge}>Admin</span>
           </div>
-          <p className={styles.brandSubtitle}>Kampung Smart Farming Ops</p>
+          <p className={styles.brandSubtitle}>Operasional</p>
         </div>
+        <Link href="/profil" className={styles.mobileMemberLink}>Profil</Link>
       </div>
 
       <nav className={styles.navSection} aria-label="Navigasi Operasional Admin">
-        <span className={styles.navLabel}>Modul Operasional</span>
+        <span className={styles.navLabel}>Menu</span>
         {visibleItems.map((item) => {
           const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
           return (
@@ -187,21 +188,21 @@ export function AdminNav({ user }: AdminNavProps) {
         <div className={styles.userCard}>
           <div className={styles.userInfo}>
             <p className={styles.userName}>{user.profile?.full_name || user.email}</p>
-            <p className={styles.userRole}>Role: {user.profile?.role}</p>
+            <p className={styles.userRole}>{user.profile?.role}</p>
           </div>
         </div>
 
-        <Link href="/dashboard" className={styles.backLink}>
+        <Link href="/profil" className={styles.backLink}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
-          <span>Ke Dashboard Member</span>
+          <span>Profil akun</span>
         </Link>
         <Link href="/" className={styles.backLink}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
           </svg>
-          <span>Ke Website Publik</span>
+          <span>Website publik</span>
         </Link>
       </div>
     </aside>

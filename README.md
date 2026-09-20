@@ -1,15 +1,32 @@
 # KAMPUNG SMART FARMING
 
-> **Tagline:** Dari Limbah, Tumbuh Manfaat.  
+> **Master Brand:** KITA TUMBUH
+> **Tagline:** Dari Limbah, Tumbuh Manfaat.
 > **Brand Statement:** *SAMPAH KALIAN SANGAT BERARTI BAGI KAMI*
 
-Platform circular economy dan dampak sosial yang mengubah limbah rumah tangga menjadi produk bernilai dan mengalokasikan hasil ekonominya untuk program sosial serta pemberdayaan masyarakat.
+Platform circular economy dan dampak sosial yang mengubah limbah rumah tangga — terutama minyak jelantah dan sampah organik dapur — menjadi produk bernilai, dikerjakan bersama anak-anak difabel, dengan sebagian hasil penjualannya dialokasikan untuk program pemberdayaan sosial.
+
+Untuk penjelasan konsep produk secara naratif, lihat [`docs/PAPER.md`](docs/PAPER.md). Untuk alur data donasi end-to-end sampai ke angka dampak publik, lihat [`docs/ALUR_DONASI.md`](docs/ALUR_DONASI.md).
 
 ---
 
-## Status Proyek: Fase 0 — Project Foundation
+## Apa yang Dikerjakan Platform Ini
 
-Fondasi sistem telah selesai diinisialisasi dan siap untuk pengembangan fitur pada fase berikutnya:
+1. **Donasi limbah** — warga mendonasikan limbah lewat drop-off ke titik penyerahan atau penjemputan terjadwal, tanpa wajib membuat akun.
+2. **Verifikasi & pengolahan** — operator memverifikasi jumlah fisik yang diterima (terpisah dari estimasi donatur), lalu limbah diolah bersama anak-anak difabel menjadi produk bernilai jual (lilin aromaterapi, sabun, kompos, dan sejenisnya).
+3. **Penjualan produk** — produk dijual lewat katalog publik dengan konfirmasi pembayaran manual, dan pendapatan tercatat otomatis di buku besar keuangan.
+4. **Alokasi dampak sosial** — sebagian pendapatan dialokasikan ke program sosial dan disalurkan ke penerima manfaat, dengan validasi saldo yang tidak bisa dilewati.
+5. **Transparansi publik** — halaman `/dampak` dan `/transparansi` menampilkan angka agregat yang dihitung langsung dari data terverifikasi, bukan estimasi atau angka ilustratif.
+
+Sistem sengaja **tidak** mengklaim pelacakan satu-lawan-satu ("donasi ini menjadi produk itu") — akuntansi bahan dan dana bersifat pooled (digabung), dan hal ini dinyatakan eksplisit ke pengguna. Detail lengkap ada di [`docs/ALUR_DONASI.md`](docs/ALUR_DONASI.md).
+
+---
+
+## Status Proyek
+
+Fondasi teknis, alur donasi, sistem operasional (inventaris limbah, produksi, katalog produk, penjualan, keuangan, program sosial), kontrol akses berjenjang (RBAC), SEO, aksesibilitas, dan pengamanan data telah dibangun dan diverifikasi. Item yang secara sadar belum dikerjakan (publikasi cerita dampak dengan alur consent, laporan transparansi berbentuk snapshot periodik, pengujian end-to-end otomatis) dicatat eksplisit di `.agents/TASK.md` — tidak diklaim selesai jika belum.
+
+Ringkasan fondasi teknis awal:
 
 - [x] Struktur Next.js App Router (Server Components by default)
 - [x] Strict TypeScript (`strict: true`, `noImplicitAny: true`, `strictNullChecks: true`)
@@ -19,8 +36,10 @@ Fondasi sistem telah selesai diinisialisasi dan siap untuk pengembangan fitur pa
 - [x] UI Primitives dasar (`Button`, `Badge`, `Card`, `Input`, `Container`, `SkipLink`)
 - [x] Aksesibilitas WCAG 2.2 AA (Focus states, semantic HTML, screen reader helpers)
 - [x] Error boundaries & loading states (`loading.tsx`, `error.tsx`, `not-found.tsx`, `global-error.tsx`)
-- [x] Metadata & SEO Foundation (`robots.ts`, `sitemap.ts`, Open Graph, Twitter cards)
+- [x] Metadata & SEO Foundation (`robots.ts`, `sitemap.ts`, Open Graph, structured data)
 - [x] Fondasi Utilitas Supabase (`lib/supabase/` SSR client/server/middleware dengan perlindungan service-role key)
+- [x] Row Level Security (RLS) granular per peran di seluruh tabel operasional
+- [x] Kontrol akses berjenjang (SUPER_ADMIN, ADMIN, OPERATOR, FINANCE, SOCIAL_OFFICER)
 
 ---
 

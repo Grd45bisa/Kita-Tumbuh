@@ -25,7 +25,7 @@ export default async function AdminOverviewPage() {
   const [donations, wasteLots, batches, products, orders, allocations, programs] = results.map((result) => result.count ?? 0);
 
   const allCards: Card[] = [
-    { module: "donations", label: "Antrean Donasi", value: donations, hint: "Menunggu penerimaan atau verifikasi", href: "/admin/donations" },
+    { module: "donations", label: "Donasi perlu diproses", value: donations, hint: "Menunggu penerimaan atau verifikasi", href: "/admin/donations" },
     { module: "waste_inventory", label: "Lot Limbah Tersedia", value: wasteLots, hint: "Lot dengan saldo fisik", href: "/admin/inventory" },
     { module: "production", label: "Produksi Aktif", value: batches, hint: "Batch direncanakan atau berjalan", href: "/admin/production" },
     { module: "product_catalog", label: "Produk Tersedia", value: products, hint: "Produk dengan stok positif", href: "/admin/products" },
@@ -37,14 +37,16 @@ export default async function AdminOverviewPage() {
 
   return <div>
     <div className={styles.header}>
-      <h1 className={styles.title}>Panel Operasional Utama</h1>
-      <p className={styles.subtitle}>Ringkasan ini mengikuti akses {role ?? "pengguna"}; setiap angka berasal dari data operasional yang tersedia.</p>
+      <p className={styles.eyebrow}>Ringkasan {role ?? "pengguna"}</p>
+      <h1 className={styles.title}>Dashboard Admin</h1>
+      <p className={styles.subtitle}>Pilih data yang perlu kamu tangani hari ini.</p>
     </div>
     <div className={styles.statsGrid}>
       {cards.map((card) => <Link className={styles.actionCard} href={card.href} key={card.module}>
         <span className={styles.statLabel}>{card.label}</span>
         <strong className={styles.statValue}>{card.value}</strong>
         <span className={styles.statHint}>{card.hint}</span>
+        <span className={styles.cardArrow} aria-hidden="true">→</span>
       </Link>)}
     </div>
     {cards.length === 0 && <p className={styles.subtitle}>Belum ada modul operasional yang dapat ditampilkan untuk role ini.</p>}

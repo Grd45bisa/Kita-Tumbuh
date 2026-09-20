@@ -103,18 +103,22 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
 
   return (
     <MemberLayout activeKey="riwayat" user={user}>
-      <div className={styles.welcomeSection}>
+      <header className={styles.welcomeSection}>
         <h1 className={styles.greeting}>Riwayat Donasi</h1>
         <p className={styles.subgreeting}>
-          Pantau seluruh jejak dan status penyaluran limbah yang telah kamu daftarkan.
+          Semua donasi dan statusnya dalam satu daftar.
         </p>
-      </div>
+      </header>
 
-      {/* Filter Bar (Search params driven) */}
-      <form method="GET" action="/riwayat" className={styles.filterBar}>
+      <details className={styles.filterPanel} open={hasActiveFilter || undefined}>
+        <summary className={styles.filterSummary}>
+          <span>Filter riwayat</span>
+          <span>{hasActiveFilter ? "Aktif" : "Opsional"}</span>
+        </summary>
+        <form method="GET" action="/riwayat" className={styles.filterBar}>
         <div className={styles.filterGroup}>
           <label htmlFor="status" className={styles.filterLabel}>
-            Status Donasi
+            Status
           </label>
           <select
             id="status"
@@ -133,7 +137,7 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
 
         <div className={styles.filterGroup}>
           <label htmlFor="waste_type" className={styles.filterLabel}>
-            Jenis Limbah
+            Jenis limbah
           </label>
           <select
             id="waste_type"
@@ -152,7 +156,7 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
 
         <div className={styles.filterGroup}>
           <label htmlFor="method" className={styles.filterLabel}>
-            Metode Penyerahan
+            Metode
           </label>
           <select
             id="method"
@@ -168,7 +172,7 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
 
         <div className={styles.filterGroup}>
           <label htmlFor="from" className={styles.filterLabel}>
-            Dari Tanggal
+            Dari tanggal
           </label>
           <input
             id="from"
@@ -182,7 +186,7 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
 
         <div className={styles.filterGroup}>
           <label htmlFor="to" className={styles.filterLabel}>
-            Sampai Tanggal
+            Sampai tanggal
           </label>
           <input
             id="to"
@@ -206,7 +210,8 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
             </Link>
           )}
         </div>
-      </form>
+        </form>
+      </details>
 
       {/* List / Empty State */}
       {!donations || donations.length === 0 ? (
@@ -242,7 +247,7 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
                 </div>
 
                 <div className={styles.donationStatusArea}>
-                  <span style={{ fontSize: "var(--text-sm)", color: "var(--color-ink-muted)" }}>
+                  <span className={styles.quantity}>
                     {d.verified_quantity != null
                       ? `${d.verified_quantity} ${d.unit}`
                       : `Est. ~${d.estimated_quantity} ${d.unit}`}
@@ -259,15 +264,7 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "var(--space-3)",
-                marginTop: "var(--space-6)",
-              }}
-            >
+            <nav className={styles.pagination} aria-label="Navigasi halaman riwayat">
               {currentPage > 1 && (
                 <Link href={buildFilterUrl({ page: (currentPage - 1).toString() })}>
                   <Button variant="secondary" size="sm">
@@ -275,7 +272,7 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
                   </Button>
                 </Link>
               )}
-              <span style={{ fontSize: "var(--text-sm)", color: "var(--color-ink-muted)" }}>
+              <span>
                 Halaman {currentPage} dari {totalPages}
               </span>
               {currentPage < totalPages && (
@@ -285,7 +282,7 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
                   </Button>
                 </Link>
               )}
-            </div>
+            </nav>
           )}
         </>
       )}

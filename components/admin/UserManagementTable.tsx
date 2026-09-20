@@ -5,7 +5,6 @@ import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Badge, type BadgeVariant } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import {
   createUserAction,
   updateUserRoleAction,
@@ -13,7 +12,6 @@ import {
   type ManagedUser,
 } from "@/lib/domain/admin/users";
 import { ALLOWED_ROLES, type ManagedRole } from "@/lib/validation/admin-user-schema";
-import type { Role } from "@/lib/auth/permissions";
 import styles from "./UserManagementTable.module.css";
 
 interface UserManagementTableProps {
@@ -22,14 +20,43 @@ interface UserManagementTableProps {
   canWrite: boolean;
 }
 
-const ROLE_LABELS: Record<Role, string> = {
-  SUPER_ADMIN: "Super Admin",
-  ADMIN: "Admin",
-  OPERATOR: "Operator",
-  FINANCE: "Finance",
-  SOCIAL_OFFICER: "Social Officer",
-  MEMBER: "Member",
-  PUBLIC: "Public",
+interface RoleConfig {
+  label: string;
+  description: string;
+  badgeVariant: BadgeVariant;
+}
+
+const ROLE_CONFIGS: Record<ManagedRole, RoleConfig> = {
+  SUPER_ADMIN: {
+    label: "Super Admin",
+    description: "Akses penuh tanpa batasan ke seluruh sistem, modul keuangan, audit log, dan hak manajemen akun.",
+    badgeVariant: "success",
+  },
+  ADMIN: {
+    label: "Admin Operasional",
+    description: "Mengelola donasi, gudang limbah, siklus batch produksi, katalog produk, dan program sosial.",
+    badgeVariant: "brand",
+  },
+  OPERATOR: {
+    label: "Operator Lapangan",
+    description: "Fokus operasional: verifikasi intake donasi, timbangan fisik limbah, dan pemrosesan batch produksi.",
+    badgeVariant: "info",
+  },
+  FINANCE: {
+    label: "Finance / Keuangan",
+    description: "Verifikasi pembayaran pesanan produk sirkular, pencatatan biaya operasional, dan alokasi dana sosial.",
+    badgeVariant: "info",
+  },
+  SOCIAL_OFFICER: {
+    label: "Social Officer",
+    description: "Mengelola program sosial kemandirian, verifikasi data penerima manfaat, dan penyaluran bantuan.",
+    badgeVariant: "info",
+  },
+  MEMBER: {
+    label: "Member / Donatur",
+    description: "Akses standar donatur masyarakat (hanya dapat melihat dashboard donasi dan riwayat pribadi).",
+    badgeVariant: "neutral",
+  },
 };
 
 export function UserManagementTable({
@@ -135,34 +162,63 @@ export function UserManagementTable({
       key: "user",
       header: "Nama & Email",
       render: (item) => (
-        <div>
-          <strong style={{ color: "var(--color-text-primary)", display: "block" }}>
-            {item.fullName}
-            {item.id === currentUserId && (
-              <span style={{ fontSize: "11px", marginLeft: "6px", color: "var(--color-brand-primary)" }}>
-                (Anda)
-              </span>
-            )}
-          </strong>
-          <span style={{ fontSize: "12px", color: "var(--color-text-muted)" }}>
-            {item.email}
-          </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+          <div
+            style={{
+              width: "36px",
+              height: "36px",
+              borderRadius: "9999px",
+              backgroundColor: item.role === "SUPER_ADMIN" ? "var(--color-green-700)" : "var(--color-surface-sunken)",
+              color: item.role === "SUPER_ADMIN" ? "#ffffff" : "var(--color-text-secondary)",
+              border: "1px solid var(--color-border)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: 700,
+              fontSize: "14px",
+              flexShrink: 0,
+            }}
+          >
+            {item.fullName.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <strong style={{ color: "var(--color-text-primary)", display: "block", fontSize: "14px" }}>
+              {item.fullName}
+              {item.id === currentUserId && (
+                <span
+                  style={{
+                    fontSize: "11px",
+                    marginLeft: "6px",
+                    padding: "1px 6px",
+                    borderRadius: "4px",
+                    backgroundColor: "var(--color-green-100)",
+                    color: "var(--color-brand-primary)",
+                    fontWeight: 600,
+                  }}
+                >
+                  Anda
+                </span>
+              )}
+            </strong>
+            <span style={{ fontSize: "12px", color: "var(--color-text-muted)" }}>
+              {item.email}
+            </span>
+          </div>
         </div>
       ),
     },
     {
       key: "role",
       header: "Role / Hak Akses",
-      width: "160px",
+      width: "170px",
       render: (item) => {
-        let variant: BadgeVariant = "neutral";
-        if (item.role === "SUPER_ADMIN") variant = "success";
-        else if (item.role === "ADMIN") variant = "brand";
-        else if (["OPERATOR", "FINANCE", "SOCIAL_OFFICER"].includes(item.role)) variant = "info";
-
+        const config = ROLE_CONFIGS[item.role as ManagedRole] || {
+          label: item.role,
+          badgeVariant: "neutral" as BadgeVariant,
+        };
         return (
-          <Badge variant={variant}>
-            {ROLE_LABELS[item.role] || item.role}
+          <Badge variant={config.badgeVariant}>
+            {config.label}
           </Badge>
         );
       },
@@ -170,17 +226,17 @@ export function UserManagementTable({
     {
       key: "phone",
       header: "Telepon",
-      render: (item) => <span>{item.phone || "—"}</span>,
+      render: (item) => <span style={{ fontSize: "13px" }}>{item.phone || "—"}</span>,
     },
     {
       key: "email_status",
-      header: "Email Status",
-      width: "140px",
+      header: "Status Akun",
+      width: "150px",
       render: (item) =>
         item.emailConfirmedAt ? (
           <Badge variant="success">Aktif Terverifikasi</Badge>
         ) : (
-          <Badge variant="warning">Pending</Badge>
+          <Badge variant="warning">Pending Aktivasi</Badge>
         ),
     },
     {
@@ -239,7 +295,7 @@ export function UserManagementTable({
       <div className={styles.topBar}>
         <div className={styles.titleArea}>
           <h2>Daftar Akun Pengguna & Admin</h2>
-          <p>Kelola hak akses role operasional dan pengguna Kampung Smart Farming.</p>
+          <p>Kelola hak akses wewenang operasional dan manajemen pengguna Kampung Smart Farming.</p>
         </div>
         {canWrite && (
           <Button variant="primary" onClick={() => setIsCreateOpen(true)}>
@@ -255,12 +311,129 @@ export function UserManagementTable({
         emptyMessage="Belum ada akun terdaftar."
       />
 
-      {/* Modal Buat Akun Baru Langsung Tanpa Konfirmasi Email */}
+      {/* ====================================================================
+          MODAL 1: UBAH ROLE PENGGUNA (PENAMPILAN BARU & MODERN)
+          ==================================================================== */}
+      {editUser && (
+        <div className={styles.modalOverlay} role="dialog" aria-modal="true">
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <div className={styles.headerTitleGroup}>
+                <div className={styles.headerIcon}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className={styles.modalHeaderTitle}>Ubah Role Pengguna</h3>
+                  <p className={styles.modalHeaderSubtitle}>Sesuaikan tingkat hak akses dan wewenang akun ini.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className={styles.closeButton}
+                onClick={() => setEditUser(null)}
+                aria-label="Tutup"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateRoleSubmit}>
+              <div className={styles.modalBody}>
+                {editError && <div className={styles.errorMessage}>{editError}</div>}
+
+                {/* Target User Info Card */}
+                <div className={styles.targetUserCard}>
+                  <div className={styles.userCardProfile}>
+                    <div className={styles.avatarInitial}>
+                      {editUser.fullName.charAt(0).toUpperCase()}
+                    </div>
+                    <div className={styles.targetUserDetails}>
+                      <span className={styles.targetUserName}>{editUser.fullName}</span>
+                      <span className={styles.targetUserEmail}>{editUser.email}</span>
+                    </div>
+                  </div>
+                  <div className={styles.currentRoleBadge}>
+                    <span className={styles.currentRoleLabel}>Role Saat Ini</span>
+                    <Badge variant={ROLE_CONFIGS[editUser.role as ManagedRole]?.badgeVariant || "neutral"}>
+                      {ROLE_CONFIGS[editUser.role as ManagedRole]?.label || editUser.role}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Role Options Radio Cards */}
+                <div>
+                  <div className={styles.roleSectionTitle}>Pilih Tingkat Hak Akses Baru:</div>
+                  <div className={styles.roleGrid}>
+                    {ALLOWED_ROLES.map((roleKey) => {
+                      const cfg = ROLE_CONFIGS[roleKey];
+                      const isSelected = selectedRole === roleKey;
+                      return (
+                        <button
+                          key={roleKey}
+                          type="button"
+                          className={`${styles.roleCard} ${isSelected ? styles.roleCardActive : ""}`}
+                          onClick={() => setSelectedRole(roleKey)}
+                        >
+                          <div className={styles.roleRadio}>
+                            {isSelected && <div className={styles.roleRadioInner} />}
+                          </div>
+                          <div className={styles.roleInfo}>
+                            <div className={styles.roleTitleRow}>
+                              <span className={styles.roleName}>{cfg.label}</span>
+                              <Badge variant={cfg.badgeVariant}>
+                                {roleKey}
+                              </Badge>
+                            </div>
+                            <span className={styles.roleDesc}>{cfg.description}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.modalFooter}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setEditUser(null)}
+                  disabled={isPending}
+                >
+                  Batal
+                </Button>
+                <Button type="submit" variant="primary" disabled={isPending}>
+                  {isPending ? "Menyimpan Perubahan..." : "Simpan Perubahan Role"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+          MODAL 2: TAMBAH AKUN BARU
+          ==================================================================== */}
       {isCreateOpen && (
         <div className={styles.modalOverlay} role="dialog" aria-modal="true">
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
-              <h3>Tambah Akun Admin / User Baru</h3>
+              <div className={styles.headerTitleGroup}>
+                <div className={styles.headerIcon}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <line x1="19" y1="8" x2="19" y2="14" />
+                    <line x1="22" y1="11" x2="16" y2="11" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className={styles.modalHeaderTitle}>Tambah Akun Baru</h3>
+                  <p className={styles.modalHeaderSubtitle}>Daftarkan admin atau personil operasional baru.</p>
+                </div>
+              </div>
               <button
                 type="button"
                 className={styles.closeButton}
@@ -270,6 +443,7 @@ export function UserManagementTable({
                 ✕
               </button>
             </div>
+
             <form onSubmit={handleCreateSubmit}>
               <div className={styles.modalBody}>
                 <div className={styles.instantBadge}>
@@ -277,7 +451,10 @@ export function UserManagementTable({
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                     <polyline points="22 4 12 14.01 9 11.01" />
                   </svg>
-                  <span>Akun ini akan langsung <strong>aktif dan terverifikasi</strong> tanpa memerlukan konfirmasi tautan email.</span>
+                  <div>
+                    <strong>Instan & Tanpa Konfirmasi Email</strong>
+                    <div>Akun yang dibuat akan langsung aktif dan terverifikasi untuk login segera dengan password awal yang Anda tentukan.</div>
+                  </div>
                 </div>
 
                 {createError && <div className={styles.errorMessage}>{createError}</div>}
@@ -285,7 +462,7 @@ export function UserManagementTable({
                 <Input
                   label="Nama Lengkap"
                   required
-                  placeholder="misal: Budi Pratama"
+                  placeholder="misal: Budi Santoso"
                   value={createForm.fullName}
                   onChange={(e) => setCreateForm({ ...createForm, fullName: e.target.value })}
                 />
@@ -316,15 +493,37 @@ export function UserManagementTable({
                   onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
                 />
 
-                <Select
-                  label="Role / Hak Akses"
-                  value={createForm.role}
-                  onChange={(e) => setCreateForm({ ...createForm, role: e.target.value as ManagedRole })}
-                  options={ALLOWED_ROLES.map((r) => ({
-                    value: r,
-                    label: `${ROLE_LABELS[r]} ${r === "SUPER_ADMIN" ? "(Akses Penuh)" : ""}`,
-                  }))}
-                />
+                {/* Role selection radio list */}
+                <div>
+                  <div className={styles.roleSectionTitle}>Pilih Role / Hak Akses:</div>
+                  <div className={styles.roleGrid}>
+                    {ALLOWED_ROLES.map((roleKey) => {
+                      const cfg = ROLE_CONFIGS[roleKey];
+                      const isSelected = createForm.role === roleKey;
+                      return (
+                        <button
+                          key={roleKey}
+                          type="button"
+                          className={`${styles.roleCard} ${isSelected ? styles.roleCardActive : ""}`}
+                          onClick={() => setCreateForm({ ...createForm, role: roleKey })}
+                        >
+                          <div className={styles.roleRadio}>
+                            {isSelected && <div className={styles.roleRadioInner} />}
+                          </div>
+                          <div className={styles.roleInfo}>
+                            <div className={styles.roleTitleRow}>
+                              <span className={styles.roleName}>{cfg.label}</span>
+                              <Badge variant={cfg.badgeVariant}>
+                                {roleKey}
+                              </Badge>
+                            </div>
+                            <span className={styles.roleDesc}>{cfg.description}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
               <div className={styles.modalFooter}>
@@ -337,7 +536,7 @@ export function UserManagementTable({
                   Batal
                 </Button>
                 <Button type="submit" variant="primary" disabled={isPending}>
-                  {isPending ? "Menyimpan..." : "Buat Akun Sekarang"}
+                  {isPending ? "Mendaftarkan Akun..." : "Buat Akun Sekarang"}
                 </Button>
               </div>
             </form>
@@ -345,67 +544,29 @@ export function UserManagementTable({
         </div>
       )}
 
-      {/* Modal Ubah Role */}
-      {editUser && (
-        <div className={styles.modalOverlay} role="dialog" aria-modal="true">
-          <div className={styles.modalContent}>
-            <div className={styles.modalHeader}>
-              <h3>Ubah Role Pengguna</h3>
-              <button
-                type="button"
-                className={styles.closeButton}
-                onClick={() => setEditUser(null)}
-                aria-label="Tutup"
-              >
-                ✕
-              </button>
-            </div>
-            <form onSubmit={handleUpdateRoleSubmit}>
-              <div className={styles.modalBody}>
-                {editError && <div className={styles.errorMessage}>{editError}</div>}
-
-                <div>
-                  <p style={{ fontSize: "13px", color: "var(--color-text-muted)" }}>Target Pengguna:</p>
-                  <p style={{ fontWeight: 600, fontSize: "15px", color: "var(--color-text-primary)" }}>
-                    {editUser.fullName} ({editUser.email})
-                  </p>
-                </div>
-
-                <Select
-                  label="Pilih Role Baru"
-                  value={selectedRole}
-                  onChange={(e) => setSelectedRole(e.target.value as ManagedRole)}
-                  options={ALLOWED_ROLES.map((r) => ({
-                    value: r,
-                    label: ROLE_LABELS[r],
-                  }))}
-                />
-              </div>
-
-              <div className={styles.modalFooter}>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => setEditUser(null)}
-                  disabled={isPending}
-                >
-                  Batal
-                </Button>
-                <Button type="submit" variant="primary" disabled={isPending}>
-                  {isPending ? "Menyimpan..." : "Simpan Perubahan Role"}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Konfirmasi Hapus Pengguna */}
+      {/* ====================================================================
+          MODAL 3: KONFIRMASI HAPUS PENGGUNA
+          ==================================================================== */}
       {deleteTarget && (
         <div className={styles.modalOverlay} role="dialog" aria-modal="true">
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
-              <h3 style={{ color: "var(--color-status-error)" }}>Konfirmasi Hapus Akun</h3>
+              <div className={styles.headerTitleGroup}>
+                <div className={`${styles.headerIcon} ${styles.headerIconDanger}`}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    <line x1="10" y1="11" x2="10" y2="17" />
+                    <line x1="14" y1="11" x2="14" y2="17" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className={styles.modalHeaderTitle} style={{ color: "var(--color-danger-fg)" }}>
+                    Hapus Akun Pengguna
+                  </h3>
+                  <p className={styles.modalHeaderSubtitle}>Konfirmasi tindakan penghapusan akun dari sistem.</p>
+                </div>
+              </div>
               <button
                 type="button"
                 className={styles.closeButton}
@@ -417,13 +578,15 @@ export function UserManagementTable({
             </div>
             <div className={styles.modalBody}>
               {deleteError && <div className={styles.errorMessage}>{deleteError}</div>}
-              <p className={styles.deleteWarning}>
-                Apakah Anda yakin ingin menghapus akun <strong>{deleteTarget.fullName}</strong> (
-                {deleteTarget.email})?
-              </p>
-              <p style={{ fontSize: "12px", color: "var(--color-text-muted)" }}>
-                Tindakan ini permanen dan akan menghapus akun dari sistem autentikasi dan profil pengguna.
-              </p>
+
+              <div className={styles.deleteWarningBox}>
+                <div className={styles.deleteWarningText}>
+                  Tindakan ini tidak dapat dibatalkan!
+                </div>
+                <div className={styles.deleteWarningSubtext}>
+                  Akun atas nama <strong>{deleteTarget.fullName}</strong> ({deleteTarget.email}) akan dihapus secara permanen dari server autentikasi dan database.
+                </div>
+              </div>
             </div>
             <div className={styles.modalFooter}>
               <Button
@@ -440,7 +603,7 @@ export function UserManagementTable({
                 onClick={handleDeleteSubmit}
                 disabled={isPending}
               >
-                {isPending ? "Menghapus..." : "Hapus Akun Permanen"}
+                {isPending ? "Menghapus..." : "Ya, Hapus Akun Permanen"}
               </Button>
             </div>
           </div>

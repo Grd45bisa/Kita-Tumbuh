@@ -18,12 +18,12 @@ export default async function ProfilPage() {
 
   return (
     <MemberLayout activeKey="profil" user={user}>
-      <div className={styles.welcomeSection}>
-        <h1 className={styles.greeting}>Pengaturan Akun</h1>
+      <header className={styles.welcomeSection}>
+        <h1 className={styles.greeting}>Profil</h1>
         <p className={styles.subgreeting}>
-          Perbarui data kontak dan informasi keamanan akun Anda.
+          Kelola data kontak dan kata sandi akunmu.
         </p>
-      </div>
+      </header>
 
       <ProfileForms user={user} />
     </MemberLayout>

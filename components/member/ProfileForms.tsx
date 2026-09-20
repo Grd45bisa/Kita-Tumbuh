@@ -1,17 +1,33 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import type { AuthUser } from "@/types/user";
-import { updateProfileAction, updatePasswordAction } from "@/lib/auth/actions";
+import { signOutAction, updateProfileAction, updatePasswordAction } from "@/lib/auth/actions";
+import { hasPermission, normalizeRole, type Role } from "@/lib/auth/permissions";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
+import styles from "./ProfileForms.module.css";
 
 interface ProfileFormsProps {
   user: AuthUser;
 }
 
+const ROLE_LABELS: Record<Role, string> = {
+  PUBLIC: "Pengunjung",
+  MEMBER: "Member",
+  SUPER_ADMIN: "Super Admin",
+  ADMIN: "Admin",
+  OPERATOR: "Operator",
+  FINANCE: "Tim Keuangan",
+  SOCIAL_OFFICER: "Petugas Program Sosial",
+};
+
 export function ProfileForms({ user }: ProfileFormsProps) {
+  const normalizedRole = normalizeRole(user.profile?.role);
+  const accountRole: Role = normalizedRole === "PUBLIC" ? "MEMBER" : normalizedRole;
+  const hasOperationalDashboard = hasPermission(accountRole, "dashboard", "read");
   // Profile info state
   const [fullName, setFullName] = useState(user.profile?.full_name || "");
   const [phone, setPhone] = useState(user.profile?.phone || "");
@@ -68,45 +84,52 @@ export function ProfileForms({ user }: ProfileFormsProps) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)", maxWidth: "600px" }}>
-      {/* Profile Form */}
-      <Card>
-        <h2 style={{ fontSize: "var(--text-lg)", fontWeight: 600, marginBottom: "var(--space-4)", color: "var(--color-ink)" }}>
-          Informasi Profil
+    <div className={styles.forms}>
+      <section className={styles.accessSection} aria-labelledby="access-title">
+        <div className={styles.accessIdentity}>
+          <span className={styles.avatar} aria-hidden="true">
+            {(user.profile?.full_name || user.email).charAt(0).toUpperCase()}
+          </span>
+          <div>
+            <span className={styles.accessLabel}>Status akun</span>
+            <h2 id="access-title">{ROLE_LABELS[accountRole]}</h2>
+            <p>{user.email}</p>
+          </div>
+        </div>
+        {hasOperationalDashboard && (
+          <Link href="/admin" className={styles.dashboardLink}>
+            Buka dashboard operasional
+            <span aria-hidden="true">→</span>
+          </Link>
+        )}
+      </section>
+
+      <Card className={styles.formCard}>
+        <h2 className={styles.cardTitle}>
+          Data diri
         </h2>
 
         {profileMessage && (
-          <div
-            style={{
-              padding: "var(--space-3) var(--space-4)",
-              borderRadius: "var(--radius-md)",
-              fontSize: "var(--text-sm)",
-              marginBottom: "var(--space-4)",
-              background: profileMessage.type === "success" ? "var(--color-primary-subtle)" : "var(--color-destructive-subtle, #fef2f2)",
-              color: profileMessage.type === "success" ? "var(--color-primary-dark, #166534)" : "var(--color-destructive, #b91c1c)",
-              border: `1px solid ${profileMessage.type === "success" ? "var(--color-primary-border, #bbf7d0)" : "var(--color-destructive-border, #fecaca)"}`,
-            }}
-          >
+          <div className={profileMessage.type === "success" ? styles.successMessage : styles.errorMessage}>
             {profileMessage.text}
           </div>
         )}
 
-        <form onSubmit={handleUpdateProfile} style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+        <form onSubmit={handleUpdateProfile} className={styles.form}>
           <Input
             id="profile_email"
             name="email"
             type="email"
-            label="Alamat Email"
+            label="Email"
             value={user.email}
             disabled
-            helperText="Email akun dikelola oleh autentikasi sistem."
           />
 
           <Input
             id="profile_full_name"
             name="full_name"
             type="text"
-            label="Nama Lengkap"
+            label="Nama lengkap"
             placeholder="Nama Anda"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
@@ -118,12 +141,12 @@ export function ProfileForms({ user }: ProfileFormsProps) {
             id="profile_phone"
             name="phone"
             type="tel"
-            label="Nomor Telepon / WhatsApp"
+            label="Nomor WhatsApp"
             placeholder="08123456789"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             disabled={isProfilePending}
-            helperText="Digunakan petugas penjemputan untuk konfirmasi koordinasi."
+            helperText="Dipakai petugas untuk menghubungi saat penjemputan."
           />
 
           <Button
@@ -131,41 +154,30 @@ export function ProfileForms({ user }: ProfileFormsProps) {
             variant="primary"
             size="md"
             isLoading={isProfilePending}
-            style={{ alignSelf: "flex-start" }}
+            className={styles.submitButton}
           >
-            Simpan Perubahan
+            Simpan profil
           </Button>
         </form>
       </Card>
 
-      {/* Password Change Form */}
-      <Card>
-        <h2 style={{ fontSize: "var(--text-lg)", fontWeight: 600, marginBottom: "var(--space-4)", color: "var(--color-ink)" }}>
-          Keamanan & Kata Sandi
+      <Card className={styles.formCard}>
+        <h2 className={styles.cardTitle}>
+          Ubah kata sandi
         </h2>
 
         {passwordMessage && (
-          <div
-            style={{
-              padding: "var(--space-3) var(--space-4)",
-              borderRadius: "var(--radius-md)",
-              fontSize: "var(--text-sm)",
-              marginBottom: "var(--space-4)",
-              background: passwordMessage.type === "success" ? "var(--color-primary-subtle)" : "var(--color-destructive-subtle, #fef2f2)",
-              color: passwordMessage.type === "success" ? "var(--color-primary-dark, #166534)" : "var(--color-destructive, #b91c1c)",
-              border: `1px solid ${passwordMessage.type === "success" ? "var(--color-primary-border, #bbf7d0)" : "var(--color-destructive-border, #fecaca)"}`,
-            }}
-          >
+          <div className={passwordMessage.type === "success" ? styles.successMessage : styles.errorMessage}>
             {passwordMessage.text}
           </div>
         )}
 
-        <form onSubmit={handleUpdatePassword} style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+        <form onSubmit={handleUpdatePassword} className={styles.form}>
           <Input
             id="new_pwd"
             name="password"
             type="password"
-            label="Kata Sandi Baru"
+            label="Kata sandi baru"
             placeholder="Minimal 8 karakter"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
@@ -178,7 +190,7 @@ export function ProfileForms({ user }: ProfileFormsProps) {
             id="confirm_pwd"
             name="confirm_password"
             type="password"
-            label="Konfirmasi Kata Sandi Baru"
+            label="Ulangi kata sandi"
             placeholder="Ulangi kata sandi baru"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -192,23 +204,30 @@ export function ProfileForms({ user }: ProfileFormsProps) {
             variant="secondary"
             size="md"
             isLoading={isPasswordPending}
-            style={{ alignSelf: "flex-start" }}
+            className={styles.submitButton}
           >
-            Perbarui Kata Sandi
+            Simpan kata sandi
           </Button>
         </form>
       </Card>
 
-      {/* Note about Saved Pickup Addresses (P1-405 MVP scope postponement) */}
-      <Card style={{ background: "var(--color-canvas)" }}>
-        <h3 style={{ fontSize: "var(--text-sm)", fontWeight: 600, color: "var(--color-ink)", marginBottom: "var(--space-1)" }}>
-          Daftar Alamat Penjemputan Tersimpan
-        </h3>
-        <p style={{ fontSize: "var(--text-xs)", color: "var(--color-ink-muted)", lineHeight: 1.5 }}>
-          Fitur multi-alamat tersimpan untuk penjemputan limbah direncanakan pada pembaruan Phase 5.
-          Saat ini, alamat penjemputan dimasukkan langsung pada formulir penjemputan di wizard donasi.
-        </p>
-      </Card>
+      <section className={styles.logoutSection} aria-labelledby="logout-title">
+        <div>
+          <h2 id="logout-title">Keluar dari akun</h2>
+          <p>Akhiri sesi akun pada perangkat ini.</p>
+        </div>
+        <form action={signOutAction}>
+          <button type="submit" className={styles.logoutButton}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            Keluar
+          </button>
+        </form>
+      </section>
+
     </div>
   );
 }
