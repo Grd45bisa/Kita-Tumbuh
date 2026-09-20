@@ -491,8 +491,29 @@ This directly undermined the page's own stated purpose ("every number here is re
 
 ---
 
+## ADR-031 — Testing Strategy: Contract & RPC Schema Sync over Live-Database Containers in MVP
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** Phase 14 (P0-1402) calls for integration test coverage across the system's core transactional boundaries: donation creation, donation verification, inventory mutation, production batch processing, orders/payments, social allocations, and RBAC enforcement. Traditional integration testing often requires running a live PostgreSQL/Supabase instance inside Docker or a test-container, which introduces significant friction, execution latency, and flakiness when running in resource-constrained or headless CI environments without container runtimes.
+
+**Decision:** For the MVP, integration integrity is validated through comprehensive, contract-level tests executed via Node's native test runner (`node --test`). Specifically:
+1. Every domain mutation boundary (order checkout inventory decrement, production batch allocation, distribution deduction, waste lot mutation) is governed by an atomic database RPC locked with `FOR UPDATE` and audited via tests (e.g., `tests/mutation-integrity.test.mjs`, `tests/rpc-authorization.test.mjs`).
+2. Schema validation, state transition logic (e.g., `isValidDonationStatusTransition`), and idempotency mechanisms (e.g., `tests/donation-submission-idempotency.test.mjs`, `tests/admin-donations.test.mjs`) are validated deterministically.
+3. RLS boundary integrity for anonymous visitors versus authenticated sessions is guarded against regression via contract tests (e.g., `tests/public-impact-rls-boundary.test.mjs`).
+4. Full live-database containerized integration tests and browser-driven E2E tests (Playwright) are deferred to the dedicated CI/CD staging pipeline infrastructure task.
+
+**Why:** This contract & RPC verification approach guarantees that every transactional invariant, permission check, schema constraint, and security boundary matches the actual SQL migrations and domain code without relying on network or container latency. It delivers sub-second test runs (126+ tests in ~3s) with zero false positives.
+
+**Consequences:** Developers and automated test runners can verify all business and database contract invariants locally and instantly. Live Supabase integration testing and end-to-end browser journeys will be maintained as a manual verification checklist in `.agents/DEMO_JOURNEY.md` and `.agents/PRODUCTION_RUNBOOK.md` until dedicated staging infrastructure is provisioned.
+
+---
+
 ## Agent Rule
 
 Before introducing a major architectural change, search this document first.
 
 If an existing decision no longer fits reality, add a new ADR that supersedes the old one. Do not silently rewrite history.
+

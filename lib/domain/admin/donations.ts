@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   VerifyDonationSchema,
   UpdateDonationStatusSchema,
+  isValidDonationStatusTransition,
   type VerifyDonationInput,
   type UpdateDonationStatusInput,
 } from "@/lib/validation/admin-donation-schema";
@@ -97,6 +98,27 @@ export async function updateDonationStatusAction(
   try {
     const supabase = await createClient();
     const now = new Date().toISOString();
+
+    // Fetch the current status to validate the transition is a legitimate
+    // next step, not an arbitrary jump. Found missing during the Phase 14
+    // audit: the schema only checked next_status was *a* valid enum value,
+    // never that it was reachable from the donation's actual current status.
+    const { data: existing, error: fetchError } = await supabase
+      .from("donations")
+      .select("status")
+      .eq("id", donationId)
+      .single();
+
+    if (fetchError || !existing) {
+      return { success: false, error: "Donasi tidak ditemukan." };
+    }
+
+    if (!isValidDonationStatusTransition(existing.status, parse.data.next_status)) {
+      return {
+        success: false,
+        error: `Tidak dapat mengubah status dari ${existing.status} langsung ke ${parse.data.next_status}. Status hanya dapat maju satu tahap secara berurutan, atau ditolak (REJECTED) sebelum tahap CONVERTED.`,
+      };
+    }
 
     const { error } = await supabase
       .from("donations")

@@ -293,41 +293,9 @@ export async function getPublicImpactSummary(): Promise<PublicImpactSummary> {
   };
 }
 
-/**
- * Utilitas format angka untuk tampilan publik.
- * Rupiah: nilai dalam integer minor units (bukan desimal).
- */
-export function formatMetricValue(
-  value: number,
-  unit: string,
-  locale = "id-ID"
-): string {
-  if (unit === "IDR") {
-    // Nilai dalam integer Rupiah langsung (bukan sen)
-    return new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  }
-
-  if (unit === "liter") {
-    return `${new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 1,
-    }).format(value)} L`;
-  }
-
-  if (unit === "kilogram") {
-    return `${new Intl.NumberFormat(locale, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 1,
-    }).format(value)} kg`;
-  }
-
-  return new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-}
+// formatMetricValue moved to ./format.ts (Phase 14 audit) — it's a pure,
+// dependency-free formatting helper with no reason to live in the same
+// module as server-only Supabase data fetching. Re-exported here so
+// existing imports (app/dampak/page.tsx, app/transparansi/page.tsx) keep
+// working without change.
+export { formatMetricValue } from "./format";
