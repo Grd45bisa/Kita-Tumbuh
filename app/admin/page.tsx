@@ -1,152 +1,52 @@
-import React from "react";
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth/session";
+import { hasPermission, type AdminModule } from "@/lib/auth/permissions";
 import { createClient } from "@/lib/supabase/server";
 import styles from "@/components/admin/AdminDashboard.module.css";
 
+type Card = { module: AdminModule; label: string; value: number; hint: string; href: string };
+
 export default async function AdminOverviewPage() {
+  const user = await requirePermission("dashboard", "read", "/admin");
+  const role = user.profile?.role;
   const supabase = await createClient();
+  const can = (module: AdminModule) => hasPermission(role, module, "read");
 
-  // 1. Count donations pending verification
-  const { count: pendingVerificationCount } = await supabase
-    .from("donations")
-    .select("id", { count: "exact", head: true })
-    .in("status", ["SUBMITTED", "COLLECTED"]);
+  const emptyCount = Promise.resolve({ count: 0 });
+  const results = await Promise.all([
+    can("donations") ? supabase.from("donations").select("id", { count: "exact", head: true }).in("status", ["SUBMITTED", "COLLECTED"]) : emptyCount,
+    can("waste_inventory") ? supabase.from("waste_lots").select("id", { count: "exact", head: true }).gt("current_quantity", 0) : emptyCount,
+    can("production") ? supabase.from("production_batches").select("id", { count: "exact", head: true }).in("status", ["PLANNED", "IN_PROGRESS"]) : emptyCount,
+    can("product_catalog") ? supabase.from("products").select("id", { count: "exact", head: true }).gt("stock_quantity", 0) : emptyCount,
+    can("orders_sales") ? supabase.from("orders").select("id", { count: "exact", head: true }).in("status", ["PENDING_PAYMENT", "PAID", "PROCESSING"]) : emptyCount,
+    can("finance") ? supabase.from("social_allocations").select("id", { count: "exact", head: true }).eq("approval_status", "APPROVED") : emptyCount,
+    can("social_programs") ? supabase.from("social_programs").select("id", { count: "exact", head: true }).eq("public_status", true) : emptyCount,
+  ]);
+  const [donations, wasteLots, batches, products, orders, allocations, programs] = results.map((result) => result.count ?? 0);
 
-  // 2. Count active pickups
-  const { count: activePickupCount } = await supabase
-    .from("donations")
-    .select("id", { count: "exact", head: true })
-    .eq("method", "PICKUP")
-    .in("status", ["SUBMITTED", "SCHEDULED"]);
+  const allCards: Card[] = [
+    { module: "donations", label: "Antrean Donasi", value: donations, hint: "Menunggu penerimaan atau verifikasi", href: "/admin/donations" },
+    { module: "waste_inventory", label: "Lot Limbah Tersedia", value: wasteLots, hint: "Lot dengan saldo fisik", href: "/admin/inventory" },
+    { module: "production", label: "Produksi Aktif", value: batches, hint: "Batch direncanakan atau berjalan", href: "/admin/production" },
+    { module: "product_catalog", label: "Produk Tersedia", value: products, hint: "Produk dengan stok positif", href: "/admin/products" },
+    { module: "orders_sales", label: "Pesanan Aktif", value: orders, hint: "Menunggu bayar hingga diproses", href: "/admin/orders" },
+    { module: "finance", label: "Alokasi Disetujui", value: allocations, hint: "Catatan alokasi dana sosial", href: "/admin/finance" },
+    { module: "social_programs", label: "Program Publik", value: programs, hint: "Program yang sedang dipublikasikan", href: "/admin/social/programs" },
+  ];
+  const cards = allCards.filter((card) => can(card.module));
 
-  // 3. Count active waste types
-  const { count: activeWasteTypesCount } = await supabase
-    .from("waste_types")
-    .select("id", { count: "exact", head: true })
-    .eq("is_active", true);
-
-  // 4. Count total donations recorded
-  const { count: totalDonationsCount } = await supabase
-    .from("donations")
-    .select("id", { count: "exact", head: true });
-
-  return (
-    <div>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Panel Operasional Utama</h1>
-        <p className={styles.subtitle}>
-          Kelola alur penerimaan limbah, proses verifikasi, pencatatan inventaris, dan siklus produksi Kampung Smart Farming.
-        </p>
-      </div>
-
-      {/* Overview Metric Cards */}
-      <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <span className={styles.statLabel}>Perlu Verifikasi</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.statIcon}>
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
-          </div>
-          <div className={styles.statValue}>{pendingVerificationCount ?? 0}</div>
-          <div className={styles.statHint}>Donasi masuk status SUBMITTED / COLLECTED</div>
-        </div>
-
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <span className={styles.statLabel}>Pickup Aktif</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.statIcon}>
-              <rect x="1" y="3" width="15" height="13" />
-              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-              <circle cx="5.5" cy="18.5" r="2.5" />
-              <circle cx="18.5" cy="18.5" r="2.5" />
-            </svg>
-          </div>
-          <div className={styles.statValue}>{activePickupCount ?? 0}</div>
-          <div className={styles.statHint}>Jadwal penjemputan belum selesai</div>
-        </div>
-
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <span className={styles.statLabel}>Jenis Limbah Aktif</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.statIcon}>
-              <path d="M4 7h16" />
-              <path d="M10 11v6" />
-              <path d="M14 11v6" />
-              <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12" />
-            </svg>
-          </div>
-          <div className={styles.statValue}>{activeWasteTypesCount ?? 0}</div>
-          <div className={styles.statHint}>Kategori limbah yang dapat didonasikan</div>
-        </div>
-
-        <div className={styles.statCard}>
-          <div className={styles.statHeader}>
-            <span className={styles.statLabel}>Total Seluruh Donasi</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.statIcon}>
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-            </svg>
-          </div>
-          <div className={styles.statValue}>{totalDonationsCount ?? 0}</div>
-          <div className={styles.statHint}>Akumulasi transaksi donasi di sistem</div>
-        </div>
-      </div>
-
-      {/* Quick Access Modules */}
-      <h2 style={{ fontSize: "var(--font-size-title)", fontWeight: 600, color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>
-        Akses Cepat Modul Operasional
-      </h2>
-
-      <div className={styles.quickActionsGrid}>
-        <Link href="/admin/donations" className={styles.actionCard}>
-          <h3 className={styles.actionTitle}>Antrean Donasi & Verifikasi</h3>
-          <p className={styles.actionDesc}>
-            Periksa kiriman limbah, input hasil penimbangan riil (verified quantity), dan perbarui status penjemputan/pengantaran.
-          </p>
-          <span className={styles.actionLinkText}>Buka Antrean Donasi →</span>
-        </Link>
-
-        <Link href="/admin/waste-types" className={styles.actionCard}>
-          <h3 className={styles.actionTitle}>Master Data Jenis Limbah</h3>
-          <p className={styles.actionDesc}>
-            Atur jenis limbah yang diterima, satuan takaran, batas kuantitas minimum/maksimum, dan panduan kondisi diterima/ditolak.
-          </p>
-          <span className={styles.actionLinkText}>Kelola Master Limbah →</span>
-        </Link>
-
-        <Link href="/admin/inventory" className={styles.actionCard}>
-          <h3 className={styles.actionTitle}>Inventaris & Gudang Limbah</h3>
-          <p className={styles.actionDesc}>
-            Pantau saldo stok fisik per kategori limbah, lacak nomor lot bahan baku, dan lakukan penyesuaian stok dengan audit trail.
-          </p>
-          <span className={styles.actionLinkText}>Lihat Inventaris →</span>
-        </Link>
-
-        <Link href="/admin/production" className={styles.actionCard}>
-          <h3 className={styles.actionTitle}>Batch Pengolahan & Produksi</h3>
-          <p className={styles.actionDesc}>
-            Catat alur pengolahan limbah menjadi produk bernilai (sabun/lilin/pupuk) dengan pelacakan bahan baku dan catatan susut.
-          </p>
-          <span className={styles.actionLinkText}>Kelola Batch Produksi →</span>
-        </Link>
-
-        <Link href="/admin/products" className={styles.actionCard}>
-          <h3 className={styles.actionTitle}>Katalog Produk Sirkular</h3>
-          <p className={styles.actionDesc}>
-            Kelola data produk hasil hilirisasi, penetapan harga (Rupiah), nomor SKU, dan pengaturan visibilitas ke halaman publik.
-          </p>
-          <span className={styles.actionLinkText}>Kelola Produk →</span>
-        </Link>
-
-        <Link href="/admin/orders" className={styles.actionCard}>
-          <h3 className={styles.actionTitle}>Pesanan & Penjualan Produk</h3>
-          <p className={styles.actionDesc}>
-            Pantau pesanan masuk dari pembeli produk, verifikasi bukti transfer pembayaran, dan update status pengiriman pesanan.
-          </p>
-          <span className={styles.actionLinkText}>Kelola Pesanan →</span>
-        </Link>
-      </div>
+  return <div>
+    <div className={styles.header}>
+      <h1 className={styles.title}>Panel Operasional Utama</h1>
+      <p className={styles.subtitle}>Ringkasan ini mengikuti akses {role ?? "pengguna"}; setiap angka berasal dari data operasional yang tersedia.</p>
     </div>
-  );
+    <div className={styles.statsGrid}>
+      {cards.map((card) => <Link className={styles.actionCard} href={card.href} key={card.module}>
+        <span className={styles.statLabel}>{card.label}</span>
+        <strong className={styles.statValue}>{card.value}</strong>
+        <span className={styles.statHint}>{card.hint}</span>
+      </Link>)}
+    </div>
+    {cards.length === 0 && <p className={styles.subtitle}>Belum ada modul operasional yang dapat ditampilkan untuk role ini.</p>}
+  </div>;
 }

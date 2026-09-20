@@ -10,6 +10,7 @@ import {
   type ProductCategory,
   PRODUCT_CATEGORY_LABELS,
 } from "@/lib/validation/product-schema";
+import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -18,6 +19,13 @@ export const metadata: Metadata = {
     "Produk hasil olahan limbah sirkular dari Kampung Smart Farming — lilin aromaterapi, sabun alami, dan kompos.",
   alternates: {
     canonical: `${env.siteUrl}/produk`,
+  },
+  openGraph: {
+    title: "Produk Hasil Olahan — Kampung Setara Smart Farming",
+    description:
+      "Produk hasil olahan limbah sirkular dari Kampung Smart Farming — lilin aromaterapi, sabun alami, dan kompos.",
+    url: `${env.siteUrl}/produk`,
+    type: "website",
   },
 };
 
@@ -68,6 +76,10 @@ export default async function ProdukPage() {
 
   return (
     <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(breadcrumbItems)) }}
+      />
       <section className={styles.hero}>
         <Container>
           <div className={styles.heroInner}>

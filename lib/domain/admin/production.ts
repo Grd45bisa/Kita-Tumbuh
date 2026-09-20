@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import {
   CreateProductionBatchSchema,
   AddBatchInputSchema,
@@ -25,7 +25,7 @@ export interface ProductionActionResult<T = unknown> {
 export async function createProductionBatchAction(
   rawInput: CreateProductionBatchInput
 ): Promise<ProductionActionResult<{ id: string; batch_number: string }>> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("production", "write");
 
   const parsed = CreateProductionBatchSchema.safeParse(rawInput);
   if (!parsed.success) {
@@ -77,7 +77,7 @@ export async function createProductionBatchAction(
 export async function addBatchInputAction(
   rawInput: AddBatchInput
 ): Promise<ProductionActionResult<{ id: string }>> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("production", "write");
 
   const parsed = AddBatchInputSchema.safeParse(rawInput);
   if (!parsed.success) {
@@ -212,7 +212,7 @@ export async function addBatchInputAction(
 export async function updateBatchStatusAction(
   rawInput: UpdateBatchStatusInput
 ): Promise<ProductionActionResult<{ status: string }>> {
-  await requireAdmin();
+  await requirePermission("production", "write");
 
   const parsed = UpdateBatchStatusSchema.safeParse(rawInput);
   if (!parsed.success) {

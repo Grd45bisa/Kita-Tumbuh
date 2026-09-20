@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/lib/auth/session";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { DonationVerificationForm } from "@/components/admin/DonationVerificationForm";
@@ -13,6 +14,7 @@ interface DonationDetailPageProps {
 }
 
 export default async function AdminDonationDetailPage({ params }: DonationDetailPageProps) {
+  await requirePermission("donations", "read");
   const { reference } = await params;
   const supabase = await createClient();
 

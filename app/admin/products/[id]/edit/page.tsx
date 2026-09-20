@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/lib/auth/session";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ProductForm, type BatchOption, type InitialProductData } from "@/components/admin/ProductForm";
 import type { ProductCategory } from "@/lib/validation/product-schema";
@@ -27,6 +28,7 @@ interface RawBatchRow {
 }
 
 export default async function EditProductPage({ params }: PageProps) {
+  await requirePermission("product_catalog", "write");
   const { id } = await params;
   const supabase = await createClient();
 

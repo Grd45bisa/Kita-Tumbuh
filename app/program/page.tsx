@@ -7,6 +7,7 @@ import { ComingSoon } from "@/components/ui/ComingSoon";
 import { getPublicPrograms } from "@/lib/domain/social-programs";
 import { SOCIAL_PROGRAM_STATUS_LABELS } from "@/lib/validation/social-schema";
 import { env } from "@/lib/env";
+import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -15,6 +16,13 @@ export const metadata: Metadata = {
     "Program pemberdayaan sosial yang didukung oleh hasil ekonomi Kampung Setara Smart Farming.",
   alternates: {
     canonical: `${env.siteUrl}/program`,
+  },
+  openGraph: {
+    title: "Program Sosial — Kampung Setara Smart Farming",
+    description:
+      "Program pemberdayaan sosial yang didukung oleh hasil ekonomi Kampung Setara Smart Farming.",
+    url: `${env.siteUrl}/program`,
+    type: "website",
   },
 };
 
@@ -29,6 +37,10 @@ export default async function ProgramPage() {
 
   return (
     <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(breadcrumbItems)) }}
+      />
       <section className={styles.hero}>
         <Container>
           <div className={styles.heroInner}>

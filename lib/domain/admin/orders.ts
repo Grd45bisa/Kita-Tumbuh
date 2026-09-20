@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
+import { recordAuditLog } from "@/lib/domain/admin/audit-logs";
 import {
   UpdateOrderStatusSchema,
   type UpdateOrderStatusInput,
@@ -33,7 +34,7 @@ export interface GetAdminOrdersResult {
 export async function getAdminOrders(
   params: GetAdminOrdersParams = {}
 ): Promise<GetAdminOrdersResult> {
-  await requireAdmin();
+  await requirePermission("orders_sales", "read");
   const supabase = await createClient();
 
   const page = Math.max(1, params.page || 1);
@@ -130,7 +131,7 @@ export async function getAdminOrders(
  * Fetch full order detail with line items by order ID for admin back-office.
  */
 export async function getAdminOrderById(orderId: string): Promise<Order | null> {
-  await requireAdmin();
+  await requirePermission("orders_sales", "read");
   const supabase = await createClient();
 
   const { data: order, error } = await supabase
@@ -222,7 +223,7 @@ export interface ConfirmPaymentInput {
  * Confirm manual bank transfer payment for an order.
  *
  * Requirements:
- * 1. requireAdmin() server authorization.
+ * 1. orders_sales write permission on the server.
  * 2. Order must not already be PAID or CANCELLED.
  * 3. Decrement inventory stock in `products` (ADR-020) and flip status to
  *    PAID atomically — delegated to the `execute_order_payment_confirmation`
@@ -238,7 +239,7 @@ export interface ConfirmPaymentInput {
 export async function confirmOrderPaymentAction(
   input: ConfirmPaymentInput
 ): Promise<OrderActionResult<{ orderId: string; reference: string }>> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("orders_sales", "write");
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc("execute_order_payment_confirmation", {
@@ -278,6 +279,22 @@ export async function confirmOrderPaymentAction(
     };
   }
 
+  await recordAuditLog({
+    actorId: admin.id,
+    action: "ORDER_PAID",
+    entityType: "order",
+    entityId: updatedOrder.id,
+    newValue: { status: "PAID", payment_status: "PAID" },
+    reason: input.notes || null,
+  });
+  await recordAuditLog({
+    actorId: admin.id,
+    action: "REVENUE_RECORDED",
+    entityType: "order",
+    entityId: updatedOrder.id,
+    newValue: { source: "PAID_ORDER" },
+  });
+
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${updatedOrder.id}`);
   revalidatePath(`/pesanan/${updatedOrder.reference}`);
@@ -298,7 +315,7 @@ export async function confirmOrderPaymentAction(
 export async function updateOrderStatusAction(
   rawInput: UpdateOrderStatusInput
 ): Promise<OrderActionResult<{ orderId: string; newStatus: OrderStatus }>> {
-  await requireAdmin();
+  await requirePermission("orders_sales", "write");
 
   const parseResult = UpdateOrderStatusSchema.safeParse(rawInput);
   if (!parseResult.success) {

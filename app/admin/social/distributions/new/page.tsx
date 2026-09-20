@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { DistributionForm } from "@/components/admin/DistributionForm";
 import { getAdminPrograms } from "@/lib/domain/admin/social-programs";
 import { getAdminBeneficiaryOptions } from "@/lib/domain/admin/beneficiaries";
+import { requirePermission } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Catat Distribusi | Admin KITA TUMBUH",
@@ -12,6 +13,8 @@ export const metadata: Metadata = {
 };
 
 export default async function NewDistributionPage() {
+  await requirePermission("social_programs", "write");
+  await requirePermission("beneficiaries", "write");
   const [programsData, beneficiaries] = await Promise.all([
     getAdminPrograms({ pageSize: 50 }),
     getAdminBeneficiaryOptions(),

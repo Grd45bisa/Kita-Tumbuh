@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import {
   CreateDistributionSchema,
   type CreateDistributionInput,
@@ -73,7 +73,8 @@ function mapDistribution(row: RawDistribution): Distribution {
 export async function getAdminDistributions(
   params: GetAdminDistributionsParams = {}
 ): Promise<GetAdminDistributionsResult> {
-  await requireAdmin();
+  await requirePermission("social_programs", "read");
+  await requirePermission("beneficiaries", "read");
   const supabase = await createClient();
 
   const page = Math.max(1, params.page || 1);
@@ -138,7 +139,8 @@ export async function getAdminDistributions(
 export async function createDistributionAction(
   rawInput: CreateDistributionInput
 ): Promise<SocialActionResult<{ id: string }>> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("social_programs", "write");
+  await requirePermission("beneficiaries", "write");
 
   const parsed = CreateDistributionSchema.safeParse(rawInput);
   if (!parsed.success) {

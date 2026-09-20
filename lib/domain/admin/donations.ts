@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import {
   VerifyDonationSchema,
@@ -27,7 +27,7 @@ export async function verifyDonationAction(
   reference: string,
   input: VerifyDonationInput | FormData
 ): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("donations", "write");
 
   const parse = VerifyDonationSchema.safeParse(toRecord(input));
   if (!parse.success) {
@@ -84,7 +84,7 @@ export async function updateDonationStatusAction(
   reference: string,
   input: UpdateDonationStatusInput | FormData
 ): Promise<ActionResult> {
-  await requireAdmin();
+  await requirePermission("donations", "write");
 
   const parse = UpdateDonationStatusSchema.safeParse(toRecord(input));
   if (!parse.success) {

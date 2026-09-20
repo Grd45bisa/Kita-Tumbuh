@@ -1,7 +1,13 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   /dampak — Halaman Ringkasan Dampak Publik
+   Semua token dari styles/tokens.css — tanpa warna ad-hoc.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* Hero */
 .hero {
   background-color: var(--color-bg-canvas);
   border-bottom: 1px solid var(--color-border-subtle);
-  padding: var(--space-8) 0;
+  padding: var(--space-10) 0;
 }
 
 .heroInner {
@@ -32,6 +38,7 @@
   margin: 0;
 }
 
+/* Sections */
 .section {
   background-color: var(--color-bg-canvas);
   padding: var(--space-12) 0;
@@ -41,51 +48,348 @@
   background-color: var(--color-bg-subtle);
 }
 
+.sectionCta {
+  background-color: var(--color-green-800);
+}
+
+.sectionHeader {
+  margin-bottom: var(--space-6);
+}
+
 .sectionTitle {
   font-size: var(--font-size-heading-m);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
-  margin: 0 0 var(--space-6);
+  margin: 0 0 var(--space-2);
 }
 
+.sectionLead {
+  font-size: var(--font-size-body-m);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body-m);
+  max-width: 48rem;
+  margin: 0 0 var(--space-8);
+}
+
+/* Freshness notice */
+.freshnessNotice {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* Metric group label */
+.metricGroupLabel {
+  font-size: var(--font-size-body-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 var(--space-3);
+}
+
+.metricGroupLabel + .metricGrid {
+  margin-bottom: var(--space-8);
+}
+
+/* Metric grid */
 .metricGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-4);
-  margin-bottom: var(--space-10);
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 480px) {
+  .metricGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
   .metricGrid {
     grid-template-columns: repeat(4, 1fr);
   }
 }
 
+/* Metric card */
 .metricCard {
-  padding: var(--space-5);
+  padding: var(--space-5) var(--space-4);
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
-  text-align: center;
+  box-shadow: var(--elevation-1);
+}
+
+.metricCardEmpty {
+  background-color: var(--color-bg-subtle);
+  border-color: var(--color-border-subtle);
 }
 
 .metricLabel {
   font-size: var(--font-size-body-s);
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   margin: 0 0 var(--space-2);
+  line-height: var(--line-height-body-s);
 }
 
 .metricValue {
   font-size: var(--font-size-heading-s);
   font-weight: var(--font-weight-bold);
+  color: var(--color-brand-primary);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.metricValueEmpty {
+  font-size: var(--font-size-body-m);
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-muted);
   margin: 0;
 }
 
+.metricCaveat {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+  margin: var(--space-2) 0 0;
+  line-height: var(--line-height-caption);
+}
+
+/* No-data note */
+.noDataNote {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-muted);
+  max-width: 48rem;
+  line-height: var(--line-height-body-s);
+  margin: 0;
+  padding: var(--space-4);
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+/* Error state */
+.errorState {
+  padding: var(--space-6);
+  background-color: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-radius: var(--radius-md);
+  color: var(--color-danger-fg);
+  font-size: var(--font-size-body-m);
+}
+
+/* Journey diagram */
+.journeyWrapper {
+  max-width: 56rem;
+}
+
+.journeyList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.journeyItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.journeyStep {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  width: 100%;
+  box-shadow: var(--elevation-1);
+}
+
+.journeyNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  border-radius: var(--radius-full);
+  background-color: var(--color-green-100);
+  color: var(--color-green-700);
+  font-size: var(--font-size-body-s);
+  font-weight: var(--font-weight-bold);
+}
+
+.journeyText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.journeyLabel {
+  font-size: var(--font-size-body-m);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.journeySub {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+.journeyArrow {
+  width: 2px;
+  height: var(--space-4);
+  background-color: var(--color-border-default);
+  margin-left: calc(var(--space-4) + 1rem);
+}
+
+.journeyNote {
+  margin: var(--space-6) 0 0;
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-muted);
+  line-height: var(--line-height-body-s);
+  padding: var(--space-4);
+  border-left: 3px solid var(--color-green-300);
+  background-color: var(--color-green-100);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+/* Methodology */
+.methodologyGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+@media (min-width: 768px) {
+  .methodologyGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.methodologyItem {
+  padding: var(--space-5);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.methodologyTitle {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-3);
+}
+
 .methodologyText {
-  max-width: 42rem;
   font-size: var(--font-size-body-m);
   color: var(--color-text-secondary);
   line-height: var(--line-height-body-m);
+  margin: 0;
+}
+
+.methodologyText code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  padding: 0.1em 0.3em;
+  color: var(--color-earth-600);
+}
+
+.transparencyLink {
+  font-size: var(--font-size-body-m);
+  color: var(--color-text-secondary);
+}
+
+.inlineLink {
+  color: var(--color-brand-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.inlineLink:hover {
+  color: var(--color-brand-primary-hover);
+}
+
+/* CTA block */
+.ctaBlock {
+  max-width: 42rem;
+  margin: 0 auto;
+  text-align: center;
+  padding: var(--space-8) 0;
+}
+
+.ctaTitle {
+  font-size: var(--font-size-heading-m);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-paper-0);
   margin: 0 0 var(--space-4);
+  line-height: var(--line-height-heading-m);
+}
+
+.ctaText {
+  font-size: var(--font-size-body-l);
+  color: var(--color-green-200);
+  line-height: var(--line-height-body-l);
+  margin: 0 0 var(--space-6);
+}
+
+.ctaButton {
+  display: inline-block;
+  background-color: var(--color-paper-0);
+  color: var(--color-green-800);
+  font-size: var(--font-size-body-m);
+  font-weight: var(--font-weight-semibold);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+}
+
+.ctaButton:hover {
+  background-color: var(--color-green-100);
+}
+
+/* Responsive: stack journey horizontally on wide screens */
+@media (min-width: 900px) {
+  .journeyList {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0;
+    align-items: center;
+  }
+
+  .journeyItem {
+    flex-direction: row;
+    align-items: center;
+    flex: 0 0 auto;
+  }
+
+  .journeyStep {
+    width: auto;
+    flex-direction: column;
+    text-align: center;
+    padding: var(--space-4) var(--space-3);
+    max-width: 110px;
+  }
+
+  .journeyText {
+    align-items: center;
+  }
+
+  .journeyArrow {
+    width: var(--space-4);
+    height: 2px;
+    margin: 0;
+    flex-shrink: 0;
+  }
 }

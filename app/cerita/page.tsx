@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/Container";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ComingSoon } from "@/components/ui/ComingSoon";
 import { env } from "@/lib/env";
+import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -12,6 +13,13 @@ export const metadata: Metadata = {
     "Cerita dari perjalanan donasi limbah dan proses berkarya anak-anak difabel di Kampung Setara Smart Farming — sedang kami siapkan.",
   alternates: {
     canonical: `${env.siteUrl}/cerita`,
+  },
+  openGraph: {
+    title: "Cerita — Kampung Setara Smart Farming",
+    description:
+      "Cerita dari perjalanan donasi limbah dan proses berkarya anak-anak difabel di Kampung Setara Smart Farming.",
+    url: `${env.siteUrl}/cerita`,
+    type: "website",
   },
 };
 
@@ -23,6 +31,10 @@ export default function CeritaPage() {
 
   return (
     <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(breadcrumbItems)) }}
+      />
       <section className={styles.hero}>
         <Container>
           <div className={styles.heroInner}>

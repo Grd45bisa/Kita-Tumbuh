@@ -393,6 +393,72 @@ KITA TUMBUH
 
 ---
 
+## ADR-025 — Public Impact Aggregation: Narrow SECURITY DEFINER RPCs, Not Direct Table Queries
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** P0-802 requires `/dampak` and `/transparansi` to show real, verified aggregate numbers to public visitors — no session, anon Supabase client (`lib/supabase/server.ts` `createClient()` always uses the visitor's own session, never service role). The Phase 8 audit found the first implementation of `getPublicImpactSummary()` queried `donations`, `production_batches`, `batch_inputs`, and `social_allocations` directly with that anon client. Under those tables' actual RLS:
+- `donations_owner_read` (`001_donation_foundation.sql`) is `USING (user_id = auth.uid() OR user_id IS NULL)`. For an anonymous visitor `auth.uid()` is `NULL`, so only donations with `user_id IS NULL` (anonymous donations) are visible — every donation made by a logged-in member silently disappears from the public aggregate. No error, no warning, just a wrong (undercounted) number.
+- `production_batches`, `batch_inputs`, `social_allocations` all carry admin-only policies (`FOR ALL TO authenticated USING (is_admin())`) with **no public SELECT policy whatsoever**. A direct query from the anon client on these tables always returns zero rows — which the aggregation code cannot distinguish from "no data exists yet," so it always rendered `"no_data"` in production regardless of how much real data existed.
+
+This directly undermined the page's own stated purpose ("every number here is real, verified, not an estimate") — the numbers weren't fabricated, but they were systematically wrong or permanently empty due to an RLS boundary the aggregation code crossed without noticing.
+
+**Decision:** Six of the seven public metrics (`waste_collected_liters`, `waste_collected_kg`, `donations_verified`, `waste_processed`, `production_batches_completed`, `social_allocation_total`) are computed by narrow, read-only `SECURITY DEFINER` Postgres functions (`get_public_impact_*`, `017_public_impact_aggregation.sql`) that return **only an already-aggregated SUM/COUNT value**, never raw rows, and are explicitly `GRANT EXECUTE`'d to the `anon` role. `social_programs_count` is the one exception and keeps querying `social_programs` directly, because that table already has a correct public SELECT policy (`social_programs_public_read`, scoped to `public_status = true`) — no RPC is needed there.
+
+**Why:** A `SECURITY DEFINER` function that returns one aggregated number cannot leak anything RLS would otherwise protect (no individual donor, beneficiary, order, or allocation row is ever exposed through it) while still correctly seeing *all* the underlying data, not just the subset visible to an anonymous session. This is the same trust boundary already established for `execute_social_allocation`, `execute_order_payment_confirmation`, and `execute_distribution` (ADR-020/024): cross an RLS boundary deliberately and narrowly, through a function whose entire contract is auditable in one place, rather than by weakening a table's RLS policy itself (which would also expose it to authenticated non-admin users) or by querying with an admin/service-role client from a public page (which would defeat RLS entirely for that request).
+
+**Consequences:** Any future public metric that aggregates over a table with owner-scoped or admin-only RLS must follow this same pattern — a dedicated `get_public_impact_*` (or similarly named) RPC that returns only the aggregate, granted to `anon` — rather than a direct `.from(...)` query from `lib/domain/impact/public-impact.ts` or any other public-facing code path. `tests/public-impact-rls-boundary.test.mjs` guards against regressing to a direct query against the four tables named above.
+
+---
+
+## ADR-026 — Phase 9 RBAC Uses a Checked Role Column and Granular Boundaries
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Decision:** Keep `profiles.role` as `TEXT` with a database `CHECK`, and centralize the fixed MVP matrix in `lib/auth/permissions.ts` plus the equivalent database `has_permission()` function. Existing lowercase `admin` rows are promoted to `SUPER_ADMIN`, while `member` becomes `MEMBER`. The compatibility helper `is_admin()` means exactly `SUPER_ADMIN` or `ADMIN`. Server actions use module-specific read/write checks, navigation and dashboard use the same matrix for visibility, and RLS policies enforce module access independently. No role/permission join tables or per-user overrides are introduced.
+
+**Why:** Promoting legacy admins preserves all capabilities they already had. A checked text column fits the existing schema and the fixed five-role MVP without adding a second permission source in relational tables. Finance and beneficiary access stay separate. Distribution additionally requires beneficiary permission because its rows reveal a beneficiary relationship.
+
+**Consequences:** Changes to the official matrix must update TypeScript, migration logic, ARSITEKTUR §11, and its sync test together. UI visibility never grants access. Migration `018_rbac_roles.sql` must be applied before deploying the new application code.
+
+---
+
+## ADR-027 — Explicit, Append-Only Audit Events
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Decision:** Use explicit `recordAuditLog()` calls after critical server mutations. `audit_logs` has SELECT-only RLS for all five staff roles and no direct client write policy. Its allowlisted `SECURITY DEFINER` append RPC (`record_audit_log`) is executable only by `service_role`. The first iteration wires `ORDER_PAID`, `REVENUE_RECORDED`, `ALLOCATION_CREATED`, and `BENEFICIARY_UPDATED`. Beneficiary audit payloads record status/field names only, never names, needs, or notes.
+
+**Why:** Explicit events are reviewable and avoid a generic trigger copying entire sensitive rows. They also allow a reason and a minimal old/new projection suited to each business action.
+
+**Consequences:** Audit writing currently follows the successful domain mutation as a separate best-effort RPC; an audit RPC failure is logged but does not roll back the completed business transaction. Events listed in ARSITEKTUR §18 but not wired above remain documented follow-up work in TASK.md. Migration `019_audit_logs.sql` must be applied after `018`.
+
+**Correction (2026-09-20, Phase 9 audit):** The first implementation had `recordAuditLog()` call `requirePermission()` again internally, re-deriving and re-checking the caller's authorization *after* the underlying mutation had already been committed. This was a real bug, not defense-in-depth: `requirePermission()` can call Next.js `redirect()`, which throws a special error that the function's own generic `try/catch` would silently swallow (logged only, never actually redirecting) — so a genuine authorization failure at that point would just quietly drop the audit entry for an action that had already happened, with no signal to anyone. It was also redundant: the caller had already been gated by its own `requirePermission()` call before the mutation. Fixed by having `recordAuditLog()` accept the caller's already-verified `actorId` as a parameter instead of re-deriving it — the real security boundary against forged audit entries was never that internal check anyway; it is that `record_audit_log` is `SECURITY DEFINER` and `GRANT EXECUTE`'d only to `service_role`, so no client-side or `anon`/`authenticated`-role code path can call it regardless of what `recordAuditLog()` itself checks.
+
+---
+
+## ADR-028 — Write-RPC Authorization: Explicit REVOKE/GRANT Plus an In-Function Permission Guard
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** The Phase 9 audit found that four `SECURITY DEFINER` RPCs introduced in earlier phases — `execute_social_allocation` (allocating social funds, Phase 6/7), `execute_order_payment_confirmation` (confirming payment + decrementing stock, Phase 6), `execute_distribution` (distributing funds/items to a beneficiary, Phase 7), and `update_revenue_reconciliation` (mutating the revenue ledger's reconciliation status, Phase 6) — never received an explicit `REVOKE`/`GRANT`. Postgres grants `EXECUTE` on a newly created function to `PUBLIC` by default. For a `SECURITY DEFINER` function this means any authenticated session — not just staff, a plain `MEMBER` too — could call it directly via `supabase.rpc(...)` from a browser console and have it genuinely execute, completely bypassing every `requirePermission()` check in `lib/domain/admin/*.ts` (those checks only guard the Server Action call path, never the RPC itself). This directly violated AGENTS.md §14's requirement to use "all applicable layers" (UI + server authorization + database RLS) — the database layer was entirely absent for these four functions specifically.
+
+**Decision:** `supabase/migrations/020_rpc_grant_hardening.sql` re-declares all four functions (`CREATE OR REPLACE`, identical signature and logic) with two additions: (1) `REVOKE ALL ... FROM PUBLIC` followed by `GRANT EXECUTE ... TO authenticated`, closing the anon/public gap; (2) an in-function guard, `IF NOT public.has_permission('<module>', 'write') THEN RAISE EXCEPTION ... END IF;` at the top of the function body, using the exact same RBAC matrix (`has_permission`, `018_rbac_roles.sql`) as every other authorization check in the system.
+
+**Why:** `GRANT ... TO authenticated` alone is not sufficient — `authenticated` includes every staff role and every `MEMBER`, not just the roles the ARSITEKTUR.md §11 matrix actually permits for that module (e.g. a `SOCIAL_OFFICER` has `orders_sales: read` only, so they must not be able to call `execute_order_payment_confirmation` even though they are staff). The in-function `has_permission()` check makes the database layer independently correct rather than merely "not wide open," consistent with the "UI + server + RLS" layering principle this phase exists to establish everywhere else.
+
+**Consequences:** Any future `SECURITY DEFINER` RPC that mutates sensitive data must follow this same two-part pattern (explicit `REVOKE`/`GRANT` to `authenticated`, plus an internal `has_permission()` guard matching the module the mutation belongs to) from the moment it is first written — not added later as an audit fix. `tests/rpc-grant-hardening.test.mjs` guards the four functions named above against regressing to an ungranted or unguarded state; any new critical write RPC should be added to that test's `CRITICAL_WRITE_RPCS` list when it is introduced.
+
+---
+
 ## Agent Rule
 
 Before introducing a major architectural change, search this document first.

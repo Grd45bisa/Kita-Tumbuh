@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { WasteTypeSchema, type WasteTypeInput } from "@/lib/validation/waste-type-schema";
 import type { ActionResult } from "@/types/donation";
@@ -20,7 +20,7 @@ function toRecord(input: unknown): Record<string, unknown> {
 export async function createWasteTypeAction(
   input: WasteTypeInput | FormData
 ): Promise<ActionResult<{ id: string }>> {
-  await requireAdmin();
+  await requirePermission("waste_inventory", "write");
 
   const parse = WasteTypeSchema.safeParse(toRecord(input));
   if (!parse.success) {
@@ -80,7 +80,7 @@ export async function updateWasteTypeAction(
   id: string,
   input: WasteTypeInput | FormData
 ): Promise<ActionResult> {
-  await requireAdmin();
+  await requirePermission("waste_inventory", "write");
 
   const parse = WasteTypeSchema.safeParse(toRecord(input));
   if (!parse.success) {
@@ -140,7 +140,7 @@ export async function toggleWasteTypeStatusAction(
   id: string,
   nextStatus: boolean
 ): Promise<ActionResult> {
-  await requireAdmin();
+  await requirePermission("waste_inventory", "write");
 
   try {
     const supabase = await createClient();

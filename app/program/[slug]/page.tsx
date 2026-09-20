@@ -6,6 +6,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { getPublicProgramBySlug } from "@/lib/domain/social-programs";
 import { SOCIAL_PROGRAM_STATUS_LABELS } from "@/lib/validation/social-schema";
 import { env } from "@/lib/env";
+import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 interface Props {
@@ -17,14 +18,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const program = await getPublicProgramBySlug(slug);
 
   if (!program) {
-    return { title: "Program Tidak Ditemukan — Kampung Smart Farming" };
+    return {
+      title: "Program Tidak Ditemukan — Kampung Smart Farming",
+      robots: { index: false, follow: false },
+    };
   }
+
+  const canonicalUrl = `${env.siteUrl}/program/${encodeURIComponent(slug)}`;
 
   return {
     title: `${program.name} — Program Sosial KITA TUMBUH`,
     description: program.description,
     alternates: {
-      canonical: `${env.siteUrl}/program/${encodeURIComponent(slug)}`,
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: `${program.name} — Program Sosial KITA TUMBUH`,
+      description: program.description,
+      url: canonicalUrl,
+      type: "website",
     },
   };
 }
@@ -49,6 +61,10 @@ export default async function ProgramDetailPage({ params }: Props) {
 
   return (
     <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(breadcrumbItems)) }}
+      />
       <section className={styles.section}>
         <Container>
           <Breadcrumb items={breadcrumbItems} />

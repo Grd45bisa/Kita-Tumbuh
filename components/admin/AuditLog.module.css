@@ -1,0 +1,12 @@
+.header { margin-bottom: var(--space-6); }
+.header h1 { color: var(--color-text-primary); font-size: var(--font-size-heading-m); }
+.header p { color: var(--color-text-secondary); font-size: var(--font-size-body-s); }
+.filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-6); align-items: end; }
+.filters label { display: grid; gap: var(--space-1); color: var(--color-text-secondary); font-size: var(--font-size-caption); }
+.filters input { min-height: 40px; padding: var(--space-2); border: 1px solid var(--color-border-default); border-radius: var(--radius-sm); background: var(--color-bg-surface); color: var(--color-text-primary); }
+.filters button { min-height: 40px; border: 0; border-radius: var(--radius-sm); background: var(--color-brand-primary); color: var(--color-brand-primary-fg); font-weight: var(--font-weight-semibold); cursor: pointer; }
+.tableWrap { overflow-x: auto; border: 1px solid var(--color-border-default); border-radius: var(--radius-md); background: var(--color-bg-surface); }
+.tableWrap table { width: 100%; border-collapse: collapse; font-size: var(--font-size-body-s); }
+.tableWrap th, .tableWrap td { padding: var(--space-3); text-align: left; vertical-align: top; border-bottom: 1px solid var(--color-border-subtle); }
+.tableWrap th { color: var(--color-text-secondary); background: var(--color-bg-subtle); }
+.tableWrap code { overflow-wrap: anywhere; color: var(--color-text-primary); }

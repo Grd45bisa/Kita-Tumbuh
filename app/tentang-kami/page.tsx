@@ -5,6 +5,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { LinkButton } from "@/components/ui/LinkButton";
 import { organizationContent } from "@/lib/content/organization";
 import { env } from "@/lib/env";
+import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -31,6 +32,10 @@ export default function TentangKamiPage() {
 
   return (
     <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(breadcrumbItems)) }}
+      />
       <section className={styles.hero}>
         <Container>
           <div className={styles.heroInner}>

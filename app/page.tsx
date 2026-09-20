@@ -12,6 +12,16 @@ export const metadata: Metadata = {
   title: "Donasi Sampah untuk Anak Difabel",
   description:
     "Ubah minyak jelantah, sampah organik, dan plastik terpilah dari rumah menjadi karya bernilai yang mendukung ruang belajar dan kemandirian anak-anak difabel.",
+  alternates: {
+    canonical: env.siteUrl,
+  },
+  openGraph: {
+    title: "KITA TUMBUH — Kampung Smart Farming",
+    description:
+      "Ubah minyak jelantah, sampah organik, dan plastik terpilah dari rumah menjadi karya bernilai yang mendukung ruang belajar dan kemandirian anak-anak difabel.",
+    url: env.siteUrl,
+    type: "website",
+  },
 };
 
 function WasteIcon({ name }: { name: string }) {
@@ -42,7 +52,7 @@ function WasteIcon({ name }: { name: string }) {
 }
 
 export default function HomePage() {
-  const jsonLd = {
+  const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "KITA TUMBUH — Kampung Setara Smart Farming",
@@ -52,11 +62,25 @@ export default function HomePage() {
       "Gerakan donasi sampah terpilah yang mengolah limbah rumah tangga menjadi karya bernilai untuk mendukung ruang tumbuh anak-anak difabel.",
   };
 
+  // WebSite schema — distinct from Organization, describes the site itself
+  // rather than the entity behind it (P0-1004). No SearchAction is included
+  // because there is no site-wide search feature to genuinely represent.
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "KITA TUMBUH — Kampung Setara Smart Farming",
+    url: env.siteUrl,
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
 
       <section className={styles.hero} aria-labelledby="hero-title">

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import {
   CreateSocialProgramSchema,
   UpdateSocialProgramSchema,
@@ -69,7 +69,7 @@ function mapProgram(row: RawProgram): SocialProgram {
 export async function getAdminPrograms(
   params: GetAdminProgramsParams = {}
 ): Promise<GetAdminProgramsResult> {
-  await requireAdmin();
+  await requirePermission("social_programs", "read");
   const supabase = await createClient();
 
   const page = Math.max(1, params.page || 1);
@@ -116,7 +116,7 @@ export async function getAdminPrograms(
 }
 
 export async function getAdminProgramById(id: string): Promise<SocialProgram | null> {
-  await requireAdmin();
+  await requirePermission("social_programs", "read");
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -145,7 +145,7 @@ export async function getAdminProgramById(id: string): Promise<SocialProgram | n
 export async function createSocialProgramAction(
   rawInput: CreateSocialProgramInput
 ): Promise<SocialActionResult<{ id: string; slug: string }>> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("social_programs", "write");
 
   const parsed = CreateSocialProgramSchema.safeParse(rawInput);
   if (!parsed.success) {
@@ -194,7 +194,7 @@ export async function createSocialProgramAction(
 export async function updateSocialProgramAction(
   rawInput: UpdateSocialProgramInput
 ): Promise<SocialActionResult<{ id: string }>> {
-  await requireAdmin();
+  await requirePermission("social_programs", "write");
 
   const parsed = UpdateSocialProgramSchema.safeParse(rawInput);
   if (!parsed.success) {

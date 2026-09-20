@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
+import { recordAuditLog } from "@/lib/domain/admin/audit-logs";
 import {
   UpdateReconciliationSchema,
   CreateSocialAllocationSchema,
@@ -43,7 +44,7 @@ export interface GetRevenueEntriesResult {
 export async function getAdminRevenueEntries(
   params: GetRevenueEntriesParams = {}
 ): Promise<GetRevenueEntriesResult> {
-  await requireAdmin();
+  await requirePermission("finance", "read");
   const supabase = await createClient();
 
   const page = Math.max(1, params.page || 1);
@@ -141,7 +142,7 @@ export async function getAdminRevenueEntries(
  * Balance is always a derived calculation, never an overwritten mutable field.
  */
 export async function getFinancialSummary(): Promise<FinancialSummary> {
-  await requireAdmin();
+  await requirePermission("finance", "read");
   const supabase = await createClient();
 
   // 1. Sum total revenue from append-only revenue entries
@@ -206,7 +207,7 @@ export async function getFinancialSummary(): Promise<FinancialSummary> {
 export async function updateRevenueReconciliationAction(
   rawInput: UpdateReconciliationInput
 ): Promise<FinanceActionResult<{ entryId: string }>> {
-  await requireAdmin();
+  await requirePermission("finance", "write");
 
   const parseResult = UpdateReconciliationSchema.safeParse(rawInput);
   if (!parseResult.success) {
@@ -261,7 +262,7 @@ export async function getAdminSocialAllocations(
   page: number = 1,
   pageSize: number = 15
 ): Promise<GetSocialAllocationsResult> {
-  await requireAdmin();
+  await requirePermission("finance", "read");
   const supabase = await createClient();
 
   const validPage = Math.max(1, page);
@@ -353,14 +354,14 @@ export async function getAdminSocialAllocations(
  * Allocate realized revenue to a social program.
  *
  * Requirements:
- * 1. requireAdmin() server authorization.
+ * 1. finance write permission on the server.
  * 2. Strict server-side balance check: cannot allocate more than (SUM revenue - SUM approved allocations).
  * 3. Atomic insert with validation to prevent race-condition overdrafts (P0-604).
  */
 export async function allocateRevenueAction(
   rawInput: CreateSocialAllocationInput
 ): Promise<FinanceActionResult<{ allocationId: string }>> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("finance", "write");
 
   const parseResult = CreateSocialAllocationSchema.safeParse(rawInput);
   if (!parseResult.success) {
@@ -394,11 +395,20 @@ export async function allocateRevenueAction(
   );
 
   if (!rpcError && rpcResult) {
+    const allocationId = (rpcResult as { id: string }).id;
+    await recordAuditLog({
+      actorId: admin.id,
+      action: "ALLOCATION_CREATED",
+      entityType: "social_allocation",
+      entityId: allocationId,
+      newValue: { amount: input.amount, currency: "IDR", program_id: input.program_id || null },
+      reason: input.notes || null,
+    });
     revalidatePath("/admin/finance");
     revalidatePath("/admin/finance/allocations");
     return {
       success: true,
-      data: { allocationId: (rpcResult as { id: string }).id },
+      data: { allocationId },
     };
   }
 
@@ -434,6 +444,15 @@ export async function allocateRevenueAction(
     };
   }
 
+  await recordAuditLog({
+    actorId: admin.id,
+    action: "ALLOCATION_CREATED",
+    entityType: "social_allocation",
+    entityId: inserted.id,
+    newValue: { amount: input.amount, currency: "IDR", program_id: input.program_id || null },
+    reason: input.notes || null,
+  });
+
   revalidatePath("/admin/finance");
   revalidatePath("/admin/finance/allocations");
 
@@ -450,7 +469,7 @@ export async function allocateRevenueAction(
 export async function getApprovedAllocationsForProgram(
   programId: string
 ): Promise<Array<{ id: string; amount: number; allocated_at: string }>> {
-  await requireAdmin();
+  await requirePermission("finance", "read");
   const supabase = await createClient();
 
   const { data } = await supabase
@@ -488,7 +507,7 @@ export interface GetExpensesResult {
 export async function getAdminExpenses(
   params: GetExpensesParams = {}
 ): Promise<GetExpensesResult> {
-  await requireAdmin();
+  await requirePermission("finance", "read");
   const supabase = await createClient();
 
   const page = Math.max(1, params.page || 1);
@@ -582,7 +601,7 @@ export async function getAdminExpenses(
 export async function recordExpenseAction(
   rawInput: CreateExpenseInput
 ): Promise<FinanceActionResult<{ expenseId: string }>> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("finance", "write");
 
   const parseResult = CreateExpenseSchema.safeParse(rawInput);
   if (!parseResult.success) {
@@ -632,5 +651,3 @@ export async function recordExpenseAction(
     data: { expenseId: inserted.id },
   };
 }
-
-

@@ -9,6 +9,7 @@ import { CollectionPointFilter } from "@/components/collection-point/CollectionP
 import { getCollectionPoints } from "@/lib/domain/collection-points";
 import { getWasteTypes } from "@/lib/domain/waste-types";
 import { env } from "@/lib/env";
+import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -58,6 +59,10 @@ export default async function CollectionPointPage({ searchParams }: Props) {
 
   return (
     <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(breadcrumbItems)) }}
+      />
       <section className={styles.hero}>
         <Container>
           <div className={styles.heroInner}>

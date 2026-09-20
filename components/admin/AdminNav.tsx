@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { AuthUser } from "@/types/user";
+import { hasPermission, type AdminModule } from "@/lib/auth/permissions";
 import styles from "./AdminNav.module.css";
 
 interface AdminNavProps {
@@ -13,11 +14,12 @@ interface AdminNavProps {
 export function AdminNav({ user }: AdminNavProps) {
   const pathname = usePathname();
 
-  const navItems = [
+  const navItems: Array<{ label: string; href: string; exact?: boolean; module: AdminModule; icon: React.ReactNode }> = [
     {
       label: "Overview",
       href: "/admin",
       exact: true,
+      module: "dashboard",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.navIcon}>
           <rect x="3" y="3" width="7" height="7" />
@@ -30,6 +32,7 @@ export function AdminNav({ user }: AdminNavProps) {
     {
       label: "Master Limbah",
       href: "/admin/waste-types",
+      module: "waste_inventory",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.navIcon}>
           <path d="M4 7h16" />
@@ -43,6 +46,7 @@ export function AdminNav({ user }: AdminNavProps) {
     {
       label: "Donasi & Verifikasi",
       href: "/admin/donations",
+      module: "donations",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.navIcon}>
           <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
@@ -54,6 +58,7 @@ export function AdminNav({ user }: AdminNavProps) {
     {
       label: "Inventaris Limbah",
       href: "/admin/inventory",
+      module: "waste_inventory",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.navIcon}>
           <line x1="16.5" y1="9.4" x2="7.5" y2="4.21" />
@@ -66,6 +71,7 @@ export function AdminNav({ user }: AdminNavProps) {
     {
       label: "Batch Produksi",
       href: "/admin/production",
+      module: "production",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.navIcon}>
           <polygon points="12 2 2 7 12 12 22 7 12 2" />
@@ -77,6 +83,7 @@ export function AdminNav({ user }: AdminNavProps) {
     {
       label: "Produk Sirkular",
       href: "/admin/products",
+      module: "product_catalog",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.navIcon}>
           <circle cx="9" cy="21" r="1" />
@@ -88,6 +95,7 @@ export function AdminNav({ user }: AdminNavProps) {
     {
       label: "Pesanan Produk",
       href: "/admin/orders",
+      module: "orders_sales",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.navIcon}>
           <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
@@ -99,6 +107,7 @@ export function AdminNav({ user }: AdminNavProps) {
     {
       label: "Keuangan & Alokasi",
       href: "/admin/finance",
+      module: "finance",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.navIcon}>
           <rect x="2" y="4" width="20" height="16" rx="2" />
@@ -109,6 +118,7 @@ export function AdminNav({ user }: AdminNavProps) {
     {
       label: "Program & Penerima Manfaat",
       href: "/admin/social",
+      module: "social_programs",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.navIcon}>
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -118,7 +128,17 @@ export function AdminNav({ user }: AdminNavProps) {
         </svg>
       ),
     },
+    {
+      label: "Audit Log",
+      href: "/admin/audit-log",
+      module: "audit_log",
+      icon: <span className={styles.navIcon} aria-hidden="true">≡</span>,
+    },
   ];
+
+  const visibleItems = navItems.filter((item) =>
+    hasPermission(user.profile?.role, item.module, "read")
+  );
 
   return (
     <aside className={styles.sidebar}>
@@ -134,7 +154,7 @@ export function AdminNav({ user }: AdminNavProps) {
 
       <nav className={styles.navSection} aria-label="Navigasi Operasional Admin">
         <span className={styles.navLabel}>Modul Operasional</span>
-        {navItems.map((item) => {
+        {visibleItems.map((item) => {
           const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
           return (
             <Link

@@ -14,7 +14,14 @@
   --color-ink-800: #343A36;
   --color-ink-700: #4A514C;
   --color-ink-600: #636B65;
-  --color-ink-500: #7E8780;
+  /* Darkened from the original #7E8780 (Phase 12 accessibility audit):
+     that value only reached a 3.71:1 contrast ratio against white/paper-0,
+     failing WCAG AA (4.5:1) for normal-weight text at the caption (12px)
+     and body-s (14px) sizes this token is used at throughout the app via
+     --color-text-muted. #6B766E clears 4.73:1 on white and 4.60:1 on the
+     paper-50 canvas background, while staying visually lighter than
+     --color-ink-700 so the muted/secondary/primary text hierarchy is kept. */
+  --color-ink-500: #6B766E;
   --color-ink-400: #A0A8A1;
   --color-ink-300: #C6CCC7;
   --color-ink-200: #DCE1DD;

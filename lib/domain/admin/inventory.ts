@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import {
   InventoryAdjustmentSchema,
@@ -25,7 +25,7 @@ function toRecord(input: unknown): Record<string, unknown> {
 export async function adjustWasteLotAction(
   input: InventoryAdjustmentInput | FormData
 ): Promise<ActionResult> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("waste_inventory", "write");
 
   const parse = InventoryAdjustmentSchema.safeParse(toRecord(input));
   if (!parse.success) {
@@ -126,7 +126,7 @@ export async function adjustWasteLotAction(
 export async function createWasteLotAction(
   input: CreateWasteLotInput | FormData
 ): Promise<ActionResult<{ id: string }>> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("waste_inventory", "write");
 
   const parse = CreateWasteLotSchema.safeParse(toRecord(input));
   if (!parse.success) {

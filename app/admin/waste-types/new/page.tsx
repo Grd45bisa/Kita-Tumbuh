@@ -1,8 +1,17 @@
 import React from "react";
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth/session";
 import { WasteTypeForm } from "@/components/admin/WasteTypeForm";
 
-export default function NewWasteTypePage() {
+export default async function NewWasteTypePage() {
+  // Every other admin "new"/"edit" page gates itself at the page level
+  // (e.g. app/admin/waste-types/[id]/edit/page.tsx) so a role that only has
+  // "read" on this module (FINANCE, SOCIAL_OFFICER per ARSITEKTUR.md §11)
+  // never even sees the create form — only the shared layout's baseline
+  // "dashboard: read" gate (app/admin/layout.tsx) was protecting this page,
+  // which is not module-specific. Found missing during the Phase 9 audit.
+  await requirePermission("waste_inventory", "write");
+
   return (
     <div>
       <div style={{ marginBottom: "var(--space-6)" }}>

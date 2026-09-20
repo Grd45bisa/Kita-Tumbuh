@@ -8,6 +8,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { PRODUCT_CATEGORY_LABELS, type ProductCategory } from "@/lib/validation/product-schema";
 import { ProductOrderForm } from "@/components/order/ProductOrderForm";
 import { env } from "@/lib/env";
+import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 interface Props {
@@ -27,14 +28,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!product) {
     return {
       title: "Produk Tidak Ditemukan — Kampung Smart Farming",
+      robots: { index: false, follow: false },
     };
   }
 
+  const canonicalUrl = `${env.siteUrl}/produk/${encodeURIComponent(slug)}`;
+  const description = product.description || "Pesan produk hasil daur ulang limbah dari Kampung Smart Farming.";
+
   return {
     title: `${product.name} — Produk Hasil Olahan KITA TUMBUH`,
-    description: product.description || "Pesan produk hasil daur ulang limbah dari Kampung Smart Farming.",
+    description,
     alternates: {
-      canonical: `${env.siteUrl}/produk/${encodeURIComponent(slug)}`,
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: `${product.name} — Produk Hasil Olahan KITA TUMBUH`,
+      description,
+      url: canonicalUrl,
+      type: "website",
     },
   };
 }
@@ -69,8 +80,38 @@ export default async function ProductDetailPage({ params }: Props) {
     { label: product.name },
   ];
 
+  // Product structured data — every field here is genuinely rendered on
+  // this page (name, price, currency, stock-derived availability), never
+  // invented, per P0-1004 / AGENTS.md anti-fabrication rule.
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    sku: product.sku,
+    url: `${env.siteUrl}/produk/${encodeURIComponent(product.slug)}`,
+    offers: {
+      "@type": "Offer",
+      price: Number(product.price),
+      priceCurrency: product.currency,
+      availability:
+        Number(product.stock_quantity) > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      url: `${env.siteUrl}/produk/${encodeURIComponent(product.slug)}`,
+    },
+  };
+
   return (
     <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(breadcrumbItems)) }}
+      />
       <section className={styles.section}>
         <Container>
           <Breadcrumb items={breadcrumbItems} />

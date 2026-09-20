@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/lib/auth/session";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Pagination } from "@/components/ui/Pagination";
 import { Badge } from "@/components/ui/Badge";
@@ -35,6 +36,7 @@ interface AdminDonationsPageProps {
 }
 
 export default async function AdminDonationsPage({ searchParams }: AdminDonationsPageProps) {
+  await requirePermission("donations", "read");
   const params = await searchParams;
   const currentStatus = params.status || "";
   const currentWasteType = params.waste_type || "";

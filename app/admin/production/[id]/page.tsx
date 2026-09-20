@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/lib/auth/session";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Card } from "@/components/ui/Card";
 import { DataTable, type Column } from "@/components/ui/DataTable";
@@ -58,6 +59,7 @@ interface RawAvailableLot {
 }
 
 export default async function ProductionBatchDetailPage({ params }: PageProps) {
+  await requirePermission("production", "read");
   const { id } = await params;
   const supabase = await createClient();
 

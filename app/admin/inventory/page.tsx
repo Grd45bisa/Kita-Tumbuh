@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/lib/auth/session";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { DataTable, type Column } from "@/components/ui/DataTable";
@@ -49,6 +50,7 @@ interface RawTxRow {
 }
 
 export default async function AdminInventoryPage() {
+  await requirePermission("waste_inventory", "read");
   const supabase = await createClient();
 
   // 1. Fetch waste lots with type details

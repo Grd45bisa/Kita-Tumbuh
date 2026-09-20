@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { AuthUser, UserProfile } from "@/types/user";
+import { hasPermission, type AdminModule } from "@/lib/auth/permissions";
 
 /**
  * Read the current authenticated user and profile from session cookies.
@@ -58,6 +59,14 @@ export async function requireUser(returnUrl?: string): Promise<AuthUser> {
  * - If authenticated but not admin -> redirects to /dashboard (forbidden).
  */
 export async function requireAdmin(returnUrl?: string): Promise<AuthUser> {
+  return requirePermission("dashboard", "read", returnUrl);
+}
+
+export async function requirePermission(
+  module: AdminModule,
+  level: "read" | "write",
+  returnUrl?: string
+): Promise<AuthUser> {
   const user = await getCurrentUser();
 
   if (!user) {
@@ -65,7 +74,7 @@ export async function requireAdmin(returnUrl?: string): Promise<AuthUser> {
     redirect(`/login${query}`);
   }
 
-  if (user.profile?.role !== "admin") {
+  if (!hasPermission(user.profile?.role, module, level)) {
     redirect("/dashboard");
   }
 

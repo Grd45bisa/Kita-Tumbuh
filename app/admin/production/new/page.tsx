@@ -2,13 +2,15 @@ import React from "react";
 import type { Metadata } from "next";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ProductionBatchForm } from "@/components/admin/ProductionBatchForm";
+import { requirePermission } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Buat Batch Produksi Baru | Admin KITA TUMBUH",
   robots: { index: false, follow: false },
 };
 
-export default function NewProductionBatchPage() {
+export default async function NewProductionBatchPage() {
+  await requirePermission("production", "write");
   const breadcrumbItems = [
     { label: "Admin", href: "/admin" },
     { label: "Batch Produksi", href: "/admin/production" },

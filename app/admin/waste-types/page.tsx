@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/lib/auth/session";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -11,6 +12,7 @@ interface WasteTypeRow extends WasteType {
 }
 
 export default async function AdminWasteTypesPage() {
+  await requirePermission("waste_inventory", "read");
   const supabase = await createClient();
 
   const { data: rawWasteTypes } = await supabase

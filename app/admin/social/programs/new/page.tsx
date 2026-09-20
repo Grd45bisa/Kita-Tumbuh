@@ -3,13 +3,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { ProgramForm } from "@/components/admin/ProgramForm";
+import { requirePermission } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Program Baru | Admin KITA TUMBUH",
   robots: { index: false, follow: false },
 };
 
-export default function NewProgramPage() {
+export default async function NewProgramPage() {
+  await requirePermission("social_programs", "write");
   return (
     <div>
       <div style={{ marginBottom: "var(--space-6)" }}>

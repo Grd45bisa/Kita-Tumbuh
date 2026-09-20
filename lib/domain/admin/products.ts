@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
 import { ProductSchema, type ProductInput } from "@/lib/validation/product-schema";
 
 export interface ProductActionResult<T = unknown> {
@@ -18,7 +18,7 @@ export interface ProductActionResult<T = unknown> {
 export async function createProductAction(
   rawInput: ProductInput
 ): Promise<ProductActionResult<{ id: string; slug: string }>> {
-  await requireAdmin();
+  await requirePermission("product_catalog", "write");
 
   const parsed = ProductSchema.safeParse(rawInput);
   if (!parsed.success) {
@@ -77,7 +77,7 @@ export async function updateProductAction(
   productId: string,
   rawInput: ProductInput
 ): Promise<ProductActionResult<{ id: string; slug: string }>> {
-  await requireAdmin();
+  await requirePermission("product_catalog", "write");
 
   const parsed = ProductSchema.safeParse(rawInput);
   if (!parsed.success) {
@@ -140,7 +140,7 @@ export async function toggleProductVisibilityAction(
   productId: string,
   isPublic: boolean
 ): Promise<ProductActionResult<{ is_public: boolean }>> {
-  await requireAdmin();
+  await requirePermission("product_catalog", "write");
 
   const supabase = await createClient();
 

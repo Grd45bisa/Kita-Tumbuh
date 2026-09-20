@@ -2,85 +2,346 @@ import React from "react";
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
-import { ComingSoon } from "@/components/ui/ComingSoon";
 import { env } from "@/lib/env";
+import {
+  getPublicImpactSummary,
+  formatMetricValue,
+} from "@/lib/domain/impact/public-impact";
+import { METRIC_DEFINITIONS } from "@/lib/domain/impact/definitions";
+import type { PublicImpactSummary } from "@/lib/domain/impact/definitions";
+import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Dampak — Kampung Setara Smart Farming",
+  title: "Dampak — Kampung Smart Farming | KITA TUMBUH",
   description:
-    "Ringkasan dampak Kampung Setara Smart Farming — sistem agregasi data dampak publik sedang kami bangun agar setiap angka dapat diverifikasi.",
+    "Ringkasan dampak terverifikasi Kampung Smart Farming — limbah diterima, diolah, produk dihasilkan, dan alokasi sosial berdasarkan data operasional nyata.",
   alternates: {
     canonical: `${env.siteUrl}/dampak`,
   },
+  openGraph: {
+    title: "Dampak — Kampung Smart Farming",
+    description:
+      "Angka dampak yang kami tampilkan berasal dari data operasional terverifikasi, bukan perkiraan.",
+    url: `${env.siteUrl}/dampak`,
+    type: "website",
+  },
 };
 
-const metricLabels = [
-  "Limbah diterima",
-  "Limbah diproses",
-  "Produk dihasilkan",
-  "Alokasi sosial",
-];
+// Server Component — data fetched at request time (no caching)
+// Angka harus selalu live agar tidak menyesatkan.
+export const dynamic = "force-dynamic";
 
-export default function DampakPage() {
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function MetricCard({
+  label,
+  value,
+  unit,
+  status,
+  caveat,
+}: {
+  label: string;
+  value: number | null;
+  unit: string;
+  status: "available" | "no_data" | "error";
+  caveat?: string;
+}) {
+  const isAvailable = status === "available" && value !== null;
+
+  return (
+    <div
+      className={`${styles.metricCard} ${!isAvailable ? styles.metricCardEmpty : ""}`}
+    >
+      <p className={styles.metricLabel}>{label}</p>
+      {isAvailable ? (
+        <p className={styles.metricValue}>{formatMetricValue(value!, unit)}</p>
+      ) : (
+        <p className={styles.metricValueEmpty}>
+          {status === "error" ? "Tidak tersedia" : "Belum ada data"}
+        </p>
+      )}
+      {caveat && isAvailable && (
+        <p className={styles.metricCaveat}>{caveat}</p>
+      )}
+    </div>
+  );
+}
+
+function DataFreshnessNotice({ computedAt }: { computedAt: string }) {
+  const date = new Date(computedAt);
+  const formatted = new Intl.DateTimeFormat("id-ID", {
+    dateStyle: "long",
+    timeStyle: "short",
+    timeZone: "Asia/Jakarta",
+  }).format(date);
+
+  return (
+    <p className={styles.freshnessNotice}>
+      Data diperbarui secara langsung — dihitung saat halaman ini dimuat.
+      Terakhir dihitung:{" "}
+      <time dateTime={computedAt}>{formatted} WIB</time>.
+    </p>
+  );
+}
+
+function ImpactJourneyDiagram() {
+  const steps = [
+    { label: "Limbah Donasi", sub: "dari rumah tangga" },
+    { label: "Penjemputan / Drop-off", sub: "terjadwal oleh operator" },
+    { label: "Verifikasi Fisik", sub: "kuantitas aktual dicatat" },
+    { label: "Inventaris & Sortir", sub: "lot disimpan di gudang" },
+    { label: "Pengolahan", sub: "menjadi produk sirkular" },
+    { label: "Penjualan", sub: "pendapatan tercatat" },
+    { label: "Alokasi Sosial", sub: "dari pendapatan pooled" },
+    { label: "Program & Distribusi", sub: "ke penerima manfaat" },
+  ];
+
+  return (
+    <div className={styles.journeyWrapper} aria-label="Perjalanan limbah ke dampak">
+      <ol className={styles.journeyList}>
+        {steps.map((step, i) => (
+          <li key={step.label} className={styles.journeyItem}>
+            <div className={styles.journeyStep}>
+              <span className={styles.journeyNumber} aria-hidden="true">
+                {i + 1}
+              </span>
+              <div className={styles.journeyText}>
+                <span className={styles.journeyLabel}>{step.label}</span>
+                <span className={styles.journeySub}>{step.sub}</span>
+              </div>
+            </div>
+            {i < steps.length - 1 && (
+              <div className={styles.journeyArrow} aria-hidden="true" />
+            )}
+          </li>
+        ))}
+      </ol>
+      <p className={styles.journeyNote}>
+        Akuntansi bersifat <strong>pooled</strong> — pendapatan dari semua
+        penjualan diagabungkan sebelum sebagian dialokasikan ke program sosial.
+        Tidak ada hubungan satu-ke-satu antara donasi spesifik dan program
+        spesifik.
+      </p>
+    </div>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default async function DampakPage() {
   const breadcrumbItems = [
     { label: "Beranda", href: "/" },
     { label: "Dampak" },
   ];
 
+  let summary: PublicImpactSummary | null = null;
+  let fetchError = false;
+
+  try {
+    summary = await getPublicImpactSummary();
+  } catch (err) {
+    console.error("[dampak] getPublicImpactSummary failed:", err);
+    fetchError = true;
+  }
+
+  const m = summary?.metrics;
+
   return (
     <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(breadcrumbItems)) }}
+      />
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section className={styles.hero}>
         <Container>
           <div className={styles.heroInner}>
             <Breadcrumb items={breadcrumbItems} />
-            <p className={styles.eyebrow}>KITA TUMBUH — KAMPUNG SETARA SMART FARMING</p>
+            <p className={styles.eyebrow}>KITA TUMBUH — KAMPUNG SMART FARMING</p>
             <h1 className={styles.title}>Dampak</h1>
             <p className={styles.lead}>
-              Kami ingin setiap angka dampak yang ditampilkan di sini benar-benar berasal
-              dari data operasional yang terverifikasi — bukan perkiraan.
+              Setiap angka di halaman ini berasal dari data operasional yang
+              telah diverifikasi secara fisik — bukan perkiraan, bukan target.
             </p>
           </div>
         </Container>
       </section>
 
+      {/* ── Metrik Utama ──────────────────────────────────────────────────── */}
       <section className={styles.section}>
         <Container>
-          <h2 className={styles.sectionTitle}>Metrik yang akan kami tampilkan</h2>
-          <div className={styles.metricGrid}>
-            {metricLabels.map((label) => (
-              <div key={label} className={styles.metricCard}>
-                <p className={styles.metricLabel}>{label}</p>
-                <p className={styles.metricValue}>—</p>
-              </div>
-            ))}
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>Ringkasan Dampak</h2>
+            {summary && (
+              <DataFreshnessNotice computedAt={summary.computedAt} />
+            )}
           </div>
 
-          <ComingSoon
-            title="Angka dampak sedang kami verifikasi"
-            description="Kami sedang membangun sistem agregasi data agar angka limbah diterima, diproses, produk dihasilkan, dan alokasi sosial yang ditampilkan di sini benar-benar berasal dari catatan operasional yang terverifikasi — bukan perkiraan."
-            action={{ label: "Lacak Donasimu", href: "/donasikan" }}
-          />
+          {fetchError ? (
+            <div className={styles.errorState} role="alert">
+              <p>
+                Data dampak tidak dapat dimuat saat ini. Silakan coba lagi
+                dalam beberapa saat.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Baris 1: Limbah */}
+              <div className={styles.metricGroupLabel}>Limbah</div>
+              <div className={styles.metricGrid}>
+                <MetricCard
+                  label={METRIC_DEFINITIONS.donations_verified.label}
+                  value={m?.donations_verified.value ?? null}
+                  unit={METRIC_DEFINITIONS.donations_verified.unit}
+                  status={m?.donations_verified.status ?? "no_data"}
+                />
+                <MetricCard
+                  label={METRIC_DEFINITIONS.waste_collected_liters.label}
+                  value={m?.waste_collected_liters.value ?? null}
+                  unit={METRIC_DEFINITIONS.waste_collected_liters.unit}
+                  status={m?.waste_collected_liters.status ?? "no_data"}
+                  caveat="Jumlah aktual terverifikasi, bukan estimasi donatur"
+                />
+                <MetricCard
+                  label={METRIC_DEFINITIONS.waste_collected_kg.label}
+                  value={m?.waste_collected_kg.value ?? null}
+                  unit={METRIC_DEFINITIONS.waste_collected_kg.unit}
+                  status={m?.waste_collected_kg.status ?? "no_data"}
+                  caveat="Jumlah aktual terverifikasi, bukan estimasi donatur"
+                />
+                <MetricCard
+                  label={METRIC_DEFINITIONS.waste_processed.label}
+                  value={m?.waste_processed.value ?? null}
+                  unit={METRIC_DEFINITIONS.waste_processed.unit}
+                  status={m?.waste_processed.status ?? "no_data"}
+                />
+              </div>
+
+              {/* Baris 2: Produksi & Dampak Sosial */}
+              <div className={styles.metricGroupLabel}>Produksi &amp; Sosial</div>
+              <div className={styles.metricGrid}>
+                <MetricCard
+                  label={METRIC_DEFINITIONS.production_batches_completed.label}
+                  value={m?.production_batches_completed.value ?? null}
+                  unit={METRIC_DEFINITIONS.production_batches_completed.unit}
+                  status={m?.production_batches_completed.status ?? "no_data"}
+                />
+                <MetricCard
+                  label={METRIC_DEFINITIONS.social_allocation_total.label}
+                  value={m?.social_allocation_total.value ?? null}
+                  unit={METRIC_DEFINITIONS.social_allocation_total.unit}
+                  status={m?.social_allocation_total.status ?? "no_data"}
+                  caveat="Dari pendapatan penjualan produk sirkular (pooled)"
+                />
+                <MetricCard
+                  label={METRIC_DEFINITIONS.social_programs_count.label}
+                  value={m?.social_programs_count.value ?? null}
+                  unit={METRIC_DEFINITIONS.social_programs_count.unit}
+                  status={m?.social_programs_count.status ?? "no_data"}
+                />
+              </div>
+
+              <p className={styles.noDataNote}>
+                Metrik yang menampilkan &ldquo;Belum ada data&rdquo; berarti
+                proses operasional untuk kategori tersebut belum menghasilkan
+                catatan yang terverifikasi — bukan berarti angkanya nol.
+              </p>
+            </>
+          )}
         </Container>
       </section>
 
+      {/* ── Perjalanan Limbah ke Dampak (P1-804) ──────────────────────────── */}
       <section className={`${styles.section} ${styles.sectionAlt}`}>
         <Container>
-          <h2 className={styles.sectionTitle}>Bagaimana angka ini nantinya dihitung</h2>
-          <p className={styles.methodologyText}>
-            <strong>Limbah diterima</strong> dihitung dari jumlah aktual yang diverifikasi
-            saat limbah diterima — bukan dari perkiraan yang diisi donatur saat mengajukan
-            donasi.
+          <h2 className={styles.sectionTitle}>
+            Perjalanan Limbah ke Dampak Sosial
+          </h2>
+          <p className={styles.sectionLead}>
+            Berikut adalah alur lengkap bagaimana limbah rumah tangga
+            bertransformasi menjadi produk dan akhirnya mendanai program
+            pemberdayaan masyarakat.
           </p>
-          <p className={styles.methodologyText}>
-            <strong>Limbah diproses</strong> dihitung dari jumlah limbah yang benar-benar
-            masuk ke tahap pengolahan menjadi produk atau bahan pendukung kebun.
-          </p>
-          <p className={styles.methodologyText}>
-            <strong>Alokasi sosial</strong> dihitung dari catatan alokasi yang telah disetujui
-            dan ditujukan untuk program sosial — dipisahkan secara jelas dari biaya
-            operasional.
-          </p>
+          <ImpactJourneyDiagram />
+        </Container>
+      </section>
+
+      {/* ── Metodologi ────────────────────────────────────────────────────── */}
+      <section className={styles.section}>
+        <Container>
+          <h2 className={styles.sectionTitle}>Cara Menghitung Angka Ini</h2>
+
+          <div className={styles.methodologyGrid}>
+            <div className={styles.methodologyItem}>
+              <h3 className={styles.methodologyTitle}>Limbah Diterima</h3>
+              <p className={styles.methodologyText}>
+                Dihitung dari kolom <code>verified_quantity</code> pada tabel
+                donasi — hanya donasi dengan status{" "}
+                <strong>VERIFIED ke atas</strong> yang dimasukkan. Perkiraan
+                jumlah dari donatur (<code>estimated_quantity</code>) tidak
+                pernah digunakan sebagai angka publik.
+              </p>
+            </div>
+
+            <div className={styles.methodologyItem}>
+              <h3 className={styles.methodologyTitle}>Limbah Diproses</h3>
+              <p className={styles.methodologyText}>
+                Dihitung dari input aktual batch produksi yang berstatus{" "}
+                <strong>COMPLETED atau RELEASED</strong>. Batch yang masih dalam
+                proses atau QC belum dihitung.
+              </p>
+            </div>
+
+            <div className={styles.methodologyItem}>
+              <h3 className={styles.methodologyTitle}>Alokasi Dana Sosial</h3>
+              <p className={styles.methodologyText}>
+                Dihitung dari total alokasi dana yang berstatus{" "}
+                <strong>APPROVED</strong> dalam catatan alokasi sosial.
+                Akuntansi bersifat <em>pooled</em>: pendapatan dari semua
+                penjualan digabung, lalu sebagian dialokasikan ke program sosial.
+                Biaya operasional tidak termasuk dan tidak disamarkan sebagai
+                dana sosial.
+              </p>
+            </div>
+
+            <div className={styles.methodologyItem}>
+              <h3 className={styles.methodologyTitle}>Program Sosial</h3>
+              <p className={styles.methodologyText}>
+                Hanya program yang memiliki status{" "}
+                <strong>public_status = true</strong> dan berada dalam tahap
+                aktif, didanai, atau selesai yang ditampilkan di sini.
+                Program internal dalam draft atau review tidak dihitung.
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.transparencyLink}>
+            <p>
+              Ingin melihat laporan periodik dan prinsip pencatatan kami secara
+              lebih rinci?{" "}
+              <a href="/transparansi" className={styles.inlineLink}>
+                Baca halaman Transparansi
+              </a>
+              .
+            </p>
+          </div>
+        </Container>
+      </section>
+
+      {/* ── CTA ───────────────────────────────────────────────────────────── */}
+      <section className={`${styles.section} ${styles.sectionCta}`}>
+        <Container>
+          <div className={styles.ctaBlock}>
+            <h2 className={styles.ctaTitle}>Limbah kamu sangat berarti bagi kami</h2>
+            <p className={styles.ctaText}>
+              Setiap liter minyak jelantah dan setiap kilogram limbah organik
+              yang kamu donasikan menjadi bagian dari siklus nyata ini.
+            </p>
+            <a href="/donasikan" className={styles.ctaButton}>
+              Donasikan Limbahmu
+            </a>
+          </div>
         </Container>
       </section>
     </main>

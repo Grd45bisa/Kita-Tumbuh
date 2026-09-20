@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-test("requireAdmin logic rejects unauthenticated users and redirects to login", () => {
+test("admin shell rejects unauthenticated/member users and accepts staff roles", () => {
+  const staffRoles = new Set(["admin", "SUPER_ADMIN", "ADMIN", "OPERATOR", "FINANCE", "SOCIAL_OFFICER"]);
   const simulateRequireAdmin = (user, returnUrl = "/admin") => {
     if (!user) {
       return { action: "REDIRECT", destination: `/login?redirect=${encodeURIComponent(returnUrl)}` };
     }
-    if (user.profile?.role !== "admin") {
+    if (!staffRoles.has(user.profile?.role)) {
       return { action: "REDIRECT", destination: "/dashboard" };
     }
     return { action: "ALLOW", user };
@@ -36,6 +37,10 @@ test("requireAdmin logic rejects unauthenticated users and redirects to login", 
   const adminResult = simulateRequireAdmin(adminUser, "/admin");
   assert.equal(adminResult.action, "ALLOW");
   assert.equal(adminResult.user.id, "adm-1");
+
+  for (const role of ["SUPER_ADMIN", "ADMIN", "OPERATOR", "FINANCE", "SOCIAL_OFFICER"]) {
+    assert.equal(simulateRequireAdmin({ profile: { role } }, "/admin").action, "ALLOW", role);
+  }
 });
 
 test("middleware route matching correctly flags /admin routes as requiring authentication", () => {

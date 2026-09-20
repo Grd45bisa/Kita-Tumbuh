@@ -5,6 +5,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { FaqAccordion } from "@/components/faq/FaqAccordion";
 import { faqItems } from "@/lib/content/faq";
 import { env } from "@/lib/env";
+import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -50,6 +51,10 @@ export default function FaqPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(breadcrumbItems)) }}
       />
 
       <section className={styles.hero}>

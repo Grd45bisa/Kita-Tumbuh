@@ -18,8 +18,15 @@ export function Input({
   id,
   className = "",
   disabled,
+  required,
   ...props
 }: InputProps) {
+  // The visible "*" mark tracks either the explicit isRequired prop or the
+  // native HTML `required` attribute — every form in this codebase passes
+  // plain `required`, not `isRequired`, so without this the mark never
+  // appeared even though the native attribute (and its screen-reader
+  // announcement) was already correct via {...props}.
+  const showRequiredMark = isRequired || Boolean(required);
   const generatedId = useId();
   const inputId = id || generatedId;
   const helperId = `${inputId}-helper`;
@@ -38,7 +45,7 @@ export function Input({
         <div className={styles.labelWrapper}>
           <label htmlFor={inputId} className={styles.label}>
             {label}
-            {isRequired && <span className={styles.requiredMark} aria-hidden="true">*</span>}
+            {showRequiredMark && <span className={styles.requiredMark} aria-hidden="true">*</span>}
           </label>
           {isOptional && <span className={styles.optionalTag}>Opsional</span>}
         </div>
@@ -48,6 +55,7 @@ export function Input({
         id={inputId}
         className={`${styles.input} ${error ? styles.inputError : ""} ${className}`.trim()}
         disabled={disabled}
+        required={required}
         aria-invalid={Boolean(error)}
         aria-describedby={describedBy || undefined}
         {...props}

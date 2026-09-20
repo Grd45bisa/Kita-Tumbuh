@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/lib/auth/session";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -37,6 +38,7 @@ interface PageProps {
 }
 
 export default async function AdminProductionPage({ searchParams }: PageProps) {
+  await requirePermission("production", "read");
   const { status: statusFilter, page: pageParam } = await searchParams;
   const currentPage = Math.max(1, parseInt(pageParam || "1", 10) || 1);
   const pageSize = 10;

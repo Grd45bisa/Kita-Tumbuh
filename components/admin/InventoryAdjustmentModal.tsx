@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -29,6 +29,63 @@ export function InventoryAdjustmentModal({
   const [reason, setReason] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const firstFieldRef = useRef<HTMLSelectElement>(null);
+  // Lazy-initialized so it captures the trigger element exactly once, at
+  // first mount — never re-captured on a later re-render while the modal
+  // is still open (which would wrongly point it at an element inside the
+  // modal itself if the parent re-renders for an unrelated reason).
+  const triggerElementRef = useRef<Element | null>(
+    typeof document !== "undefined" ? document.activeElement : null
+  );
+
+  // Focus the first field once, when the dialog first mounts.
+  useEffect(() => {
+    firstFieldRef.current?.focus();
+  }, []);
+
+  // Escape-to-close and Tab focus trap. Re-attaching this on every render is
+  // harmless (it's the same idempotent listener), so onClose can safely be
+  // a dependency without needing a stable identity from the caller.
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  // Restore focus to the trigger element once, on unmount only.
+  useEffect(() => {
+    return () => {
+      if (triggerElementRef.current instanceof HTMLElement) {
+        triggerElementRef.current.focus();
+      }
+    };
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
@@ -52,6 +109,7 @@ export function InventoryAdjustmentModal({
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="adj-modal-title"
@@ -117,6 +175,7 @@ export function InventoryAdjustmentModal({
               Jenis Penyesuaian
             </label>
             <select
+              ref={firstFieldRef}
               id="adj_type"
               value={adjustmentType}
               onChange={(e) => setAdjustmentType(e.target.value as "ADD" | "SUBTRACT")}

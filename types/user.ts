@@ -4,12 +4,13 @@
 
 import type { User } from "@supabase/supabase-js";
 import type { ActionResult } from "./donation";
+import type { Role } from "@/lib/auth/permissions";
 
 export interface UserProfile {
   id: string;
   full_name: string;
   phone: string;
-  role: "member" | "admin";
+  role: Role | "member" | "admin";
   created_at: string;
   updated_at: string;
 }

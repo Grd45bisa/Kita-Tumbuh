@@ -582,60 +582,65 @@ Payment provider selection is a separate decision and should not be hard-coded i
 
 ---
 
-# 11. Phase 8 — Transparency & Impact Engine
+# 11. Phase 8 — Transparency & Impact Engine ✅
 
-## P0-801 — Impact calculation definitions
+## P0-801 — Impact calculation definitions ✅
 
-Document every public metric.
+- [x] `lib/domain/impact/definitions.ts` — registri MetricDefinition untuk
+      setiap metrik publik (slug, label, formula, sourceTable, filter,
+      unit, caveat, isPooled). Tidak ada metrik yang dipublikasikan tanpa
+      definisi tercatat.
 
-Example:
+## P0-802 — Public impact aggregation ✅
 
-```text
-Waste Collected
-= sum verified received quantities
-for selected period
-```
+- [x] `lib/domain/impact/public-impact.ts` — agregasi paralel 7 metrik dari DB.
+- [x] Hanya data terverifikasi (status ≥ VERIFIED, batch COMPLETED/RELEASED,
+      allocation APPROVED, program public_status=true).
+- [x] Per material: minyak jelantah (L) dan limbah organik (kg) terpisah.
+- [x] Privacy boundary dijaga: tidak ada query ke tabel sensitif
+      (beneficiaries, pickup_requests, donor PII).
+- [x] Status "no_data" dipisahkan dari angka nol sungguhan.
+- [x] force-dynamic (no caching) — angka publik selalu live.
+- [ ] Filter per periode (bulan/tahun) — backlog iterasi berikutnya.
 
-```text
-Social Allocation
-= sum approved social allocation records
-published for selected period
-```
+**Bug kritis ditemukan & diperbaiki saat audit (2026-09-20):** implementasi awal
+meng-query `donations`, `production_batches`, `batch_inputs`, dan
+`social_allocations` langsung dengan Supabase client anon-key milik
+pengunjung publik. Di bawah RLS aktual tabel-tabel itu: (1) `donations_owner_read`
+hanya mengizinkan baris `user_id IS NULL`, sehingga donasi dari member yang
+login **hilang diam-diam** dari hitungan publik (undercount, bukan error);
+(2) `production_batches`/`batch_inputs`/`social_allocations` memakai RLS
+admin-only tanpa policy SELECT publik sama sekali, sehingga query langsung
+dari klien anon **selalu mengembalikan 0 baris** — 3 metrik (`waste_processed`,
+`production_batches_completed`, `social_allocation_total`) SELALU tampil
+"Belum ada data" di production meski datanya ada, bukan karena datanya kosong.
+Diperbaiki dengan memindahkan 6 dari 7 metrik ke RPC `SECURITY DEFINER`
+read-only yang HANYA mengembalikan angka agregat (`supabase/migrations/017_public_impact_aggregation.sql`,
+ADR-025), granted ke role `anon`. Test regresi `tests/public-impact-rls-boundary.test.mjs`
+mencegah query langsung ini kembali dipakai — divalidasi efektif dengan
+sengaja mereproduksi bug lalu mengonfirmasi test gagal, lalu direvert.
 
-No metric may be published without a defined source.
+## P0-803 — Transparency report ✅
 
-## P0-802 — Public impact aggregation
+- [x] `app/transparansi/page.tsx` — laporan transparansi penuh:
+      prinsip pencatatan (6 prinsip), ringkasan operasional live,
+      rantai domain keterlacakan, tabel metodologi per metrik,
+      catatan keterbatasan operasional yang jujur.
+- [x] Data freshness notice: timestamp dihitung.
+- [x] Halaman /dampak dibangun ulang dengan metrik live + metodologi grid.
+- [x] **Keputusan arsitektur (ADR-025):** MVP memakai live-aggregation setiap
+      request (`force-dynamic`, tanpa tabel snapshot `transparency_reports`/
+      `transparency_report_metrics` yang disebut di DATABASE.md). Snapshot
+      laporan periodik yang dipublikasikan secara sadar (bukan live-query)
+      ditunda ke iterasi berikutnya — trafik masih rendah dan agregasi
+      real-time secara langsung memenuhi janji "data selalu live" di UI.
 
-- [ ] Aggregate verified records.
-- [ ] Filter by period.
-- [ ] Filter by material where useful.
-- [ ] Handle privacy boundaries.
-- [ ] Cache/ISR only when safe and necessary.
+## P1-804 — Donation-to-impact trace ✅
 
-## P0-803 — Transparency report
-
-- [ ] Period summary.
-- [ ] Methodology.
-- [ ] Data freshness.
-- [ ] Operational caveats.
-- [ ] Source/report references.
-
-## P1-804 — Donation-to-impact trace
-
-Where data quality supports it, visualize:
-
-```text
-Donation
-→ Collection
-→ Waste Lot
-→ Production Batch
-→ Product
-→ Sale
-→ Social Allocation
-→ Program
-```
-
-Do not imply direct one-to-one financial causality when the accounting model is pooled.
+- [x] Diagram perjalanan 8-tahap di /dampak: Limbah Donasi → Penjemputan →
+      Verifikasi Fisik → Inventaris → Pengolahan → Penjualan → Alokasi Sosial →
+      Program & Distribusi.
+- [x] Catatan eksplisit bahwa akuntansi bersifat pooled (tidak ada 1:1).
 
 ---
 
@@ -653,36 +658,76 @@ FINANCE
 SOCIAL_OFFICER
 ```
 
+- [x] Role `TEXT + CHECK` diperluas melalui migration `018_rbac_roles.sql`.
+- [x] Role lama `admin` dipromosikan ke `SUPER_ADMIN`; `member` dinormalisasi ke `MEMBER`.
+- [x] `is_admin()` tetap kompatibel untuk `SUPER_ADMIN` dan `ADMIN`.
+
 ## P0-902 — Permission matrix
 
-- [ ] Create permission list.
-- [ ] Map roles to permissions.
-- [ ] Enforce on server.
-- [ ] UI visibility is only a convenience, not authorization.
+- [x] Create permission list. *(`lib/auth/permissions.ts`, 16 modul.)*
+- [x] Map roles to permissions. *(Sama persis dengan ARSITEKTUR §11; dijaga test regresi.)*
+- [x] Enforce on server. *(Seluruh 38 pemanggilan `requireAdmin()` pada 10 file domain dimigrasikan ke `requirePermission()` read/write dan halaman admin dengan query langsung diberi guard route. RLS granular diterapkan per modul.)*
+- [x] UI visibility is only a convenience, not authorization. *(AdminNav dan dashboard difilter; Server Action dan RLS tetap memeriksa secara independen.)*
+
+**Bug kritis ditemukan & diperbaiki saat audit (2026-09-20):** 4 RPC finansial paling
+sensitif di seluruh sistem — `execute_social_allocation` (alokasi dana sosial),
+`execute_order_payment_confirmation` (konfirmasi pembayaran + decrement stok),
+`execute_distribution` (penyaluran dana ke beneficiary), `update_revenue_reconciliation`
+(rekonsiliasi ledger pendapatan) — **tidak pernah mendapat `REVOKE`/`GRANT` eksplisit**
+sejak dibuat di Phase 6/7. Karena Postgres secara default memberi `EXECUTE` ke `PUBLIC`
+untuk fungsi baru, siapa pun dengan sesi terautentikasi (termasuk MEMBER biasa) secara
+teknis bisa memanggil RPC ini langsung lewat `supabase.rpc(...)` dari browser, melewati
+seluruh pengecekan `requirePermission()` yang hanya melindungi jalur Server Action —
+pelanggaran langsung AGENTS.md §14 ("gunakan semua lapisan: UI + server authorization +
+database RLS"). Diperbaiki di `supabase/migrations/020_rpc_grant_hardening.sql`:
+`REVOKE ALL ... FROM PUBLIC` + `GRANT ... TO authenticated` pada keempat fungsi, DITAMBAH
+guard `has_permission(...)` di dalam body fungsi itu sendiri (bukan cuma level
+`authenticated` generik) sehingga staff role yang tidak berwenang modul terkait tetap
+ditolak di level database, bukan hanya level kode. Divalidasi efektif dengan
+`tests/rpc-grant-hardening.test.mjs` — sengaja dihapus lalu dikonfirmasi test gagal,
+lalu dikembalikan.
+
+**Bug lain ditemukan & diperbaiki saat audit:** `recordAuditLog()` melakukan
+`requirePermission()` ULANG di dalamnya setelah aksi utama sudah tervalidasi & commit —
+desain yang salah karena `redirect()` Next.js yang mungkin terpanggil di dalamnya akan
+tertelan oleh `try/catch` generik, membuat kegagalan otorisasi (kalaupun genuinely
+terjadi) menjadi audit entry yang hilang diam-diam untuk aksi yang sudah terjadi.
+Diperbaiki: `recordAuditLog()` sekarang menerima `actorId` yang sudah tervalidasi dari
+pemanggil (bukan re-derive sendiri); lapisan keamanan sebenarnya tetap di RPC
+`record_audit_log` yang `SECURITY DEFINER` dan hanya di-grant ke `service_role`.
+Juga: `app/admin/waste-types/new/page.tsx` adalah satu-satunya halaman "buat baru" yang
+kehilangan gate `requirePermission()` eksplisit di level halaman (hanya terlindungi baseline
+`dashboard: read` dari `app/admin/layout.tsx`) — role dengan `waste_inventory: read`-only
+(FINANCE, SOCIAL_OFFICER) bisa melihat form meski submit-nya pasti ditolak Server Action.
+Sudah ditambahkan gate yang konsisten dengan halaman "new/edit" lainnya.
+
+**Keputusan distribusi:** karena setiap record distribusi mengungkap relasi ke penerima manfaat, read/write memerlukan izin `social_programs` **dan** `beneficiaries`. Konsekuensinya ADMIN dapat mengelola program tetapi hanya membaca beneficiary dan tidak dapat menulis distribusi; SUPER_ADMIN dan SOCIAL_OFFICER dapat menulis.
 
 ## P0-903 — Admin dashboard
 
-- [ ] Operations overview.
-- [ ] Donation queue.
-- [ ] Waste stock.
-- [ ] Production.
-- [ ] Product inventory.
-- [ ] Orders.
-- [ ] Finance summary.
-- [ ] Social programs.
-- [ ] Alerts/actions requiring attention.
+- [x] Operations overview. *(Card disaring berdasarkan role.)*
+- [x] Donation queue.
+- [x] Waste stock.
+- [x] Production.
+- [x] Product inventory.
+- [x] Orders.
+- [x] Finance summary. *(Jumlah record alokasi yang disetujui; tidak membuat angka uang baru.)*
+- [x] Social programs.
+- [ ] Alerts/actions requiring attention. — **ditunda:** belum ada definisi SLA/threshold alert yang tervalidasi; dashboard tidak mengarang ambang stok atau umur pesanan.
 
 ## P0-904 — Audit log
 
 Log important mutations:
 
-- [ ] actor;
-- [ ] action;
-- [ ] entity;
-- [ ] entity id;
-- [ ] old/new value where appropriate;
-- [ ] reason when required;
-- [ ] timestamp.
+- [x] actor;
+- [x] action;
+- [x] entity;
+- [x] entity id;
+- [x] old/new value where appropriate;
+- [x] reason when required;
+- [x] timestamp.
+
+Implementasi awal mencatat `ORDER_PAID`, `REVENUE_RECORDED`, `ALLOCATION_CREATED`, dan `BENEFICIARY_UPDATED`, serta menyediakan `/admin/audit-log` dengan filter actor/action/entity/periode. Event `DONATION_CREATED`, `DONATION_VERIFIED`, `WEIGHT_UPDATED`, `WASTE_LOT_CREATED`, `BATCH_STARTED`, `BATCH_COMPLETED`, `PRODUCT_RELEASED`, `PROGRAM_APPROVED`, dan `REPORT_PUBLISHED` tetap dalam allowlist namun wiring-nya ditunda ke iterasi modul terkait; jangan menganggap daftar audit sudah mencakup seluruh mutasi Phase 0–8.
 
 Avoid storing sensitive values unnecessarily.
 

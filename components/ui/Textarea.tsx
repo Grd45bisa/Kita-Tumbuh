@@ -36,6 +36,7 @@ export function Textarea({
       <textarea
         id={textareaId}
         className={`${styles.textarea} ${error ? styles.hasError : ""} ${className}`.trim()}
+        required={required}
         aria-invalid={!!error}
         aria-describedby={
           error ? `${textareaId}-error` : hint ? `${textareaId}-hint` : undefined

@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { requireAdmin } from "@/lib/auth/session";
+import { requirePermission } from "@/lib/auth/session";
+import { recordAuditLog } from "@/lib/domain/admin/audit-logs";
 import {
   CreateBeneficiarySchema,
   UpdateBeneficiarySchema,
@@ -55,7 +56,7 @@ function mapBeneficiary(row: RawBeneficiary): Beneficiary {
 export async function getAdminBeneficiaries(
   params: GetAdminBeneficiariesParams = {}
 ): Promise<GetAdminBeneficiariesResult> {
-  await requireAdmin();
+  await requirePermission("beneficiaries", "read");
   const supabase = await createClient();
 
   const page = Math.max(1, params.page || 1);
@@ -89,12 +90,12 @@ export async function getAdminBeneficiaries(
 
 /**
  * Lightweight lookup list for select inputs (e.g. distribution form) —
- * still admin-only and still goes through requireAdmin().
+ * remains staff-only and goes through the beneficiary read permission.
  */
 export async function getAdminBeneficiaryOptions(): Promise<
   Array<{ id: string; name_or_alias: string; category: BeneficiaryCategory }>
 > {
-  await requireAdmin();
+  await requirePermission("beneficiaries", "read");
   const supabase = await createClient();
 
   const { data } = await supabase
@@ -109,7 +110,7 @@ export async function getAdminBeneficiaryOptions(): Promise<
 export async function createBeneficiaryAction(
   rawInput: CreateBeneficiaryInput
 ): Promise<SocialActionResult<{ id: string }>> {
-  const admin = await requireAdmin();
+  const admin = await requirePermission("beneficiaries", "write");
 
   const parsed = CreateBeneficiarySchema.safeParse(rawInput);
   if (!parsed.success) {
@@ -152,7 +153,7 @@ export async function createBeneficiaryAction(
 export async function updateBeneficiaryAction(
   rawInput: UpdateBeneficiaryInput
 ): Promise<SocialActionResult<{ id: string }>> {
-  await requireAdmin();
+  const actor = await requirePermission("beneficiaries", "write");
 
   const parsed = UpdateBeneficiarySchema.safeParse(rawInput);
   if (!parsed.success) {
@@ -185,6 +186,19 @@ export async function updateBeneficiaryAction(
     console.error("[updateBeneficiaryAction] Update failed:", error);
     return { success: false, error: "Gagal memperbarui data penerima manfaat." };
   }
+
+  await recordAuditLog({
+    actorId: actor.id,
+    action: "BENEFICIARY_UPDATED",
+    entityType: "beneficiary",
+    entityId: id,
+    newValue: {
+      changed_fields: ["category", "need_type", "verification_status", "consent_status", "privacy_level"],
+      verification_status: input.verification_status,
+      consent_status: input.consent_status,
+      privacy_level: input.privacy_level,
+    },
+  });
 
   revalidatePath("/admin/social/beneficiaries");
   return { success: true, data: { id } };

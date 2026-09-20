@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/lib/auth/session";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ProductForm, type BatchOption } from "@/components/admin/ProductForm";
 
@@ -19,6 +20,7 @@ interface RawBatchRow {
 }
 
 export default async function NewProductPage() {
+  await requirePermission("product_catalog", "write");
   const supabase = await createClient();
 
   // Fetch production batches that are completed or released

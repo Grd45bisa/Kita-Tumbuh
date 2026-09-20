@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requirePermission } from "@/lib/auth/session";
 import { WasteTypeForm } from "@/components/admin/WasteTypeForm";
 import type { WasteType } from "@/types/donation";
 
@@ -10,6 +11,7 @@ interface EditWasteTypePageProps {
 }
 
 export default async function EditWasteTypePage({ params }: EditWasteTypePageProps) {
+  await requirePermission("waste_inventory", "write");
   const { id } = await params;
   const supabase = await createClient();
 

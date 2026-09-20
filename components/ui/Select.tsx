@@ -42,6 +42,7 @@ export function Select({
         <select
           id={selectId}
           className={`${styles.select} ${error ? styles.hasError : ""} ${className}`.trim()}
+          required={required}
           aria-invalid={!!error}
           aria-describedby={
             error ? `${selectId}-error` : hint ? `${selectId}-hint` : undefined

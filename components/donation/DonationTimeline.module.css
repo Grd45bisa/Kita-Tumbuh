@@ -118,6 +118,18 @@
   50% { opacity: 0.6; transform: scale(0.85); }
 }
 
+/* This dot pulses continuously for as long as the page is open (it marks
+   the "in progress" timeline step), not just briefly during a load — WCAG
+   2.2.2 (Pause, Stop, Hide) applies. Respect the user's reduced-motion
+   preference by holding it at a static, fully-visible state instead. */
+@media (prefers-reduced-motion: reduce) {
+  .dotPulse {
+    animation: none;
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .itemContent {
   padding-bottom: var(--space-8);
 }
