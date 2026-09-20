@@ -295,6 +295,56 @@ KITA TUMBUH
 
 ---
 
+## ADR-019 — Anonymous vs. Authenticated Order Placement
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** TASK.md P0-601 requires customer information for orders. We needed to decide whether customer account creation/login should be mandatory before ordering circular products.
+
+**Decision:** Allow guest (anonymous) checkout by collecting customer name, email, phone, and delivery address directly in the order form, while capturing `user_id` if the user is currently authenticated (matching the established pattern in `donations`).
+
+**Why:** Enforcing mandatory registration increases drop-off friction for customers who wish to support circular social products. Linking `user_id` when authenticated allows seamless member order history tracking without blocking anonymous buyers.
+
+**Consequences:** `orders.user_id` is a nullable foreign key to `auth.users(id)`. Public order tracking (`/pesanan/[reference]`) is accessible using the human-readable order reference without exposing sensitive account credentials or other customers' orders.
+
+---
+
+## ADR-020 — Inventory Decrement Exclusively at Payment Verification
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** P0-601 specifies that product inventory should only decrement at the agreed transactional point. We must choose whether to decrement stock at initial checkout submission (`PENDING_PAYMENT`) or upon payment verification (`PAID`).
+
+**Decision:** Decrement product `stock_quantity` strictly when the order transitions to `PAID`. Initial order creation in `PENDING_PAYMENT` validates that sufficient stock is available, but does not deduct physical stock from `products`.
+
+**Why:** In a manual bank transfer or asynchronous payment workflow, holding or decrementing inventory for unpaid orders risks locking limited community craft inventory against unpaid/abandoned drafts. Decrementing upon verified payment ensures inventory reflects actual finalized commitments.
+
+**Consequences:** Admin payment confirmation (or future payment webhook callbacks) must decrement product stock and verify available quantity in a single transaction.
+
+**Implementation note (2026-09-20, Phase 6 audit):** The first implementation of `confirmOrderPaymentAction` decremented stock via an application-level read-then-write loop per item, which did not actually satisfy "single transaction" and was vulnerable to a TOCTOU race between two concurrent payment confirmations touching the same product. Fixed by moving the entire operation into a single `SECURITY DEFINER` Postgres function, `execute_order_payment_confirmation` (`supabase/migrations/013_order_payment_fixes.sql`), which row-locks the order and every affected product (`FOR UPDATE`) and performs validation + decrement + status transition atomically — mirroring the pattern already used correctly by `execute_social_allocation` (ADR "P0-604"). The function also rejects confirmation of an already-`CANCELLED` order, and the generic `updateOrderStatusAction` now refuses `status = "PAID"` entirely (it can only be reached through this RPC), closing a second path that could otherwise leave `payment_status` and `stock_quantity` inconsistent with `status`.
+
+---
+
+## ADR-021 — Payment Integration Boundary and Manual Confirmation Provider
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** TASK.md P0-602 states that payment provider selection (Midtrans, Xendit, etc.) is a separate decision. The platform needs an order and payment lifecycle that can be verified and tested immediately without hard-coding or locking into an external provider.
+
+**Decision:** Define an abstract TypeScript interface `PaymentProvider` (`createPaymentIntent`, `verifyCallback`). Provide `ManualConfirmationProvider` as the initial concrete implementation, where customers transfer to official community bank accounts and administrators verify the transfer via the protected back-office dashboard (`/admin/orders/[id]`).
+
+**Why:** Decouples payment gateway APIs and vendor SDKs from core orders, inventory, and revenue domain logic. Switching to or adding an automated payment gateway later requires only writing a new class that implements `PaymentProvider`, with zero rewrites to order states, inventory decrement routines, or revenue recording.
+
+**Consequences:** Client and server code interact solely with domain actions. Payment status mutations cannot be forged from the client and require `requireAdmin()` server authorization.
+
+---
+
 ## Agent Rule
 
 Before introducing a major architectural change, search this document first.

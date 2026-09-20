@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ComingSoon } from "@/components/ui/ComingSoon";
@@ -127,6 +128,9 @@ export default async function ProdukPage() {
                         Stok: {Number(p.stock_quantity)} {p.unit}
                       </span>
                     </div>
+                    <Link href={`/produk/${p.slug}`} className={styles.orderButton}>
+                      Lihat Detail & Pesan
+                    </Link>
                   </article>
                 ))}
               </div>

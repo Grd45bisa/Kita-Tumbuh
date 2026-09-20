@@ -1,0 +1,141 @@
+.page {
+  padding: var(--space-8) 0 var(--space-16);
+  background-color: var(--color-bg-canvas);
+}
+
+.card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  max-width: 680px;
+  margin: var(--space-6) auto 0;
+  box-shadow: var(--elevation-2);
+}
+
+.successHeader {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.iconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-green-100);
+  color: var(--color-brand-primary);
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-size: var(--font-size-heading-m);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.subtitle {
+  font-size: var(--font-size-body-m);
+  color: var(--color-text-secondary);
+}
+
+.refBadgeBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-subtle);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.refLabel {
+  font-size: var(--font-size-caption);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.refCode {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-heading-s);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brand-primary);
+  letter-spacing: 0.05em;
+}
+
+.paymentBox {
+  background-color: var(--color-earth-100);
+  border: 1px solid var(--color-earth-300);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.paymentTitle {
+  font-size: var(--font-size-body-m);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-earth-700);
+  margin-bottom: var(--space-4);
+}
+
+.amountHighlight {
+  font-size: var(--font-size-heading-l);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-earth-700);
+  margin-bottom: var(--space-4);
+}
+
+.bankList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.bankItem {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bankName {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-body-m);
+  color: var(--color-text-primary);
+}
+
+.bankAccount {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-body-m);
+  color: var(--color-text-secondary);
+}
+
+.instructions {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body-s);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .actions {
+    flex-direction: row;
+  }
+}

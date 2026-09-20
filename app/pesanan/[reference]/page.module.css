@@ -1,0 +1,102 @@
+.page {
+  padding: var(--space-8) 0 var(--space-16);
+  background-color: var(--color-bg-canvas);
+}
+
+.card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  max-width: 720px;
+  margin: var(--space-6) auto 0;
+  box-shadow: var(--elevation-1);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding-bottom: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.refRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.refCode {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-heading-s);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brand-primary);
+}
+
+.date {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-muted);
+}
+
+.title {
+  font-size: var(--font-size-heading-m);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.sectionBlock {
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+}
+
+.addressBox {
+  padding: var(--space-4);
+  background-color: var(--color-bg-subtle);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body-s);
+}
+
+.itemsTable {
+  width: 100%;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: var(--font-size-body-s);
+}
+
+.itemRow:last-child {
+  border-bottom: none;
+}
+
+.itemTotalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4);
+  background-color: var(--color-bg-subtle);
+  font-size: var(--font-size-body-m);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brand-primary);
+}

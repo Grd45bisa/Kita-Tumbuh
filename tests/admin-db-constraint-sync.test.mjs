@@ -158,3 +158,106 @@ test("production_batches.status values in UpdateBatchStatusSchema exist in the m
     );
   }
 });
+
+test("orders.status values in order-schema.ts exist in the migration 009 CHECK constraint", () => {
+  const migration = readSource("supabase/migrations/009_orders.sql");
+  const validStatuses = extractCheckConstraintValues(migration, "status");
+
+  const schemaSource = readSource("lib/validation/order-schema.ts");
+  const stepsMatch = schemaSource.match(/ORDER_STATUS_STEPS\s*=\s*\[([^\]]+)\]/);
+  assert.ok(stepsMatch, "Expected to find ORDER_STATUS_STEPS array");
+  const usedStatuses = stepsMatch[1]
+    .split(",")
+    .map((v) => v.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
+
+  for (const status of usedStatuses) {
+    assert.ok(
+      validStatuses.includes(status),
+      `order-schema.ts uses orders.status "${status}" which is not in the migration 009 CHECK constraint: [${validStatuses.join(", ")}]`
+    );
+  }
+});
+
+test("orders.payment_status values in order-schema.ts exist in the migration 009 CHECK constraint", () => {
+  const migration = readSource("supabase/migrations/009_orders.sql");
+  const validStatuses = extractCheckConstraintValues(migration, "payment_status");
+
+  const schemaSource = readSource("lib/validation/order-schema.ts");
+  const stepsMatch = schemaSource.match(/ORDER_PAYMENT_STATUS_STEPS\s*=\s*\[([^\]]+)\]/);
+  assert.ok(stepsMatch, "Expected to find ORDER_PAYMENT_STATUS_STEPS array");
+  const usedStatuses = stepsMatch[1]
+    .split(",")
+    .map((v) => v.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
+
+  for (const status of usedStatuses) {
+    assert.ok(
+      validStatuses.includes(status),
+      `order-schema.ts uses orders.payment_status "${status}" which is not in the migration 009 CHECK constraint: [${validStatuses.join(", ")}]`
+    );
+  }
+});
+
+test("revenue_entries.reconciliation_status values in finance-schema.ts exist in the migration 010 CHECK constraint", () => {
+  const migration = readSource("supabase/migrations/010_revenue_ledger.sql");
+  const validStatuses = extractCheckConstraintValues(migration, "reconciliation_status");
+
+  const schemaSource = readSource("lib/validation/finance-schema.ts");
+  const stepsMatch = schemaSource.match(/RECONCILIATION_STATUSES\s*=\s*\[([^\]]+)\]/);
+  assert.ok(stepsMatch, "Expected to find RECONCILIATION_STATUSES array");
+  const usedStatuses = stepsMatch[1]
+    .split(",")
+    .map((v) => v.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
+
+  for (const status of usedStatuses) {
+    assert.ok(
+      validStatuses.includes(status),
+      `finance-schema.ts uses reconciliation_status "${status}" which is not in the migration 010 CHECK constraint: [${validStatuses.join(", ")}]`
+    );
+  }
+});
+
+test("social_allocations.approval_status values in finance-schema.ts exist in the migration 011 CHECK constraint", () => {
+  const migration = readSource("supabase/migrations/011_social_allocations.sql");
+  const validStatuses = extractCheckConstraintValues(migration, "approval_status");
+
+  const schemaSource = readSource("lib/validation/finance-schema.ts");
+  const stepsMatch = schemaSource.match(/ALLOCATION_APPROVAL_STATUSES\s*=\s*\[([^\]]+)\]/);
+  assert.ok(stepsMatch, "Expected to find ALLOCATION_APPROVAL_STATUSES array");
+  const usedStatuses = stepsMatch[1]
+    .split(",")
+    .map((v) => v.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
+
+  for (const status of usedStatuses) {
+    assert.ok(
+      validStatuses.includes(status),
+      `finance-schema.ts uses allocation approval_status "${status}" which is not in the migration 011 CHECK constraint: [${validStatuses.join(", ")}]`
+    );
+  }
+});
+
+test("expenses.category values in finance-schema.ts exist in the migration 012 CHECK constraint", () => {
+  const migration = readSource("supabase/migrations/012_expenses.sql");
+  const validCategories = extractCheckConstraintValues(migration, "category");
+
+  const schemaSource = readSource("lib/validation/finance-schema.ts");
+  const stepsMatch = schemaSource.match(/EXPENSE_CATEGORIES\s*=\s*\[([^\]]+)\]/);
+  assert.ok(stepsMatch, "Expected to find EXPENSE_CATEGORIES array");
+  const usedCategories = stepsMatch[1]
+    .split(",")
+    .map((v) => v.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
+
+  for (const category of usedCategories) {
+    assert.ok(
+      validCategories.includes(category),
+      `finance-schema.ts uses expense category "${category}" which is not in the migration 012 CHECK constraint: [${validCategories.join(", ")}]`
+    );
+  }
+});
+
+
+

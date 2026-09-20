@@ -138,6 +138,14 @@ export default async function AdminOverviewPage() {
           </p>
           <span className={styles.actionLinkText}>Kelola Produk →</span>
         </Link>
+
+        <Link href="/admin/orders" className={styles.actionCard}>
+          <h3 className={styles.actionTitle}>Pesanan & Penjualan Produk</h3>
+          <p className={styles.actionDesc}>
+            Pantau pesanan masuk dari pembeli produk, verifikasi bukti transfer pembayaran, dan update status pengiriman pesanan.
+          </p>
+          <span className={styles.actionLinkText}>Kelola Pesanan →</span>
+        </Link>
       </div>
     </div>
   );

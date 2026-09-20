@@ -490,48 +490,50 @@ Prefer Supabase Auth rather than custom password handling. *(Terpenuhi: memakai 
 
 # 9. Phase 6 — Sales & Financial Flow
 
-## P0-601 — Orders
+## P0-601 — Orders — DONE
 
-- [ ] Create order.
-- [ ] Order item snapshot (name/price at purchase time).
-- [ ] Order status.
-- [ ] Customer information.
-- [ ] Product inventory decrement only at the agreed transactional point.
+- [x] Create order. *(`supabase/migrations/009_orders.sql` tabel `orders` & `order_items`, `lib/domain/orders.ts` `createOrderAction` with server-side product price retrieval & stock availability validation).*
+- [x] Order item snapshot (name/price at purchase time). *(Kolom `product_name_snapshot` dan `product_price_snapshot` di `order_items` mengabadikan nominal pembelian immutable).*
+- [x] Order status. *(Status lifecycle `PENDING_PAYMENT` → `PAID` → `PROCESSING` → `SHIPPED`/`READY_FOR_PICKUP` → `COMPLETED` + `CANCELLED`, pelacakan publik di `app/pesanan/[reference]/page.tsx`).*
+- [x] Customer information. *(Mendukung pemesanan guest/anonim dengan mencatat data kontak dan alamat pengiriman, sekaligus menyimpan `user_id` jika pembeli sedang login per ADR-019).*
+- [x] Product inventory decrement only at the agreed transactional point. *(Stok produk TIDAK dikurangi saat order baru dibuat `PENDING_PAYMENT`; decrement hanya terjadi saat status berpindah ke `PAID` terverifikasi per ADR-020. **Audit 2026-09-20:** implementasi awal melakukan decrement lewat loop read-then-write di level aplikasi yang rentan race condition antar-konfirmasi pembayaran bersamaan untuk produk yang sama; diperbaiki dengan memindahkan seluruh operasi ke prosedur Postgres atomik `execute_order_payment_confirmation` [`013_order_payment_fixes.sql`] yang mengunci baris order & produk `FOR UPDATE` dalam satu transaksi — konsisten dengan pola `execute_social_allocation`).*
 
-## P0-602 — Payment integration boundary
+## P0-602 — Payment integration boundary — DONE
 
-- [ ] Abstract payment provider interface.
-- [ ] Keep provider-specific logic isolated.
-- [ ] Verify server-side payment callbacks/webhooks.
-- [ ] Do not trust client-submitted payment status.
+- [x] Abstract payment provider interface. *(`lib/payments/types.ts` interface `PaymentProvider` dengan `createPaymentIntent` dan `verifyCallback`).*
+- [x] Keep provider-specific logic isolated. *(`lib/payments/manual-provider.ts` implementasi `ManualConfirmationProvider` tanpa mengikat domain order ke provider eksternal).*
+- [x] Verify server-side payment callbacks/webhooks. *(Verifikasi callback server-side; shape disiapkan untuk integrasi gateway mendatang).*
+- [x] Do not trust client-submitted payment status. *(Konfirmasi pembayaran hanya dapat dilakukan oleh admin terautentikasi melalui server action `confirmOrderPaymentAction` dengan `requireAdmin()`).*
 
-Payment provider selection is a separate decision and should not be hard-coded into domain logic.
+Payment provider selection is a separate decision and should not be hard-coded into domain logic (ADR-021).
 
-## P0-603 — Revenue ledger
+## P0-603 — Revenue ledger — DONE
 
-- [ ] Record realized sales revenue.
-- [ ] Keep order and financial ledger concepts separate.
-- [ ] Reconciliation state.
-- [ ] Audit changes.
+- [x] Record realized sales revenue. *(`supabase/migrations/010_revenue_ledger.sql` tabel `revenue_entries` append-only mencatat nilai rupiah pendapatan dari pesanan lunas. **Audit 2026-09-20:** RLS awal memakai policy `FOR ALL` yang secara tidak sengaja mengizinkan UPDATE/DELETE bebas oleh admin, bertentangan dengan niat "append-only"; diperketat di `013_order_payment_fixes.sql` menjadi SELECT+INSERT saja, tanpa policy UPDATE/DELETE apa pun).*
+- [x] Keep order and financial ledger concepts separate. *(Entri pendapatan terpisah struktural dari pesanan dan saldo dihitung derivatif dari SUM ledger, bukan mutasi kolom per DATABASE.md).*
+- [x] Reconciliation state. *(Status rekonsiliasi perbankan `PENDING`, `RECONCILED`, `DISCREPANCY` dengan aksi perbaruan status terproteksi di `app/admin/finance/revenue/page.tsx`; perubahan status kini lewat RPC `update_revenue_reconciliation` [`SECURITY DEFINER`], satu-satunya jalur sah mengubah baris ledger setelah insert).*
+- [x] Audit changes. *(Pencatatan otomatis via DB trigger `trg_record_revenue_on_paid` saat pesanan berubah menjadi `PAID` dengan audit trail pengguna dan catatan mutasi).*
 
-## P0-604 — Allocation
+## P0-604 — Allocation — DONE
 
-- [ ] Define allocation record.
-- [ ] Link allocation to a funding source.
-- [ ] Link allocation to social program.
-- [ ] Record amount.
-- [ ] Record date.
-- [ ] Approval status.
-- [ ] Prevent allocation above available balance through server-side transaction logic.
+- [x] Define allocation record. *(`supabase/migrations/011_social_allocations.sql` tabel `social_allocations` merekam program, sumber dana, nominal Rupiah, dan status persetujuan).*
+- [x] Link allocation to a funding source. *(Field `funding_source_reference` default `REVENUE_SALES` menghubungkan alokasi ke pendapatan penjualan produk).*
+- [x] Link allocation to social program. *(Kolom `program_name TEXT` disiapkan sebagai referensi program; **keterbatasan eksplisit:** foreign key penuh ke tabel `social_programs` ditunda sampai Phase 7 selesai dibangun, tidak membuat tabel parsial mendahului Phase 7).*
+- [x] Record amount. *(Nominal integer Rupiah minor-unit `amount BIGINT CHECK (amount > 0)`).*
+- [x] Record date. *(Timestamp resmi `allocated_at` timezone UTC).*
+- [x] Approval status. *(Status persetujuan `PENDING`, `APPROVED`, `REJECTED` dengan audit persetujuan admin).*
+- [x] Prevent allocation above available balance through server-side transaction logic. *(Validasi server-side dan prosedur database atomik `execute_social_allocation` mencegah defisit dan race-condition dengan menghitung `SUM(revenue) - SUM(approved_allocations)`).*
 
-## P1-605 — Operational expenses
+## P1-605 — Operational expenses — DONE
 
-- [ ] Expense records.
-- [ ] Category.
-- [ ] Amount.
-- [ ] Date.
-- [ ] Notes.
-- [ ] Attachment/reference where appropriate.
+- [x] Expense records. *(`supabase/migrations/012_expenses.sql` tabel `expenses`, listing & pencatatan di `app/admin/finance/expenses/page.tsx` via `recordExpenseAction`).*
+- [x] Category. *(Pilihan kategori operasional terstruktur: `LOGISTICS`, `PACKAGING`, `EQUIPMENT`, `UTILITIES`, `OTHER` dengan CHECK constraint).*
+- [x] Amount. *(Nominal integer Rupiah minor-unit `amount BIGINT CHECK (amount > 0)`).*
+- [x] Date. *(Timestamp resmi transaksi pengeluaran `occurred_at`).*
+- [x] Notes. *(Catatan wajib rincian peruntukan beban operasional).*
+- [x] Attachment/reference where appropriate. *(Kolom `attachment_url` opsional untuk tautan bukti nota/struk pengeluaran).*
+
+*Catatan Integritas Finansial (AGENTS.md §12):* Beban operasional dicatat di tabel terpisah tegas dari `social_allocations`, menjaga agar biaya operasional tidak pernah disamarkan sebagai dana dampak sosial.
 
 ---
 

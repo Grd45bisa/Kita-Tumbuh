@@ -170,3 +170,21 @@
   color: var(--color-text-muted);
 }
 
+.orderButton {
+  display: inline-block;
+  text-align: center;
+  margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-brand-primary);
+  color: var(--color-brand-primary-fg);
+  font-size: var(--font-size-body-s);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+}
+
+.orderButton:hover {
+  background-color: var(--color-brand-primary-hover);
+}
+
