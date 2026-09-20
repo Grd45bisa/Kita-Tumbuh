@@ -9,7 +9,8 @@ export type DonationStatus =
   | "VERIFIED"
   | "SORTED"
   | "PROCESSED"
-  | "CONVERTED";
+  | "CONVERTED"
+  | "IMPACTED";
 
 export type DonationMethod = "DROP_OFF" | "PICKUP";
 
@@ -75,10 +76,36 @@ export interface DonationDetail extends Donation {
   collection_point: CollectionPoint | null;
 }
 
+// Explicit public projections: never include donor identity, pickup details,
+// internal verification notes, or audit metadata in a shareable receipt.
+export interface PublicDonationReceipt {
+  reference: string;
+  waste_type_name: string;
+  estimated_quantity: number;
+  verified_quantity: number | null;
+  unit: string;
+  status: DonationStatus;
+}
+
+export interface PublicDonationTracking extends PublicDonationReceipt {
+  method: DonationMethod;
+  created_at: string;
+  collection_point: Pick<
+    CollectionPoint,
+    "name" | "address" | "district" | "city" | "operating_hours"
+  > | null;
+  status_history: Array<Pick<DonationStatusHistory, "to_status" | "created_at">>;
+}
+
 // ----------------------------------------------------------------------------
 // Server Action result types
 // ----------------------------------------------------------------------------
 
 export type ActionResult<T = void> =
   | { success: true; data: T }
-  | { success: false; error: string; fieldErrors?: Record<string, string[]> };
+  | {
+      success: false;
+      error: string;
+      code?: "NOT_FOUND" | "UNAVAILABLE" | "INVALID_REFERENCE";
+      fieldErrors?: Record<string, string[]>;
+    };

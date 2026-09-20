@@ -1,0 +1,91 @@
+.hero {
+  background-color: var(--color-bg-canvas);
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding: var(--space-8) 0;
+}
+
+.heroInner {
+  max-width: 42rem;
+}
+
+.eyebrow {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-brand-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 var(--space-3);
+}
+
+.title {
+  font-size: var(--font-size-heading-l);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-heading-l);
+  margin: 0 0 var(--space-3);
+}
+
+.lead {
+  font-size: var(--font-size-body-l);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body-l);
+  margin: 0;
+}
+
+.section {
+  background-color: var(--color-bg-canvas);
+  padding: var(--space-12) 0;
+}
+
+.sectionAlt {
+  background-color: var(--color-bg-subtle);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-heading-m);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-6);
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-10);
+}
+
+@media (min-width: 768px) {
+  .metricGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.metricCard {
+  padding: var(--space-5);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.metricLabel {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-2);
+}
+
+.metricValue {
+  font-size: var(--font-size-heading-s);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.methodologyText {
+  max-width: 42rem;
+  font-size: var(--font-size-body-m);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body-m);
+  margin: 0 0 var(--space-4);
+}

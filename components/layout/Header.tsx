@@ -4,12 +4,21 @@ import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import styles from "./Header.module.css";
 import { Container } from "@/components/ui/Container";
 
 export function Header() {
+  const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // Marks a nav link active when it points to a real route (not a homepage
+  // hash-anchor like "#cara-kerja") and that route is the current page.
+  // As Phase 2 pages go live, their nav links move from "#section" to a
+  // real path ("/cara-kerja") and automatically pick up this active state.
+  const isRouteActive = (href: string) =>
+    href.startsWith("/") && pathname === href;
 
   useEffect(() => {
     setMounted(true);
@@ -101,7 +110,11 @@ export function Header() {
 
             {/* Primary CTA (Desktop, >=1024px) */}
             <div className={styles.desktopCta}>
-              <Link href="/donasikan" className={styles.ctaButton}>
+              <Link
+                href="/donasikan"
+                className={styles.ctaButton}
+                aria-current={isRouteActive("/donasikan") ? "page" : undefined}
+              >
                 Donasikan Limbah
                 <svg
                   width="16"
@@ -125,6 +138,7 @@ export function Header() {
                 href="/donasikan"
                 className={styles.tabletCtaButton}
                 aria-label="Donasikan Limbah"
+                aria-current={isRouteActive("/donasikan") ? "page" : undefined}
               >
                 <svg
                   width="18"
@@ -272,6 +286,7 @@ export function Header() {
                   href="/donasikan"
                   className={styles.drawerCtaButton}
                   onClick={closeDrawer}
+                  aria-current={isRouteActive("/donasikan") ? "page" : undefined}
                 >
                   Donasikan Sampahmu
                   <svg

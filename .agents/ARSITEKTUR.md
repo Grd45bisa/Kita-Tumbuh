@@ -442,9 +442,9 @@ Relasi many-to-many antara `WASTE_LOT` dan `PRODUCTION_BATCH` sebaiknya diwujudk
 
 ## 7.1 Donation
 
+Lifecycle implementasi Phase 3 (`donation_status`), selaras dengan tracking publik:
+
 ```text
-DRAFT
-  ↓
 SUBMITTED
   ↓
 SCHEDULED        (pickup)
@@ -453,14 +453,18 @@ COLLECTED
   ↓
 VERIFIED
   ↓
-ACCEPTED / REJECTED
+SORTED
   ↓
 PROCESSED
   ↓
-COMPLETED
+CONVERTED
+  ↓
+IMPACTED
 ```
 
 `DROP-OFF` dapat melewati `SCHEDULED` dan langsung masuk `COLLECTED`.
+
+Donasi baru dimulai pada `SUBMITTED`. Event/transisi operasional dan pencatatan dampak nyata bergantung pada Phase 5/8; enum `IMPACTED` tidak berarti donasi otomatis mempunyai dampak terverifikasi. Draft formulir tetap state lokal, bukan status database. Keputusan diterima/ditolak menjadi bagian rancangan proses verifikasi operasional, bukan enum donasi terpisah pada MVP ini.
 
 ## 7.2 Production Batch
 
@@ -516,11 +520,9 @@ COMPLETED
 /
 ├── /tentang
 ├── /cara-kerja
-├── /donasi
-│   ├── /jenis-limbah
-│   ├── /pickup
-│   ├── /dropoff
-│   └── /status/:id
+├── /donasikan                 # landing + wizard 4 langkah
+├── /donasi/:reference         # tracking dengan referensi donasi
+│   └── /receipt               # receipt ringkas yang aman dibagikan
 ├── /dampak
 ├── /program
 │   ├── /
@@ -540,6 +542,8 @@ COMPLETED
 ```
 
 ### URL principle
+
+Route donasi Phase 3 memakai `/donasikan` sebagai titik masuk resmi; tidak ada landing `/donasi` terpisah. Material, jumlah, dan metode/lokasi/jadwal dipilih di dalam wizard yang sama. Lihat ADR-013 di `DECISIONS.md`.
 
 Gunakan URL yang:
 

@@ -47,7 +47,7 @@ export function Button({
       {...props}
     >
       {isLoading && <span className={styles.spinner} aria-hidden="true" />}
-      <span>{children}</span>
+      <span className={styles.label}>{children}</span>
     </button>
   );
 }

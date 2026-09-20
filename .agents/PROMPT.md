@@ -42,46 +42,58 @@ Every phase must enforce the strict natural palette:
 
 ```text
 PRIMARY PALETTE:
-- Warm Off-White / Tulang (Dominant canvas: 60–75%)
-- Green / Hijau (Primary brand / action: 20–30%)
-- Brown / Coklat (Secondary material / earth: 5–10%)
+- Warm Off-White / Paper (Dominant canvas: 60–75%)
+- Green (Primary brand / action: 20–30%)
+- Earth / Brown (Secondary material / earth: 5–10%)
 ```
 
-### Approved Hex Values
+> These are the tokens actually implemented in `styles/tokens.css` (and
+> mirrored in `lib/tokens/index.ts`) — `--color-paper-*`, `--color-ink-*`,
+> `--color-green-*`, `--color-earth-*`. An earlier draft of this document
+> used `cream-*` / `brown-*` names with different hex values; this section
+> was reconciled to match the shipped tokens. See `.agents/DECISIONS.md`.
 
-#### Tulang / Warm Off-White
+### Approved Hex Values (from `styles/tokens.css`)
+
+#### Paper / Warm Off-White (`--color-paper-*`)
 ```text
-cream-50   #FDFCF8 (Main page canvas)
-cream-100  #F8F5EC (Section background)
-cream-200  #EFEADF (Soft surface / divider)
-cream-300  #E2DACB (Border / muted surface)
-cream-400  #D2C7B5 (Strong divider)
+paper-0    #FFFFFF (Raised surfaces, used sparingly)
+paper-50   #FCFCFA (Main page canvas — --color-bg-canvas)
+paper-100  #F7F7F3 (Section background — --color-bg-subtle)
+paper-150  #F1F1EA (Muted surface / divider — --color-bg-muted)
 ```
 
-#### Green / Hijau
+#### Ink (neutral text & structure — `--color-ink-*`)
 ```text
-green-900  #173B2A (Deep brand text / dark surface)
-green-800  #214C37 (Primary brand)
-green-700  #2F6247 (Primary CTA)
-green-600  #477A5B (Links / active emphasis)
-green-500  #62916D (Secondary accents)
-green-400  #7FA688
-green-300  #A8BDAA
-green-200  #CDDDCF
-green-100  #E5EEE6 (Soft environmental surface)
+ink-950  #1C211E (Primary text — --color-text-primary)
+ink-700  #4A514C (Secondary text — --color-text-secondary)
+ink-500  #7E8780 (Muted text — --color-text-muted)
+ink-400  #A0A8A1 (Strong border — --color-border-strong)
+ink-200  #DCE1DD (Default border — --color-border-default)
+ink-100  #EEF1EE (Subtle border — --color-border-subtle)
 ```
 
-#### Brown / Coklat
+#### Green (`--color-green-*`)
 ```text
-brown-900  #3E2A21
-brown-800  #52372A
-brown-700  #684636
-brown-600  #815843 (Secondary brand CTA / earth accent)
-brown-500  #9A6A50
-brown-400  #B08369
-brown-300  #C8A591
-brown-200  #DFCCBD
-brown-100  #F0E4DA (Soft warning / earth surface)
+green-800  #254A3A (Deep brand text / hover — --color-brand-primary-hover)
+green-700  #32614B (Primary brand / primary CTA — --color-brand-primary)
+green-600  #43775B (Links / active emphasis)
+green-500  #5C8D70 (Secondary accents)
+green-400  #7EA28B
+green-300  #A9C0B1
+green-200  #D5E2D9
+green-100  #EAF2EC (Soft environmental surface)
+```
+
+#### Earth / Brown (`--color-earth-*`)
+```text
+earth-700  #7A4D35
+earth-600  #986145 (Secondary brand CTA / earth accent — --color-brand-secondary)
+earth-500  #B97855
+earth-400  #CD9475
+earth-300  #E4B9A0
+earth-200  #F0D6C7
+earth-100  #F7EAE2 (Soft warning / earth surface)
 ```
 
 ---
@@ -98,9 +110,9 @@ NO RAINBOW PALETTE
 NO GRADIENT-HEAVY UI
 ```
 
-1. Do NOT introduce default framework colors (e.g. default Tailwind/shadcn blue/purple focus rings or tags). Replace them with approved green/brown semantic tokens.
+1. Do NOT introduce default framework colors (e.g. default Tailwind/shadcn blue/purple focus rings or tags). Replace them with approved green/earth semantic tokens.
 2. A restrained earthy tone is allowed strictly for semantic error/destructive states—never as decoration or branding.
-3. Data charts must use green, brown, and cream tones only. No rainbow charts.
+3. Data charts must use green, earth (brown), and paper (cream/off-white) tones only. No rainbow charts.
 4. No neon glows or heavy glassmorphism.
 
 ---

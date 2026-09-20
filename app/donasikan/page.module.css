@@ -1,0 +1,6 @@
+.page {
+  background-color: var(--color-bg-canvas);
+  min-height: calc(100dvh - 76px);
+  display: flex;
+  flex-direction: column;
+}

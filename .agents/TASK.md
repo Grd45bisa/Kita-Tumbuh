@@ -107,15 +107,16 @@ Status:
 - [x] Definisikan environment variables yang dibutuhkan.
 - [x] Pisahkan public variables dari server-only secrets.
 - [x] Tambahkan `.env.example` tanpa secret nyata.
-- [x] Validasi environment saat startup/build bila memungkinkan.
+- [x] Validasi environment saat startup/build bila memungkinkan. *(2026-09-20: `lib/env.ts` divalidasi dengan Zod, lazy — dicek saat field pertama kali diakses agar `next build`/static generation tidak crash, tapi tetap fail-fast dengan pesan jelas saat runtime benar-benar memakainya.)*
 
 ## P0-004 — Supabase foundation
 
 - [x] Hubungkan Supabase project.
 - [x] Konfigurasi PostgreSQL access sesuai environment.
-- [x] Siapkan migration workflow.
+- [x] Siapkan migration workflow. *(2026-09-20: didokumentasikan di README — migration diterapkan manual via Supabase Dashboard SQL Editor atau `supabase db push` jika project sudah di-link. `supabase/config.toml` sengaja tidak dibuat karena tidak ada kebutuhan local Supabase stack via CLI; lihat catatan di README bagian "Supabase & Migration Workflow".)*
 - [x] Pastikan service-role key hanya digunakan server-side jika memang diperlukan.
-- [x] Dokumentasikan local/staging/production environment.
+- [x] Dokumentasikan local/staging/production environment. *(2026-09-20: lihat README bagian "Supabase & Migration Workflow".)*
+- [x] **`middleware.ts` di root project di-wire ke `lib/supabase/middleware.ts` `updateSession()`.** *(2026-09-20: sebelumnya fungsi ini sudah ada tapi TIDAK PERNAH dipanggil — auth session Supabase tidak pernah di-refresh oleh middleware. Ini bukan item checklist asli, dicatat di sini karena merupakan perbaikan Phase 0 yang signifikan.)*
 
 ---
 
@@ -123,7 +124,7 @@ Status:
 
 ## P0-101 — Visual design tokens
 
-- [x] Tetapkan color tokens brand.
+- [x] Tetapkan color tokens brand. *(2026-09-20: palette di `styles/tokens.css` — nama `paper/ink/green/earth` — sempat berbeda dari `.agents/DESIGN_SYSTEM.md` dan `.agents/PROMPT.md` yang mendokumentasikan `cream/green/brown` dengan hex berbeda. Kedua dokumen sudah disinkronkan mengikuti kode yang sudah dipakai luas di production; lihat ADR-012 di `.agents/DECISIONS.md`.)*
 - [x] Tetapkan typography scale.
 - [x] Tetapkan spacing scale.
 - [x] Tetapkan border radius.
@@ -140,46 +141,50 @@ Buat komponen reusable minimal:
 - [x] Button
 - [x] LinkButton
 - [x] Input
-- [ ] Select
-- [ ] Textarea
-- [ ] Checkbox / Radio
+- [x] Select *(sudah ada sebelumnya, checklist sempat tidak sinkron dengan kode)*
+- [x] Textarea *(sudah ada sebelumnya, checklist sempat tidak sinkron dengan kode)*
+- [x] Checkbox / Radio — **partial**: `RadioGroup` sudah ada sebelumnya dan lengkap. Checkbox murni **belum dibuat** — ditunda karena belum ada use case konkret di Phase 0-2 (filter yang ada di `/collection-point` cukup dengan `<select>` tunggal).
 - [x] Card
 - [x] Badge
-- [ ] Modal / Dialog
-- [x] Drawer
-- [ ] Toast / Alert
-- [ ] Tabs
-- [ ] Progress
-- [ ] DataTable
-- [ ] EmptyState
-- [ ] ErrorState
-- [ ] Skeleton
-- [ ] Pagination
-- [ ] Breadcrumb
+- [ ] Modal / Dialog — **ditunda**, belum ada use case publik di Phase 0-2 (donation wizard pakai step page, bukan modal).
+- [x] Drawer — **catatan**: implementasi saat ini adalah drawer mobile-nav inline di `components/layout/Header.tsx` (via `createPortal`), bukan primitive reusable generik. Cukup untuk kebutuhan saat ini.
+- [ ] Toast / Alert — **ditunda**, lebih relevan untuk form submission feedback di Phase 3 (donation wizard).
+- [ ] Tabs — **ditunda**, tidak ada kebutuhan tab di halaman Phase 0-2.
+- [ ] Progress — **partial**: `DonationProgress` sudah ada tapi khusus wizard donasi, bukan primitive generik. Primitive generik ditunda.
+- [ ] DataTable — **ditunda**, murni kebutuhan admin (Phase 9), di luar scope Phase 0-2.
+- [x] EmptyState *(2026-09-20: `components/ui/EmptyState.tsx`, dipakai di `/collection-point`.)*
+- [x] ErrorState *(2026-09-20: `components/ui/ErrorState.tsx`, dipakai di `/collection-point` dan `/cara-kerja` untuk kegagalan fetch data in-page.)*
+- [ ] Skeleton — **ditunda**: semua halaman data-driven baru (`/collection-point`, `/cara-kerja`) memakai server-rendered `searchParams`, bukan client-side fetch, jadi tidak ada state loading yang butuh skeleton.
+- [ ] Pagination — **ditunda**, listing yang ada (`/collection-point`) masih berjumlah kecil; ditambahkan saat data benar-benar butuh pagination.
+- [x] Breadcrumb *(2026-09-20: `components/ui/Breadcrumb.tsx`, dipakai di semua halaman Phase 2 baru.)*
+
+*(2026-09-20: tambahan di luar checklist asli — `components/ui/ComingSoon.tsx` dibuat untuk state "segera hadir" yang jujur pada halaman yang datanya bergantung backend Phase 5/7/8 yang belum ada, sesuai AGENTS.md §31.)*
 
 ## P0-103 — Public navigation
 
 - [x] Desktop header.
 - [x] Mobile navigation/drawer.
 - [x] Primary CTA `Donasikan Limbah`.
-- [x] Active navigation state.
+- [x] Active navigation state — **partial**: `usePathname()` + `aria-current="page"` sudah diterapkan di `components/layout/Header.tsx` untuk CTA `/donasikan` (satu-satunya link dengan rute asli saat P1-Phase-1 dikerjakan). Nav link lain (Galeri, Cara Kerja, Dampak, Transparansi) masih hash-anchor ke section homepage (`#cara-kerja`, dst) — logic active-state sudah siap tapi belum diterapkan ke link tersebut karena mengubahnya ke rute asli (`/cara-kerja`, `/dampak`, dst) adalah perubahan UX terpisah yang sengaja tidak dilakukan otomatis di sini, supaya homepage tidak kehilangan in-page scroll ke section yang sama.
 - [x] Footer dengan link penting.
 
 ## P0-104 — Content model baseline
 
+**Koreksi 2026-09-20:** item ini sebelumnya tercentang penuh `[x]` padahal folder `lib/content/` sama sekali belum ada — semua copy hardcoded langsung di `app/page.tsx`. Status di bawah ini mencerminkan kondisi nyata setelah ekstraksi dilakukan.
+
 Siapkan struktur konten untuk:
 
-- [x] hero messaging;
-- [x] cara kerja;
-- [x] accepted waste;
-- [x] FAQ;
-- [x] impact metrics;
-- [x] social programs;
-- [x] stories;
-- [x] products;
-- [x] transparency pages.
+- [x] hero messaging; *(`lib/content/hero.ts` — dibuat sebagai struktur data, belum di-wire ke `app/page.tsx` karena hero punya markup JSX kompleks (emphasis, ikon, quote card) yang berisiko berubah tampilan bila dipaksa jadi string interpolation murni. Tersedia sebagai referensi untuk hero halaman lain.)*
+- [x] cara kerja; *(`lib/content/how-it-works.ts` — `homepageJourney` untuk preview 4 langkah di homepage, `howItWorksSteps` untuk 6 tahap lengkap di `/cara-kerja`.)*
+- [x] accepted waste; *(`lib/content/accepted-waste.ts` untuk preview homepage; data real per jenis limbah tetap dari `lib/domain/waste-types.ts`, dipakai di `/cara-kerja` dan `/faq`.)*
+- [x] FAQ; *(`lib/content/faq.ts`, 13 item, dipakai di `/faq`.)*
+- [ ] impact metrics; — **belum ada struktur data** karena belum ada backend agregasi (P0-802 Phase 8 belum dikerjakan). `/dampak` menampilkan placeholder metrik ("—") + penjelasan methodology, bukan struktur data metrik nyata.
+- [ ] social programs; — **belum ada struktur data**, `/program` memakai `ComingSoon` karena belum ada tabel/model program (P0-701 Phase 7 belum dikerjakan).
+- [ ] stories; — **belum ada struktur data**, `/cerita` memakai `ComingSoon` — juga memerlukan proses consent nyata yang di luar scope coding.
+- [ ] products; — **belum ada struktur data**, `/produk` memakai `ComingSoon` karena belum ada tabel/model produk (P0-506 Phase 5 belum dikerjakan).
+- [x] transparency pages. *(`/transparansi` dibuat dengan prinsip pencatatan yang sudah benar-benar diterapkan di sistem + `ComingSoon` untuk laporan periodik yang butuh P0-803.)*
 
-Copy awal harus dapat diganti tanpa mengubah komponen utama.
+Copy awal harus dapat diganti tanpa mengubah komponen utama. *(Dipenuhi untuk hero/cara-kerja/accepted-waste/FAQ via `lib/content/*.ts`; item yang masih `ComingSoon` akan mendapat struktur data serupa saat backend terkait dikerjakan.)*
 
 ---
 
@@ -201,145 +206,149 @@ Copy awal harus dapat diganti tanpa mengubah komponen utama.
 
 **Acceptance:** visitor memahami proposisi produk tanpa harus membuka halaman lain.
 
-## P0-202 — `/cara-kerja`
+## P0-202 — `/cara-kerja` — DONE
 
-- [ ] Jelaskan enam tahap utama.
-- [ ] Tampilkan hubungan limbah → produk → sosial.
-- [ ] Jelaskan apa yang terjadi setelah donor menyerahkan limbah.
-- [ ] Tambahkan FAQ operasional.
+- [x] Jelaskan enam tahap utama. *(`lib/content/how-it-works.ts` → `howItWorksSteps`, ditampilkan di `app/cara-kerja/page.tsx`.)*
+- [x] Tampilkan hubungan limbah → produk → sosial. *(Diagram alur teks "Limbah → Pengolahan → Produk → Penjualan → Dana sosial → Dampak" di hero halaman.)*
+- [x] Jelaskan apa yang terjadi setelah donor menyerahkan limbah. *(Tahap 02-03 menjelaskan verifikasi dan pengolahan.)*
+- [x] Tambahkan FAQ operasional. *(Tautan ke `/faq` lengkap; halaman ini sendiri fokus pada 6 tahap + accepted/rejected waste dari `getWasteTypes()`.)*
 
-## P0-203 — `/tentang-kami`
+## P0-203 — `/tentang-kami` — DONE
 
-- [ ] Mission.
-- [ ] Vision.
-- [ ] Values.
-- [ ] Operational approach.
-- [ ] Team/organization information bila tersedia.
-- [ ] Avoid unverifiable claims.
+- [x] Mission. *(`lib/content/organization.ts`)*
+- [x] Vision.
+- [x] Values.
+- [x] Operational approach.
+- [ ] Team/organization information bila tersedia. — **sengaja dikosongkan**: tidak ada data faktual nama/struktur organisasi yang tersedia untuk dipublikasikan; menampilkannya akan melanggar AGENTS.md §4.3 (never invent facts). Ditambahkan nanti jika data faktual tersedia.
+- [x] Avoid unverifiable claims. *(Semua klaim di halaman ini diturunkan dari `.agents/RPD.md`/`.agents/CONTENT.md`, bukan angka yang bisa diverifikasi — tidak ada statistik yang diklaim.)*
 
-## P0-204 — `/dampak`
+## P0-204 — `/dampak` — PARTIAL
 
-- [ ] Public impact overview.
-- [ ] Filter periode.
-- [ ] Waste collected.
-- [ ] Waste processed.
-- [ ] Products generated/sold.
-- [ ] Social allocation.
-- [ ] Beneficiaries.
-- [ ] Data methodology link.
+- [x] Public impact overview. *(Route dibuat, `app/dampak/page.tsx`.)*
+- [ ] Filter periode. — **diblokir**: perlu backend agregasi (P0-802, Phase 8) yang belum dikerjakan.
+- [ ] Waste collected. — **diblokir**, sama alasan di atas. Ditampilkan sebagai placeholder "—" + penjelasan methodology, bukan angka fabricated.
+- [ ] Waste processed. — **diblokir**, sama.
+- [ ] Products generated/sold. — **diblokir**, sama.
+- [ ] Social allocation. — **diblokir**, sama.
+- [ ] Beneficiaries. — **diblokir**, sama.
+- [x] Data methodology link. *(Section "Bagaimana angka ini nantinya dihitung" menjelaskan definisi metrik secara eksplisit meski datanya belum ada — janji proses, bukan angka.)*
 
-## P0-205 — `/transparansi`
+## P0-205 — `/transparansi` — PARTIAL
 
-- [ ] Explain source and update cadence of metrics.
-- [ ] Monthly/periodic summary.
-- [ ] Revenue and allocation summary when publishable.
-- [ ] Operational notes.
-- [ ] Link to supporting reports/documents when appropriate.
+- [x] Explain source and update cadence of metrics. *(Section "Prinsip pencatatan kami" — 4 prinsip yang sudah benar-benar diterapkan di sistem: estimasi vs verified quantity terpisah, audit trail status, dst.)*
+- [ ] Monthly/periodic summary. — **diblokir**: perlu P0-803 (Transparency report, Phase 8) yang belum dikerjakan. `ComingSoon` state dipakai.
+- [ ] Revenue and allocation summary when publishable. — **diblokir**, sama.
+- [x] Operational notes. *(4 prinsip pencatatan yang ditampilkan sudah operasional nyata — bukan janji.)*
+- [ ] Link to supporting reports/documents when appropriate. — **diblokir**, belum ada laporan untuk ditautkan.
 
-## P1-206 — `/program`
+## P1-206 — `/program` — PARTIAL
 
-- [ ] Program list.
-- [ ] Program detail.
-- [ ] Goal and current progress.
-- [ ] Source of social funds.
-- [ ] Status.
-- [ ] Evidence/documentation where appropriate.
+- [x] Program list. *(Route dibuat, tapi berisi `ComingSoon` — belum ada tabel/model program di Supabase; P0-701 Phase 7 belum dikerjakan.)*
+- [ ] Program detail. — **diblokir**, sama alasan di atas.
+- [ ] Goal and current progress. — **diblokir**, sama.
+- [ ] Source of social funds. — **diblokir**, sama.
+- [ ] Status. — **diblokir**, sama.
+- [ ] Evidence/documentation where appropriate. — **diblokir**, sama.
 
-## P1-207 — `/cerita`
+## P1-207 — `/cerita` — PARTIAL
 
-- [ ] Story listing.
-- [ ] Story detail.
-- [ ] Consent/privacy review for identifiable people.
-- [ ] Keep storytelling human, not exploitative.
+- [x] Story listing. *(Route dibuat, `ComingSoon` — belum ada model data cerita.)*
+- [ ] Story detail. — **diblokir**, sama.
+- [ ] Consent/privacy review for identifiable people. — **diblokir**: proses consent adalah proses non-teknis yang belum berjalan, bukan sesuatu yang bisa "diselesaikan" lewat kode.
+- [x] Keep storytelling human, not exploitative. *(Dipenuhi secara default — belum ada cerita yang dipublikasikan sama sekali, jadi tidak ada risiko eksploitatif untuk saat ini.)*
 
-## P1-208 — `/produk`
+## P1-208 — `/produk` — PARTIAL
 
-- [ ] Product catalog.
-- [ ] Category/filter.
-- [ ] Product detail.
-- [ ] Product impact explanation.
-- [ ] Availability state.
+- [x] Product catalog. *(Route dibuat, `ComingSoon` untuk katalog — belum ada tabel/model produk; P0-506 Phase 5 belum dikerjakan.)*
+- [x] Category/filter. *(3 kategori konseptual ditampilkan — minyak jelantah/organik/plastik — tanpa filter interaktif karena belum ada produk nyata untuk difilter.)*
+- [ ] Product detail. — **diblokir**, belum ada produk individual.
+- [ ] Product impact explanation. — **diblokir**, sama.
+- [x] Availability state. *(`ComingSoon` itu sendiri adalah availability state yang jujur.)*
 
-## P1-209 — `/collection-point`
+## P1-209 — `/collection-point` — DONE
 
-- [ ] Search/filter locations.
-- [ ] Accepted waste per location.
-- [ ] Opening hours.
-- [ ] Instructions.
-- [ ] Directions link/CTA.
+- [x] Search/filter locations. *(Filter by jenis limbah via `searchParams`, server-rendered.)*
+- [x] Accepted waste per location. *(Ditampilkan sebagai badge nama jenis limbah per titik.)*
+- [x] Opening hours. *(`operating_hours` dari `getCollectionPoints()`.)*
+- [x] Instructions. *(`notes` per titik.)*
+- [x] Directions link/CTA. *(Link Google Maps berbasis alamat — fungsional, bukan `href="#"`.)*
 
-## P1-210 — `/faq`
+*(Catatan: seed data collection point di `supabase/migrations/001_donation_foundation.sql` masih memakai alamat/nomor telepon placeholder ("Jl. Sejahtera No. 12", "+62-xxx-xxxx-xxxx") — ini data operasional yang perlu diganti admin sebelum go-live, di luar scope frontend.)*
 
-- [ ] Donation questions.
-- [ ] Accepted/rejected waste.
-- [ ] Pickup/drop-off.
-- [ ] Processing.
-- [ ] Impact calculation.
-- [ ] Product sales.
-- [ ] Privacy.
+## P1-210 — `/faq` — DONE
+
+- [x] Donation questions.
+- [x] Accepted/rejected waste.
+- [x] Pickup/drop-off.
+- [x] Processing.
+- [x] Impact calculation. *(Jawaban jujur menyatakan sistem agregasi publik belum siap, bukan angka fabricated.)*
+- [x] Product sales. *(Jawaban jujur menyatakan katalog belum tersedia.)*
+- [x] Privacy.
 
 ---
 
 # 6. Phase 3 — Donation Flow
 
+**Sinkronisasi 2026-09-20:** fondasi wizard, submission, drop-off, dan tracking sudah ada sebelum pekerjaan ini. Checklist berikut mencatat implementasi yang tersedia serta penundaan yang disengaja, bukan klaim bahwa seluruh operasional Phase 5/8 telah selesai. Migration baru `002` perlu diterapkan ke Supabase sebelum versi aplikasi ini digunakan; hasil lint/typecheck/build dicatat terpisah setelah verifikasi.
+
 ## P0-301 — Donation start
 
-- [ ] `/donasi` landing.
-- [ ] Waste category selection.
-- [ ] Show accepted condition.
-- [ ] Show disallowed items.
-- [ ] Avoid misleading “donate anything” messaging.
+- [x] `/donasikan` sebagai landing + wizard resmi (opsi b, ADR-013); `/donasi/[reference]` untuk tracking, tanpa landing `/donasi` terpisah.
+- [x] Waste category selection. *(`StepMaterial` dari data jenis limbah aktif.)*
+- [x] Show accepted condition. *(Catatan material terpilih.)*
+- [x] Show disallowed items. *(Catatan material terpilih.)*
+- [x] Avoid misleading “donate anything” messaging. *(Pilihan dibatasi kategori yang diterima.)*
 
 ## P0-302 — Donation wizard
 
-Implement a guided flow:
+Alur yang sudah diimplementasikan dalam empat langkah:
 
 ```text
 Material
    ↓
 Quantity
    ↓
-Method
-   ↓
-Schedule / Location
+Method + Schedule / Location
    ↓
 Confirmation
 ```
 
 Tasks:
 
-- [ ] Step state management.
-- [ ] Client validation.
-- [ ] Server validation.
-- [ ] Back/next behavior.
-- [ ] Preserve entered data between steps.
-- [ ] Accessible labels and error messages.
-- [ ] Mobile-friendly form controls.
+- [x] Step state management. *(`DonationWizard`.)*
+- [x] Client validation.
+- [x] Server validation. *(`createDonation`.)*
+- [x] Back/next behavior.
+- [x] Preserve entered data between steps.
+- [x] Accessible labels and error messages.
+- [x] Mobile-friendly form controls.
 
 ## P0-303 — Donation submission
 
-- [ ] Create donation record.
-- [ ] Generate human-readable donation reference.
-- [ ] Prevent duplicate submission on accidental refresh/click.
-- [ ] Validate accepted waste type server-side.
-- [ ] Validate quantity/unit server-side.
-- [ ] Return clear confirmation state.
+- [x] Create donation record. *(Insert nyata ke Supabase melalui Server Action.)*
+- [x] Generate human-readable donation reference. *(Allocator database per tahun dengan perlindungan konkurensi pada migration `002`; tidak lagi memakai COUNT seluruh tabel di aplikasi.)*
+- [x] Prevent duplicate submission on accidental refresh/click. *(Idempotency server: pre-check dan unique-constraint fallback; client mempertahankan key untuk payload yang sama saat retry/refresh pada sesi browser.)*
+- [x] Validate accepted waste type server-side.
+- [x] Validate quantity/unit server-side.
+- [x] Return clear confirmation state.
+
+**Batas yang masih ada:** pembuatan donation dan pickup request pada alur lama belum menjadi satu transaksi atomik. Hardening transaksi/recovery pickup perlu tindak lanjut; checklist ini tidak menyatakan transaksi gabungan sudah tersedia.
 
 ## P0-304 — Pickup scheduling
 
-- [ ] Address capture.
-- [ ] Date selection.
-- [ ] Available slot logic.
-- [ ] Pickup notes.
-- [ ] Status lifecycle.
-- [ ] Operator assignment if required.
+- [x] Address capture. *(Alamat privat untuk operasional.)*
+- [x] Date selection. *(Tanggal yang diinginkan donor, menunggu konfirmasi.)*
+- [ ] Available slot logic. — **ditunda secara sengaja (ADR-014):** pilihan pagi/siang statis adalah preferensi MVP; belum ada data kapasitas per tanggal, query ketersediaan, atau reservasi slot. UI tidak menjanjikan ketersediaan.
+- [x] Pickup notes.
+- [x] Status lifecycle. *(Enum/type/timeline delapan status sampai `IMPACTED` siap; donasi baru tetap `SUBMITTED`. Transisi admin/operasional tidak otomatis dan bergantung pada Phase 5/8.)*
+- [ ] Operator assignment if required. — **ditunda:** belum ada workflow penugasan operator; bergantung pada implementasi admin/operasional.
 
 ## P0-305 — Drop-off scheduling/selection
 
-- [ ] Collection point selector.
-- [ ] Display accepted materials.
-- [ ] Operating hours.
-- [ ] Selected location summary.
+- [x] Collection point selector.
+- [x] Display accepted materials. *(Daftar titik difilter menurut material yang dipilih.)*
+- [x] Operating hours.
+- [x] Selected location summary. *(`StepReview`.)*
 
 ## P0-306 — Donation tracking
 
@@ -356,21 +365,21 @@ Submitted
 → Impacted
 ```
 
-- [ ] Timeline UI.
-- [ ] Status timestamp.
-- [ ] Status-specific copy.
-- [ ] Empty/error fallback.
-- [ ] User can open donation detail.
+- [x] Timeline UI. *(`DonationTimeline`, delapan tahap termasuk `IMPACTED`.)*
+- [x] Status timestamp. *(Dari event riwayat status yang tersimpan.)*
+- [x] Status-specific copy. *(`CONVERTED` dipisahkan dari dampak terverifikasi pada `IMPACTED`.)*
+- [x] Empty/error fallback. *(Pesan referensi tidak ditemukan memakai `EmptyState` dengan cek ulang kode/mulai donasi baru; kegagalan data memakai `ErrorState`.)*
+- [x] User can open donation detail. *(`/donasi/[reference]`, proyeksi publik tanpa alamat, kontak, atau catatan privat.)*
 
 ## P0-307 — Impact receipt
 
-- [ ] Donation reference.
-- [ ] Material.
-- [ ] Estimated quantity.
-- [ ] Actual verified quantity when available.
-- [ ] Current processing status.
-- [ ] Impact summary only when supported by verified data.
-- [ ] Shareable public-safe version.
+- [x] Donation reference. *(Disatukan dalam `ImpactReceipt`.)*
+- [x] Material.
+- [x] Estimated quantity.
+- [x] Actual verified quantity when available. *(Ditampilkan hanya jika tersedia; estimasi tetap terpisah.)*
+- [x] Current processing status.
+- [ ] Impact summary only when supported by verified data. — **ditunda:** belum ada lineage donasi individual → batch/produk → penjualan → alokasi sosial terverifikasi (Phase 5/8). Bagian ini tidak dirender sama sekali; tidak ada placeholder atau angka contoh.
+- [x] Shareable public-safe version. *(`Bagikan Dampak` membuka `/donasi/[reference]/receipt`; HTML ringkas dengan metadata Open Graph teks, tanpa data sensitif. Gambar OG dinamis tidak diperlukan untuk MVP — ADR-015.)*
 
 ---
 

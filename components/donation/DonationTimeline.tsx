@@ -2,14 +2,15 @@ import React from "react";
 import styles from "./DonationTimeline.module.css";
 import type { DonationStatus, DonationStatusHistory } from "@/types/donation";
 
-const STATUS_LABELS: Record<DonationStatus, string> = {
+export const STATUS_LABELS: Record<DonationStatus, string> = {
   SUBMITTED: "Donasi Didaftarkan",
   SCHEDULED: "Pickup / Drop-off Dijadwalkan",
   COLLECTED: "Limbah Diterima",
   VERIFIED: "Verifikasi Berat Selesai",
   SORTED: "Pemilahan Selesai",
   PROCESSED: "Sedang Diproses",
-  CONVERTED: "Menjadi Produk / Dampak",
+  CONVERTED: "Menjadi Produk",
+  IMPACTED: "Dampak Tercatat",
 };
 
 const STATUS_ORDER: DonationStatus[] = [
@@ -20,6 +21,7 @@ const STATUS_ORDER: DonationStatus[] = [
   "SORTED",
   "PROCESSED",
   "CONVERTED",
+  "IMPACTED",
 ];
 
 const STATUS_DESCRIPTIONS: Record<DonationStatus, string> = {
@@ -29,12 +31,13 @@ const STATUS_DESCRIPTIONS: Record<DonationStatus, string> = {
   VERIFIED: "Berat dan kondisi limbah telah diverifikasi oleh tim kami.",
   SORTED: "Limbah telah dipilah sesuai kategori pengolahan.",
   PROCESSED: "Limbah sedang dalam proses pengolahan menjadi produk atau kompos.",
-  CONVERTED: "Limbahmu telah berhasil diubah menjadi produk atau manfaat sosial.",
+  CONVERTED: "Limbahmu telah diolah menjadi produk.",
+  IMPACTED: "Dampak dari donasi ini telah dicatat berdasarkan data yang terverifikasi.",
 };
 
 interface DonationTimelineProps {
   currentStatus: DonationStatus;
-  statusHistory: DonationStatusHistory[];
+  statusHistory: Array<Pick<DonationStatusHistory, "to_status" | "created_at">>;
 }
 
 function formatTimestamp(ts: string): string {

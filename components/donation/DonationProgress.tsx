@@ -1,7 +1,13 @@
 import React from "react";
 import styles from "./DonationWizard.module.css";
+import { CheckIcon } from "./DonationIcons";
 
-const STEP_LABELS = ["Pilih Limbah", "Jumlah", "Cara Kirim", "Konfirmasi"];
+const STEP_LABELS = [
+  "Pilih Limbah",
+  "Perkiraan Jumlah",
+  "Metode Penyerahan",
+  "Konfirmasi Donasi",
+];
 
 export interface DonationProgressProps {
   currentStep: number; // 1-indexed
@@ -12,29 +18,36 @@ export function DonationProgress({
   currentStep,
   totalSteps,
 }: DonationProgressProps) {
-  const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+  const progressPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
 
   return (
-    <div className={styles.progress} role="progressbar" aria-valuenow={currentStep} aria-valuemin={1} aria-valuemax={totalSteps} aria-label={`Langkah ${currentStep} dari ${totalSteps}: ${STEP_LABELS[currentStep - 1]}`}>
-      {/* Step counter */}
+    <div
+      className={styles.progress}
+      role="progressbar"
+      aria-valuenow={currentStep}
+      aria-valuemin={1}
+      aria-valuemax={totalSteps}
+      aria-label={`Langkah ${currentStep} dari ${totalSteps}: ${STEP_LABELS[currentStep - 1]}`}
+    >
+      {/* Header with step counter and active title */}
       <div className={styles.progressHeader}>
-        <span className={styles.progressLabel}>
+        <span className={styles.progressBadge}>
           Langkah {currentStep} dari {totalSteps}
         </span>
-        <span className={styles.progressStepName}>
+        <span className={styles.progressStepTitle}>
           {STEP_LABELS[currentStep - 1]}
         </span>
       </div>
 
-      {/* Progress bar */}
+      {/* Modern progress bar track */}
       <div className={styles.progressBar}>
         <div
           className={styles.progressFill}
-          style={{ width: `${progress}%` }}
+          style={{ width: `${progressPercent}%` }}
         />
       </div>
 
-      {/* Step dots */}
+      {/* Step indicators */}
       <div className={styles.progressSteps} aria-hidden="true">
         {STEP_LABELS.map((label, index) => {
           const stepNum = index + 1;
@@ -43,13 +56,13 @@ export function DonationProgress({
           return (
             <div
               key={label}
-              className={`${styles.progressStep} ${isCompleted ? styles.stepCompleted : ""} ${isCurrent ? styles.stepCurrent : ""}`}
+              className={`${styles.progressStep} ${
+                isCompleted ? styles.stepCompleted : ""
+              } ${isCurrent ? styles.stepCurrent : ""}`}
             >
               <div className={styles.stepDot}>
                 {isCompleted ? (
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                    <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <CheckIcon size={14} className={styles.stepDotCheck} />
                 ) : (
                   <span>{stepNum}</span>
                 )}
@@ -62,3 +75,4 @@ export function DonationProgress({
     </div>
   );
 }
+

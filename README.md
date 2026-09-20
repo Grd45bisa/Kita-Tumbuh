@@ -49,3 +49,43 @@ Variabel yang tersedia:
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anon key publik
 - `SUPABASE_SERVICE_ROLE_KEY`: Supabase secret service-role key (**hanya untuk server-side**)
+
+Variabel publik (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`) dan `SUPABASE_SERVICE_ROLE_KEY` divalidasi secara *lazy* melalui `lib/env.ts` — aplikasi akan melempar error yang jelas saat variabel tersebut pertama kali diakses dan kosong/tidak terisi, alih-alih diam-diam berjalan dengan nilai kosong.
+
+---
+
+## Node.js Version
+
+Project ini menargetkan **Node.js 20 LTS** (lihat `.nvmrc` dan field `engines` di `package.json`). Jika menggunakan `nvm`:
+
+```bash
+nvm use
+```
+
+---
+
+## Supabase & Migration Workflow
+
+### Environment Supabase
+
+Project ini menggunakan Supabase project terpisah per environment:
+
+- **Local/Development**: gunakan Supabase project pribadi (free tier cukup) untuk development sehari-hari. Isi `.env.local` dengan URL/key project tersebut.
+- **Staging**: Supabase project terpisah untuk pengujian sebelum production, dengan data non-sensitif/demo.
+- **Production**: Supabase project produksi. Kredensial hanya disimpan di environment variable platform hosting (misalnya Vercel), **tidak pernah** dikomit ke repository.
+
+Repo ini belum menyertakan `supabase/config.toml` (konfigurasi Supabase CLI untuk local stack berbasis Docker) karena belum ada kebutuhan menjalankan Supabase secara lokal via CLI. Jika suatu saat dibutuhkan, jalankan `supabase init` secara interaktif lalu commit hasilnya.
+
+### Menjalankan Migration
+
+Migration SQL disimpan di `supabase/migrations/` (contoh: `001_donation_foundation.sql`). Setiap file migration bersifat idempotent (menggunakan `IF NOT EXISTS` / `ON CONFLICT DO NOTHING`) sehingga aman dijalankan ulang.
+
+Dua cara menerapkan migration ke sebuah Supabase project:
+
+1. **Manual via Supabase Dashboard** — buka **SQL Editor** pada project Supabase yang dituju, tempel isi file migration secara berurutan sesuai penomoran (`001_...`, `002_...`, dst.), lalu jalankan.
+2. **Via Supabase CLI** (jika project sudah di-link dengan `supabase link`):
+   ```bash
+   supabase db push
+   ```
+
+Migration baru harus selalu berupa file bernomor urut baru (`002_...`, `003_...`) — jangan mengubah isi file migration yang sudah pernah diterapkan ke environment manapun.

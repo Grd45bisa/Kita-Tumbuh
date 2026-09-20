@@ -176,6 +176,74 @@ KITA TUMBUH
 
 ---
 
+## ADR-012 — Palette Token Naming Reconciled to Implementation
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** `.agents/DESIGN_SYSTEM.md` and `.agents/PROMPT.md` documented a color palette using the names `cream-*` (warm off-white) and `brown-*` (earth), with specific hex values (e.g. `cream-50 #FDFCF8`, `green-900 #173B2A`, `brown-900 #3E2A21`). The actual implementation in `styles/tokens.css` and `lib/tokens/index.ts` — already in production use across `components/ui/*`, `components/layout/*`, `components/donation/*`, and the live homepage (`app/page.tsx`) — uses different token names and hex values: `--color-paper-*` instead of `cream-*`, `--color-earth-*` instead of `brown-*`, plus a dedicated `--color-ink-*` neutral scale that the docs did not separately name. The green family also differs in hex value at nearly every step (e.g. implemented `green-700` is `#32614B`, documented `green-700` was `#2F6247`).
+
+**Decision:** Reconcile `.agents/DESIGN_SYSTEM.md` and `.agents/PROMPT.md` to match the palette as implemented in `styles/tokens.css` (token names: `paper`, `ink`, `green`, `earth`; hex values as shipped). Documentation was updated to match code, not the reverse.
+
+**Why:** The implemented token set was already used in dozens of files before this drift was discovered. Rewriting `styles/tokens.css` to match the old documented hex values would have been a large, purely cosmetic breaking change to an already-coherent, already-shipped design system, with no evidence the documented values were ever validated against a real design review — whereas updating the documentation is a same-day, zero-risk correction that makes the docs an accurate source of truth again per `AGENTS.md` §33 (Documentation Synchronization).
+
+**Consequences:**
+- `styles/tokens.css` / `lib/tokens/index.ts` remain unchanged and continue to be the actual source of truth for color tokens.
+- Any future reference to "cream" or "brown" tokens in older docs/notes should be read as `paper` and `earth` respectively.
+- Semantic state colors (`success`/`warning`/`danger`/`info`) are documented as their own dedicated token family (`--color-success-*` etc.), not as raw green/earth values, matching how they're actually implemented.
+- The `info` semantic state intentionally uses a muted blue-gray (`--color-info-fg: #315A73`) — the one documented, scoped exception to the "no blue" rule, used only for that state and never decoratively.
+
+---
+
+## ADR-013 — One Donation Entry Route
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** The original wireframe described a separate `/donasi` landing, while the existing implementation already combines category selection, accepted/rejected conditions, and the four-step wizard at `/donasikan`.
+
+**Decision:** Keep `/donasikan` as the official combined landing and wizard (Phase 3 option b). Use `/donasi/[reference]` for tracking and `/donasi/[reference]/receipt` for the shareable receipt. Do not add a duplicate landing or a second wizard.
+
+**Why:** The first material step already serves the landing purpose; preserving the working flow avoids an extra navigation step and aligns documentation with the implementation.
+
+**Consequences:** `WIREFRAME.md` §5.1, `ARSITEKTUR.md` §8, and `TASK.md` P0-301 use the same entry route. Method, schedule/location, and review remain within the four-step wizard.
+
+---
+
+## ADR-014 — Pickup Time Preferences in MVP
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** The pickup form has static morning/afternoon choices and stores the requested date/time. There is no capacity calendar or reservation engine.
+
+**Decision:** Keep these choices as donor preferences requiring operational confirmation. Explain this in the method and review UI. Leave P0-304 available-slot logic unchecked until date-specific capacity is queried and enforced by the backend.
+
+**Why:** Real availability requires operational capacity data and concurrent reservation rules; a static select cannot truthfully represent available slots.
+
+**Consequences:** Submitting a requested date/time does not reserve capacity or guarantee collection on that date. Operator assignment and capacity scheduling remain follow-up work in the operational workflow. Do not claim automatic availability or an unverified service deadline.
+
+---
+
+## ADR-015 — Public-Safe Donation Receipt Without Unsupported Impact
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** Donation facts exist, but individual donations do not yet have verified lineage through production, sales, and social allocation. A receipt can consolidate those facts without inventing an impact result.
+
+**Decision:** Share a compact server-rendered HTML receipt at `/donasi/[reference]/receipt`, reusing `ImpactReceipt` for reference, material, estimated quantity, verified quantity when present, and current status. `Bagikan Dampak` links to this page. Use public-safe text Open Graph metadata; defer dynamic image generation. Omit the impact-summary section entirely until verified linked data exists in Phase 5/8.
+
+**Why:** A small readable page is sufficient for MVP sharing, while a fabricated summary or a promise based solely on estimated quantity would undermine traceability.
+
+**Consequences:** Public data uses an explicit safe projection and excludes donor identity, contact information, pickup address/schedule, notes, and internal audit fields. Anyone with the reference link can open this limited receipt, including for member-owned donations. Public tracking also excludes private notes. These pages are not indexed. `CONVERTED` describes a product outcome; `IMPACTED` is a supported terminal status, not automatic evidence for a numerical impact summary. Applying migration `002` is required before the updated server queries and enum are deployed.
+
+---
+
 ## Agent Rule
 
 Before introducing a major architectural change, search this document first.

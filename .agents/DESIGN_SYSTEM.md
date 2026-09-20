@@ -51,13 +51,24 @@ generic charity template
 
 # 2. MASTER COLOR PALETTE
 
-The entire product uses a **controlled natural palette**:
+The entire product uses a **controlled natural palette**, implemented as CSS
+custom properties in `styles/tokens.css` (mirrored in `lib/tokens/index.ts`):
 
 ```text
-TULANG / WARM OFF-WHITE
-HIJAU
-COKLAT
+PAPER   (warm off-white / neutral canvas)
+INK     (ink/near-black neutral for text and structure)
+GREEN   (botanical green — primary brand/action)
+EARTH   (warm earth/brown — secondary material accent)
 ```
+
+> **Note:** an earlier draft of this document used the names
+> `cream` / `hijau` / `coklat` with different hex values. The palette below
+> reflects the tokens actually implemented and shipped in `styles/tokens.css`
+> — this section was updated to match the code (not the other way around),
+> since the token set was already in wide production use across
+> `components/ui/*`, `components/layout/*`, and the live homepage before this
+> document was reconciled. See `.agents/DECISIONS.md` for the decision
+> record.
 
 These are the only normal brand color families.
 
@@ -82,72 +93,85 @@ If a component library introduces default blue, purple, red, or another unrelate
 
 ---
 
-# 3. TULANG / WARM OFF-WHITE
+# 3. PAPER (WARM OFF-WHITE)
 
 The website should not use harsh pure white as its dominant canvas.
 
-Use warm ivory/paper tones:
+Token: `--color-paper-*` in `styles/tokens.css`.
 
 ```text
-cream-50     #FDFCF8
-cream-100    #F8F5EC
-cream-200    #EFEADF
-cream-300    #E2DACB
-cream-400    #D2C7B5
+paper-0      #FFFFFF
+paper-50     #FCFCFA
+paper-100    #F7F7F3
+paper-150    #F1F1EA
 ```
 
 Primary usage:
 
 ```text
-cream-50
+paper-50  (--color-bg-canvas)
 main page background
 
-cream-100
-section background
+paper-0   (--color-bg-surface)
+raised surface / cards
 
-cream-200
-soft surface / divider
+paper-100 (--color-bg-subtle)
+section background / soft surface
 
-cream-300
-border / muted surface
-
-cream-400
-strong muted divider
+paper-150 (--color-bg-muted)
+muted surface / divider
 ```
 
 The overall interface should feel like warm quality paper.
 
-`#FFFFFF` may be used sparingly for specific surfaces where necessary, but it must not dominate the full page.
+`paper-0` (`#FFFFFF`) may be used for specific raised surfaces where necessary, but it must not dominate the full page — `paper-50` is the dominant canvas.
 
 ---
 
-# 4. HIJAU
+# 3b. INK (NEUTRAL TEXT & STRUCTURE)
 
-Green is the main brand and action family.
+Token: `--color-ink-*` in `styles/tokens.css`. Used for text, borders, and neutral structural elements — the counterpart neutral scale to `paper`.
 
 ```text
-green-900    #173B2A
-green-800    #214C37
-green-700    #2F6247
-green-600    #477A5B
-green-500    #62916D
-green-400    #7FA688
-green-300    #A8BDAA
-green-200    #CDDDCF
-green-100    #E5EEE6
+ink-950   #1C211E   (--color-text-primary)
+ink-900   #252A27
+ink-800   #343A36
+ink-700   #4A514C   (--color-text-secondary)
+ink-600   #636B65
+ink-500   #7E8780   (--color-text-muted)
+ink-400   #A0A8A1   (--color-border-strong)
+ink-300   #C6CCC7
+ink-200   #DCE1DD   (--color-border-default)
+ink-100   #EEF1EE   (--color-border-subtle)
+```
+
+Use the darkest ink shades for primary text, mid shades for secondary/muted text, and the lightest shades for borders and dividers — never for large fill surfaces (that is `paper`'s role).
+
+---
+
+# 4. GREEN (BOTANICAL GREEN)
+
+Green is the main brand and action family. Token: `--color-green-*` in `styles/tokens.css`.
+
+```text
+green-800    #254A3A
+green-700    #32614B   (--color-brand-primary)
+green-600    #43775B
+green-500    #5C8D70
+green-400    #7EA28B
+green-300    #A9C0B1
+green-200    #D5E2D9
+green-100    #EAF2EC
 ```
 
 Recommended use:
 
 ```text
-green-900
-deep brand text / dark surfaces
-
 green-800
-primary brand
+deep brand text / dark surfaces / hover state (--color-brand-primary-hover)
 
 green-700
-primary CTA
+primary brand / primary CTA (--color-brand-primary, --color-focus-ring)
 
 green-600
 links / active emphasis
@@ -165,23 +189,21 @@ A typical screen should use only a small subset.
 
 ---
 
-# 5. COKLAT
+# 5. EARTH (WARM EARTH / BROWN)
 
-Brown is the secondary earth/material family.
+Brown is the secondary earth/material family. Token: `--color-earth-*` in `styles/tokens.css`.
 
 ```text
-brown-900    #3E2A21
-brown-800    #52372A
-brown-700    #684636
-brown-600    #815843
-brown-500    #9A6A50
-brown-400    #B08369
-brown-300    #C8A591
-brown-200    #DFCCBD
-brown-100    #F0E4DA
+earth-700    #7A4D35
+earth-600    #986145   (--color-brand-secondary)
+earth-500    #B97855
+earth-400    #CD9475
+earth-300    #E4B9A0
+earth-200    #F0D6C7
+earth-100    #F7EAE2
 ```
 
-Use brown for:
+Use earth/brown for:
 
 - earth/soil references;
 - product/craft stories;
@@ -195,35 +217,52 @@ Brown should remain secondary to green.
 
 # 6. SEMANTIC COLORS
 
-Semantic states must stay compatible with the natural palette.
+Semantic states must stay compatible with the natural palette. Implemented as
+dedicated `--color-success-*` / `--color-warning-*` / `--color-danger-*` /
+`--color-info-*` tokens in `styles/tokens.css` — these are their own small
+palette (not raw green/earth values), so they stay legible and stable even
+if the brand palette shifts.
 
 ### Success
 
 ```text
-background → green-100
-foreground → green-800
+background → --color-success-bg   #EAF4EC
+foreground → --color-success-fg   #275D35
+border     → --color-success-border  #C2DEC8
 ```
 
 ### Warning
 
 ```text
-background → brown-100
-foreground → brown-800
+background → --color-warning-bg   #FFF3DC
+foreground → --color-warning-fg   #805A14
+border     → --color-warning-border  #F3DBA7
 ```
 
 ### Error / Destructive
 
 Do not use bright generic red as a brand color.
 
-Use a restrained earthy treatment derived from the brown/earth family.
+Use a restrained earthy-red treatment (`--color-danger-*`), derived in spirit from the earth family but distinct enough to read clearly as an error state — never as decoration or branding.
 
-A stronger red-like signal is allowed only when conventional accessibility/semantic signaling genuinely requires it, and only for the state—not as decoration or branding.
+```text
+background → --color-danger-bg   #FCEBEA
+foreground → --color-danger-fg   #8B2F2B
+border     → --color-danger-border  #F2C2BF
+```
 
 ### Info
 
-Prefer muted green, brown, or neutral tones.
+```text
+background → --color-info-bg   #EAF1F6
+foreground → --color-info-fg   #315A73
+border     → --color-info-border  #BCD1E1
+```
 
-Do not introduce blue just because a UI library normally uses blue for information.
+A muted blue-gray is used here rather than green/earth so informational
+messages remain visually distinct from success/brand states — this is the
+one deliberate, documented exception to the "no blue" rule, scoped strictly
+to the `info` semantic state and never used decoratively.
 
 ---
 
@@ -232,9 +271,9 @@ Do not introduce blue just because a UI library normally uses blue for informati
 As a visual guideline:
 
 ```text
-60–75%  warm off-white
+60–75%  paper (warm off-white)
 20–30%  green
-5–10%   brown
+5–10%   earth (brown)
 ```
 
 This is guidance, not a strict mathematical requirement.
@@ -424,7 +463,7 @@ Konfirmasi Donasi
 
 ### Secondary
 
-Use brown or outlined green.
+Use earth (brown) or outlined green.
 
 Examples:
 
@@ -501,8 +540,8 @@ BERMANFAAT
 Use:
 
 - green for growth and impact;
-- brown for material/earth transformation;
-- cream for the main canvas.
+- earth (brown) for material/earth transformation;
+- paper (warm off-white) for the main canvas.
 
 This visual grammar should appear across:
 
@@ -578,8 +617,8 @@ Charts should use:
 
 ```text
 green
-brown
-cream
+earth (brown)
+paper (cream/off-white)
 muted ink
 ```
 
@@ -595,10 +634,10 @@ Suggested system:
 
 ```text
 Pending
-→ brown/cream
+→ earth/paper
 
 Scheduled
-→ brown
+→ earth
 
 Collected
 → soft green
@@ -684,9 +723,9 @@ Mobile is a first-class design target.
 
 Mobile must preserve:
 
-- warm cream base;
+- warm paper base;
 - green primary CTA;
-- brown secondary accents;
+- earth (brown) secondary accents;
 - readable typography;
 - clear hierarchy;
 - no horizontal overflow.
@@ -700,11 +739,11 @@ Desktop may use richer editorial compositions and multi-column layouts.
 Admin may be denser but must retain the same design DNA:
 
 ```text
-cream background
+paper background
 +
 green primary
 +
-brown secondary
+earth (brown) secondary
 +
 same typography
 +

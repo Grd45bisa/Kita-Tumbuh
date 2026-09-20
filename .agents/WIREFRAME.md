@@ -182,9 +182,11 @@ LIMBAH → PENGOLAHAN → PRODUK → PENJUALAN → DANA SOSIAL → DAMPAK
 
 # 5. Donation Experience
 
-## 5.1 Donation landing — `/donasi`
+## 5.1 Donation landing + wizard — `/donasikan`
 
 Tujuan: membuat pengunjung yakin bahwa mereka bisa mulai tanpa harus memberikan uang.
+
+**Keputusan MVP (opsi b, ADR-013):** `/donasikan` adalah landing dan wizard resmi dalam satu halaman. Pilihan kategori berikut merupakan langkah pertama wizard, bukan halaman `/donasi` terpisah. `/donasi/[reference]` dipakai untuk tracking, dan `/donasi/[reference]/receipt` untuk receipt yang aman dibagikan.
 
 ```text
 ┌─────────────────────────────────────────┐
@@ -197,7 +199,7 @@ Tujuan: membuat pengunjung yakin bahwa mereka bisa mulai tanpa harus memberikan 
 └─────────────────────────────────────────┘
 ```
 
-Di bawah pilihan tampilkan:
+Setelah kategori dipilih, tampilkan syarat diterima/ditolak dari data jenis limbah. Batas jumlah tampil pada langkah Quantity. Panduan kemasan/keselamatan mengikuti catatan material yang tersedia:
 
 - accepted condition;
 - minimum/maximum quantity jika ada;
@@ -206,7 +208,7 @@ Di bawah pilihan tampilkan:
 
 ---
 
-## 5.2 Donation wizard
+## 5.2 Donation wizard — di `/donasikan`
 
 ### Step 1 — Material
 
@@ -262,12 +264,14 @@ Alamat
 Tanggal
 [_____________________]
 
-Slot waktu
+Waktu yang diinginkan (opsional)
 [_____________________]
 
 Catatan
 [_____________________]
 ```
+
+Tanggal dan pilihan waktu pagi/siang adalah preferensi statis MVP, bukan slot yang sudah diperiksa kapasitasnya. UI menjelaskan bahwa jadwal menunggu konfirmasi tim operasional; pengecekan kapasitas/availability ditunda (ADR-014).
 
 ### Step 4 — Confirmation
 
@@ -294,11 +298,15 @@ DON-2026-00124
 [ BAGIKAN DAMPAK ]
 ```
 
+`Bagikan Dampak` membuka `/donasi/[reference]/receipt`: halaman HTML ringkas berisi referensi, material, estimasi jumlah, jumlah terverifikasi jika tersedia, dan status saat ini. Receipt tidak memuat identitas donor, kontak, alamat/jadwal pickup, atau catatan internal. Metadata Open Graph memakai teks yang aman dipublikasikan, tanpa gambar dinamis pada MVP. Ringkasan dampak sama sekali tidak ditampilkan sampai tersedia data terverifikasi yang menghubungkan donasi individual ke hasil pengolahan/penjualan/alokasi sosial (Phase 5/8; ADR-015).
+
 ---
 
 # 6. Donation Tracking
 
-## `/donasi/:id`
+## `/donasi/[reference]`
+
+Timeline memakai delapan status: `SUBMITTED → SCHEDULED → COLLECTED → VERIFIED → SORTED → PROCESSED → CONVERTED → IMPACTED`. Waktu berasal dari riwayat event; tahap yang belum tercapai bukan klaim kegiatan yang sudah terjadi. Referensi yang tidak ditemukan menampilkan `EmptyState` kontekstual untuk memeriksa kode atau memulai donasi baru; kegagalan data menampilkan `ErrorState` dengan aksi mencoba kembali.
 
 ```text
 ┌──────────────────────────────────────────┐
@@ -307,11 +315,11 @@ DON-2026-00124
 │                                          │
 │ ✓ Donasi dibuat                          │
 │ ✓ Pickup dijadwalkan                     │
-│ ● Menunggu pengambilan                   │
+│ ● Limbah diterima                        │
 │ ○ Verifikasi berat                       │
+│ ○ Pemilahan selesai                      │
 │ ○ Diproses                               │
 │ ○ Menjadi produk                         │
-│ ○ Terjual                                │
 │ ○ Dampak tercatat                        │
 └──────────────────────────────────────────┘
 ```

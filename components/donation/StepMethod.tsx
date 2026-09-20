@@ -3,8 +3,15 @@ import styles from "./DonationWizard.module.css";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
-import { RadioGroup } from "@/components/ui/RadioGroup";
 import type { CollectionPoint } from "@/types/donation";
+import {
+  MapPinIcon,
+  PickupTruckIcon,
+  CheckIcon,
+  ClockIcon,
+  ShieldLockIcon,
+  InfoCircleIcon,
+} from "./DonationIcons";
 
 export type DonationMethod = "DROP_OFF" | "PICKUP";
 
@@ -31,6 +38,7 @@ interface StepMethodProps {
   errors: Partial<Record<keyof MethodData, string>>;
 }
 
+// MVP time preferences; these options do not represent checked capacity.
 const TIME_SLOTS = [
   { value: "08:00–12:00", label: "Pagi: 08.00 – 12.00" },
   { value: "13:00–17:00", label: "Siang: 13.00 – 17.00" },
@@ -50,20 +58,6 @@ export function StepMethod({
   wasteTypeSlug,
   errors,
 }: StepMethodProps) {
-  const methodOptions = [
-    {
-      value: "DROP_OFF",
-      label: "Antar ke Collection Point",
-      description: "Kamu mengantarkan langsung ke lokasi kami. Gratis dan tidak perlu jadwal.",
-    },
-    {
-      value: "PICKUP",
-      label: "Dijemput",
-      description:
-        "Tim kami yang datang ke rumahmu. Jadwal akan dikonfirmasi dalam 1–2 hari kerja.",
-    },
-  ];
-
   // Filter collection points that accept the selected waste type
   const compatiblePoints = collectionPoints.filter(
     (cp) =>
@@ -74,30 +68,101 @@ export function StepMethod({
   return (
     <div className={styles.stepContent}>
       <div className={styles.stepHeader}>
-        <h2 className={styles.stepTitle}>Bagaimana cara menyerahkannya?</h2>
+        <h2 className={styles.stepTitle}>Metode Penyerahan</h2>
         <p className={styles.stepSubtitle}>
-          Pilih cara yang paling nyaman untukmu.
+          Pilih cara penyerahan limbah yang paling mudah untukmu.
         </p>
       </div>
 
-      <RadioGroup
-        name="method"
-        options={methodOptions}
-        value={value.method}
-        onChange={(v) => onChange({ method: v as DonationMethod })}
-        error={errors.method}
-      />
+      {/* Method choice cards */}
+      <div className={styles.methodChoiceGrid}>
+        <button
+          type="button"
+          className={`${styles.methodChoiceCard} ${
+            value.method === "DROP_OFF" ? styles.methodChoiceCardActive : ""
+          }`}
+          onClick={() => onChange({ method: "DROP_OFF" })}
+          aria-pressed={value.method === "DROP_OFF"}
+        >
+          <div className={styles.methodIconWrap}>
+            <MapPinIcon size={24} />
+          </div>
+          <div className={styles.methodCardContent}>
+            <div className={styles.methodCardTitleRow}>
+              <strong className={styles.methodTitleText}>
+                Antar ke Collection Point
+              </strong>
+              {value.method === "DROP_OFF" && (
+                <span className={styles.methodActiveBadge}>
+                  <CheckIcon size={12} />
+                </span>
+              )}
+            </div>
+            <p className={styles.methodDescText}>
+              Kamu mengantar langsung ke titik kumpul terdekat. Cepat, fleksibel,
+              dan tanpa perlu menunggu jadwal.
+            </p>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          className={`${styles.methodChoiceCard} ${
+            value.method === "PICKUP" ? styles.methodChoiceCardActive : ""
+          }`}
+          onClick={() => onChange({ method: "PICKUP" })}
+          aria-pressed={value.method === "PICKUP"}
+        >
+          <div className={styles.methodIconWrap}>
+            <PickupTruckIcon size={24} />
+          </div>
+          <div className={styles.methodCardContent}>
+            <div className={styles.methodCardTitleRow}>
+              <strong className={styles.methodTitleText}>
+                Dijemput oleh Tim
+              </strong>
+              {value.method === "PICKUP" && (
+                <span className={styles.methodActiveBadge}>
+                  <CheckIcon size={12} />
+                </span>
+              )}
+            </div>
+            <p className={styles.methodDescText}>
+              Tim operasional kami akan datang menjemput ke alamatmu. Jadwal
+              dikonfirmasi sebelum keberangkatan.
+            </p>
+          </div>
+        </button>
+      </div>
+
+      {errors.method && (
+        <div className={styles.stepError} role="alert">
+          <InfoCircleIcon size={18} className={styles.errorIcon} />
+          <span>{errors.method}</span>
+        </div>
+      )}
 
       {/* DROP_OFF section */}
       {value.method === "DROP_OFF" && (
         <div className={styles.methodSection}>
-          <h3 className={styles.methodSectionTitle}>Pilih Lokasi Collection Point</h3>
+          <div className={styles.sectionHeadingWrap}>
+            <h3 className={styles.methodSectionTitle}>
+              Pilih Lokasi Collection Point
+            </h3>
+            <span className={styles.sectionSubtitle}>
+              Pilih titik kumpul terdekat untuk menyerahkan limbah.
+            </span>
+          </div>
+
           {compatiblePoints.length === 0 ? (
             <div className={styles.emptyState}>
-              <p>Belum ada collection point yang menerima jenis limbah ini di area kamu.</p>
+              <p>Belum ada collection point yang menerima kategori limbah ini di area sekitarmu.</p>
               <p>
-                Coba pilih metode <strong>Dijemput</strong>, atau{" "}
-                <a href="mailto:kampungsmartfarming@gmail.com" className={styles.stepNoteLink}>
+                Silakan beralih ke opsi <strong>Dijemput oleh Tim</strong>, atau{" "}
+                <a
+                  href="mailto:kampungsmartfarming@gmail.com"
+                  className={styles.stepNoteLink}
+                >
                   hubungi kami
                 </a>
                 .
@@ -111,25 +176,41 @@ export function StepMethod({
                   <button
                     key={cp.id}
                     type="button"
-                    className={`${styles.cpCard} ${isSelected ? styles.cpCardSelected : ""}`}
+                    className={`${styles.cpCard} ${
+                      isSelected ? styles.cpCardSelected : ""
+                    }`}
                     onClick={() => onChange({ collection_point_id: cp.id })}
                     aria-pressed={isSelected}
                   >
                     <div className={styles.cpCardHeader}>
-                      <strong>{cp.name}</strong>
-                      {isSelected && <span className={styles.cpSelectedBadge}>✓</span>}
+                      <div className={styles.cpNameWithIcon}>
+                        <MapPinIcon size={18} className={styles.cpPinIcon} />
+                        <strong>{cp.name}</strong>
+                      </div>
+                      {isSelected && (
+                        <span className={styles.cpSelectedBadge}>
+                          <CheckIcon size={12} />
+                          <span>Dipilih</span>
+                        </span>
+                      )}
                     </div>
                     <p className={styles.cpAddress}>{cp.address}</p>
                     {cp.notes && <p className={styles.cpNotes}>{cp.notes}</p>}
                     {cp.operating_hours && (
                       <details className={styles.cpHours}>
-                        <summary>Jam Operasional</summary>
+                        <summary>
+                          <ClockIcon size={14} className={styles.clockIcon} />
+                          <span>Lihat Jam Operasional</span>
+                        </summary>
                         <ul>
-                          {Object.entries(cp.operating_hours).map(([day, hours]) => (
-                            <li key={day}>
-                              <span className={styles.cpDay}>{day}:</span> {hours}
-                            </li>
-                          ))}
+                          {Object.entries(cp.operating_hours).map(
+                            ([day, hours]) => (
+                              <li key={day}>
+                                <span className={styles.cpDay}>{day}:</span>{" "}
+                                {hours}
+                              </li>
+                            )
+                          )}
                         </ul>
                       </details>
                     )}
@@ -139,9 +220,10 @@ export function StepMethod({
             </div>
           )}
           {errors.collection_point_id && (
-            <p className={styles.stepError} role="alert">
-              {errors.collection_point_id}
-            </p>
+            <div className={styles.stepError} role="alert">
+              <InfoCircleIcon size={18} className={styles.errorIcon} />
+              <span>{errors.collection_point_id}</span>
+            </div>
           )}
         </div>
       )}
@@ -150,83 +232,104 @@ export function StepMethod({
       {value.method === "PICKUP" && (
         <div className={styles.methodSection}>
           <div className={styles.pickupNotice}>
-            <span aria-hidden="true">📋</span>
-            <div>
-              <strong>Tentang layanan penjemputan</strong>
+            <div className={styles.noticeIconWrap}>
+              <InfoCircleIcon size={20} />
+            </div>
+            <div className={styles.noticeText}>
+              <strong>Ketentuan Layanan Penjemputan</strong>
               <p>
-                Setelah kamu konfirmasi donasi, tim kami akan menghubungi untuk
-                memastikan jadwal pickup. Penjemputan biasanya dilakukan dalam
-                1–3 hari kerja setelah konfirmasi.
+                Tanggal dan jam yang kamu tentukan merupakan preferensi jadwal.
+                Tim operasional kami akan mengonfirmasi ketersediaan rute armada
+                sebelum penjemputan dilakukan.
               </p>
             </div>
           </div>
 
-          <h3 className={styles.methodSectionTitle}>Alamat Penjemputan</h3>
-          <div className={styles.pickupForm}>
-            <Input
-              label="Alamat Lengkap"
-              placeholder="Jl. Contoh No. 1, RT 01/RW 02"
-              required
-              value={value.pickup_address_line1}
-              onChange={(e) => onChange({ pickup_address_line1: e.target.value })}
-              error={errors.pickup_address_line1}
-            />
-            <Input
-              label="Patokan / Detail Tambahan (opsional)"
-              placeholder="Dekat warung Bu Siti, rumah cat biru"
-              value={value.pickup_address_line2}
-              onChange={(e) => onChange({ pickup_address_line2: e.target.value })}
-            />
-            <div className={styles.pickupRow}>
+          <div className={styles.formGroupSection}>
+            <h3 className={styles.methodSectionTitle}>Alamat Penjemputan</h3>
+            <div className={styles.pickupForm}>
               <Input
-                label="Kelurahan / Kecamatan"
-                placeholder="Kelurahan"
-                value={value.pickup_district}
-                onChange={(e) => onChange({ pickup_district: e.target.value })}
+                label="Alamat Lengkap"
+                placeholder="Nama jalan, nomor rumah, RT/RW"
+                required
+                value={value.pickup_address_line1}
+                onChange={(e) =>
+                  onChange({ pickup_address_line1: e.target.value })
+                }
+                error={errors.pickup_address_line1}
               />
               <Input
-                label="Kota"
-                placeholder="Kota"
-                value={value.pickup_city}
-                onChange={(e) => onChange({ pickup_city: e.target.value })}
+                label="Patokan / Petunjuk Lokasi (opsional)"
+                placeholder="Contoh: Seberang masjid, pagar warna hijau"
+                value={value.pickup_address_line2}
+                onChange={(e) =>
+                  onChange({ pickup_address_line2: e.target.value })
+                }
+              />
+              <div className={styles.pickupRow}>
+                <Input
+                  label="Kelurahan / Kecamatan"
+                  placeholder="Kecamatan & Kelurahan"
+                  value={value.pickup_district}
+                  onChange={(e) =>
+                    onChange({ pickup_district: e.target.value })
+                  }
+                />
+                <Input
+                  label="Kota / Kabupaten"
+                  placeholder="Kota"
+                  value={value.pickup_city}
+                  onChange={(e) => onChange({ pickup_city: e.target.value })}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.formGroupSection}>
+            <h3 className={styles.methodSectionTitle}>
+              Preferensi Waktu Penjemputan
+            </h3>
+            <div className={styles.pickupForm}>
+              <Input
+                label="Pilihan Tanggal (Minimal Besok)"
+                type="date"
+                required
+                min={getMinDate()}
+                value={value.pickup_requested_date}
+                onChange={(e) =>
+                  onChange({ pickup_requested_date: e.target.value })
+                }
+                error={errors.pickup_requested_date}
+              />
+              <Select
+                label="Pilihan Waktu (opsional)"
+                placeholder="Pilih rentang waktu"
+                hint="Jadwal aktual akan dikoordinasikan kembali oleh staf penjemputan."
+                options={TIME_SLOTS}
+                value={value.pickup_requested_slot}
+                onChange={(e) =>
+                  onChange({ pickup_requested_slot: e.target.value })
+                }
+              />
+              <Textarea
+                label="Catatan Penjemputan (opsional)"
+                placeholder="Contoh: Mohon hubungi WhatsApp sebelum berangkat, atau parkir di depan gang"
+                value={value.pickup_notes}
+                onChange={(e) => onChange({ pickup_notes: e.target.value })}
+                showCharCount
+                maxLength={500}
               />
             </div>
           </div>
 
-          <h3 className={styles.methodSectionTitle}>Jadwal Penjemputan</h3>
-          <div className={styles.pickupForm}>
-            <Input
-              label="Tanggal yang Diinginkan"
-              type="date"
-              required
-              min={getMinDate()}
-              value={value.pickup_requested_date}
-              onChange={(e) => onChange({ pickup_requested_date: e.target.value })}
-              error={errors.pickup_requested_date}
-            />
-            <Select
-              label="Slot Waktu (opsional)"
-              placeholder="Pilih slot waktu"
-              options={TIME_SLOTS}
-              value={value.pickup_requested_slot}
-              onChange={(e) => onChange({ pickup_requested_slot: e.target.value })}
-            />
-            <Textarea
-              label="Catatan untuk Tim Kami (opsional)"
-              placeholder="Misal: Tolong hubungi lewat WhatsApp sebelum datang"
-              value={value.pickup_notes}
-              onChange={(e) => onChange({ pickup_notes: e.target.value })}
-              showCharCount
-              maxLength={500}
-            />
-          </div>
-
           <div className={styles.privacyNote}>
-            <span aria-hidden="true">🔒</span>
+            <div className={styles.privacyIconWrap}>
+              <ShieldLockIcon size={18} />
+            </div>
             <p>
-              Alamat penjemputanmu bersifat <strong>privat</strong> dan hanya
-              digunakan oleh tim operasional kami untuk keperluan penjemputan.
-              Tidak akan dibagikan kepada pihak lain.
+              Data alamat penjemputanmu bersifat <strong>rahasia & privat</strong>.
+              Hanya digunakan oleh staf operasional kami untuk keperluan logistik
+              penjemputan dan tidak akan pernah dibagikan kepada pihak lain.
             </p>
           </div>
         </div>
@@ -235,8 +338,8 @@ export function StepMethod({
       {/* Donor notes (shared, shown below both methods) */}
       <div className={styles.donorNotesSection}>
         <Textarea
-          label="Catatan Tambahan (opsional)"
-          placeholder="Ada informasi lain yang perlu kami ketahui tentang limbahmu?"
+          label="Pesan atau Catatan Tambahan (opsional)"
+          placeholder="Ada informasi tambahan mengenai kondisi limbah atau wadah yang kamu gunakan?"
           value={value.donor_notes}
           onChange={(e) => onChange({ donor_notes: e.target.value })}
           showCharCount
@@ -246,3 +349,4 @@ export function StepMethod({
     </div>
   );
 }
+

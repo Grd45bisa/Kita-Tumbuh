@@ -1,11 +1,15 @@
 "use server";
 
-import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { getWasteTypeBySlug } from "@/lib/domain/waste-types";
 import { getCollectionPointById } from "@/lib/domain/collection-points";
 import { DonationSubmitSchema } from "@/lib/validation/donation-schema";
-import type { ActionResult, Donation, DonationDetail } from "@/types/donation";
+import type {
+  ActionResult,
+  DonationStatus,
+  PublicDonationReceipt,
+  PublicDonationTracking,
+} from "@/types/donation";
 
 // =============================================================================
 // DONATION SERVER ACTIONS
@@ -42,9 +46,12 @@ export interface CreateDonationInput {
 export interface CreateDonationResult {
   reference: string;
   donationId: string;
-  status: string;
+  status: DonationStatus;
+  receipt: PublicDonationReceipt;
   wasAlreadySubmitted: boolean;
 }
+
+const submissionProjection = "id, reference, status, waste_type_name, estimated_quantity, verified_quantity, unit";
 
 export async function createDonation(
   input: CreateDonationInput
@@ -71,7 +78,7 @@ export async function createDonation(
   // 2. Idempotency check — prevent duplicate submissions
   const { data: existing } = await supabase
     .from("donations")
-    .select("id, reference, status")
+    .select(submissionProjection)
     .eq("idempotency_key", data.idempotency_key)
     .maybeSingle();
 
@@ -81,7 +88,8 @@ export async function createDonation(
       data: {
         reference: existing.reference as string,
         donationId: existing.id as string,
-        status: existing.status as string,
+        status: existing.status as DonationStatus,
+        receipt: toPublicReceipt(existing as PublicDonationReceipt),
         wasAlreadySubmitted: true,
       },
     };
@@ -137,17 +145,9 @@ export async function createDonation(
   // 6. Get authenticated user if available (anonymous is ok)
   const { data: { user } } = await supabase.auth.getUser();
 
-  // 7. Generate reference number
-  const year = new Date().getFullYear();
-  const { count } = await supabase
-    .from("donations")
-    .select("*", { count: "exact", head: true });
-  const seq = ((count ?? 0) + 1).toString().padStart(5, "0");
-  const reference = `DON-${year}-${seq}`;
-
-  // 8. Insert donation record
+  // Reference allocation is atomic and year-scoped in PostgreSQL (migration 002).
+  // Idempotency remains independent: retries can consume a sequence number.
   const donationInsert = {
-    reference,
     user_id: user?.id ?? null,
     donor_name: data.donor_name || null,
     donor_email: data.donor_email || null,
@@ -164,19 +164,32 @@ export async function createDonation(
     status: "SUBMITTED" as const,
   };
 
-  const { data: donation, error: donationError } = await supabase
-    .from("donations")
-    .insert(donationInsert)
-    .select("id, reference, status")
-    .single();
+  let donation: (PublicDonationReceipt & { id: string }) | null = null;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const { data: reference, error: referenceError } = await supabase.rpc(
+      "generate_donation_reference"
+    );
+    if (referenceError || typeof reference !== "string") {
+      console.error("[create-donation] reference allocation failed:", referenceError?.code);
+      return { success: false, error: "Gagal membuat referensi donasi. Coba lagi dalam beberapa saat." };
+    }
 
-  if (donationError || !donation) {
-    console.error("[create-donation] insert error:", donationError?.message);
-    // Handle duplicate idempotency_key race condition
+    const { data: inserted, error: donationError } = await supabase
+      .from("donations")
+      .insert({ ...donationInsert, reference })
+      .select(submissionProjection)
+      .single();
+
+    if (!donationError && inserted) {
+      donation = inserted as PublicDonationReceipt & { id: string };
+      break;
+    }
+
+    // Preserve the unique-key fallback when two requests pass the pre-check.
     if (donationError?.code === "23505") {
       const { data: raceDonation } = await supabase
         .from("donations")
-        .select("id, reference, status")
+        .select(submissionProjection)
         .eq("idempotency_key", data.idempotency_key)
         .maybeSingle();
       if (raceDonation) {
@@ -185,12 +198,27 @@ export async function createDonation(
           data: {
             reference: raceDonation.reference as string,
             donationId: raceDonation.id as string,
-            status: raceDonation.status as string,
+            status: raceDonation.status as DonationStatus,
+            receipt: toPublicReceipt(raceDonation as PublicDonationReceipt),
             wasAlreadySubmitted: true,
           },
         };
       }
+
+      // An imported/manual reference may collide with the counter. Retry only
+      // that constraint; other uniqueness failures must not look successful.
+      if (
+        donationError.message.includes("donations_reference_key") ||
+        donationError.details?.includes("Key (reference)=")
+      ) {
+        continue;
+      }
     }
+    console.error("[create-donation] insert failed:", donationError?.code);
+    break;
+  }
+
+  if (!donation) {
     return {
       success: false,
       error: "Gagal menyimpan donasi. Coba lagi dalam beberapa saat.",
@@ -226,84 +254,86 @@ export async function createDonation(
     data: {
       reference: donation.reference as string,
       donationId: donation.id as string,
-      status: donation.status as string,
+      status: donation.status,
+      receipt: toPublicReceipt(donation),
       wasAlreadySubmitted: false,
     },
   };
 }
 
 // =============================================================================
-// GET DONATION BY REFERENCE (for tracking page)
-// Returns donation details WITHOUT private pickup address.
+// PUBLIC DONATION LOOKUPS
+// Exact-reference SQL functions return only public fields, including for
+// member-owned donations. No service-role client or unrestricted row reads.
 // =============================================================================
+
+function toPublicReceipt(row: PublicDonationReceipt): PublicDonationReceipt {
+  return {
+    reference: row.reference,
+    waste_type_name: row.waste_type_name,
+    estimated_quantity: row.estimated_quantity,
+    verified_quantity: row.verified_quantity,
+    unit: row.unit,
+    status: row.status,
+  };
+}
+
+async function lookupPublicDonation<T>(
+  reference: string,
+  rpc: "get_public_donation_receipt" | "get_public_donation_tracking"
+): Promise<ActionResult<T>> {
+  // The numeric suffix can grow beyond five digits; never truncate it.
+  if (!/^DON-\d{4}-\d{5,}$/.test(reference)) {
+    return { success: false, code: "INVALID_REFERENCE", error: "Format referensi donasi tidak valid." };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc(rpc, { p_reference: reference }).maybeSingle();
+    if (error) {
+      console.error("[public-donation] lookup failed:", error.code);
+      return { success: false, code: "UNAVAILABLE", error: "Data donasi belum dapat dimuat. Coba lagi dalam beberapa saat." };
+    }
+    if (!data) {
+      return { success: false, code: "NOT_FOUND", error: "Donasi dengan referensi ini tidak ditemukan. Periksa kembali kodenya." };
+    }
+    return { success: true, data: data as T };
+  } catch {
+    return { success: false, code: "UNAVAILABLE", error: "Data donasi belum dapat dimuat. Coba lagi dalam beberapa saat." };
+  }
+}
+
+export async function getPublicDonationReceipt(
+  reference: string
+): Promise<ActionResult<PublicDonationReceipt>> {
+  const result = await lookupPublicDonation<PublicDonationReceipt>(reference, "get_public_donation_receipt");
+  if (!result.success) return result;
+  return { success: true, data: toPublicReceipt(result.data) };
+}
 
 export async function getDonationByReference(
   reference: string
-): Promise<ActionResult<DonationDetail>> {
-  if (!reference || !/^DON-\d{4}-\d{5}$/.test(reference)) {
-    return { success: false, error: "Format referensi donasi tidak valid." };
-  }
-
-  const supabase = await createClient();
-
-  const { data: donation, error } = await supabase
-    .from("donations")
-    .select(`
-      id, reference, user_id, donor_name, waste_type_slug,
-      waste_type_name, unit, estimated_quantity, verified_quantity,
-      verification_notes, verified_at, method, collection_point_id,
-      status, status_updated_at, donor_notes, created_at, updated_at,
-      collection_points (
-        id, code, name, address, district, city, phone, operating_hours,
-        accepted_waste_slugs, notes
-      ),
-      donation_status_history (
-        id, donation_id, from_status, to_status, notes, created_at
-      )
-    `)
-    .eq("reference", reference)
-    .single();
-
-  if (error || !donation) {
-    return {
-      success: false,
-      error: "Donasi dengan referensi tersebut tidak ditemukan.",
-    };
-  }
-
-  // SECURITY: Never return pickup address — it's private
-  // Only return the safe donation fields + status history
-
-  const rawDonation = donation as Record<string, unknown>;
-
-  const result: DonationDetail = {
-    id: rawDonation.id as string,
-    reference: rawDonation.reference as string,
-    user_id: rawDonation.user_id as string | null,
-    donor_name: rawDonation.donor_name as string | null,
-    donor_email: null, // Never return email to public tracking
-    waste_type_slug: rawDonation.waste_type_slug as string,
-    waste_type_name: rawDonation.waste_type_name as string,
-    unit: rawDonation.unit as string,
-    estimated_quantity: rawDonation.estimated_quantity as number,
-    verified_quantity: rawDonation.verified_quantity as number | null,
-    verification_notes: rawDonation.verification_notes as string | null,
-    verified_at: rawDonation.verified_at as string | null,
-    method: rawDonation.method as "DROP_OFF" | "PICKUP",
-    collection_point_id: rawDonation.collection_point_id as string | null,
-    status: rawDonation.status as Donation["status"],
-    status_updated_at: rawDonation.status_updated_at as string,
-    donor_notes: rawDonation.donor_notes as string | null,
-    created_at: rawDonation.created_at as string,
-    updated_at: rawDonation.updated_at as string,
-    collection_point: rawDonation.collection_points as DonationDetail["collection_point"],
-    status_history: (
-      (rawDonation.donation_status_history as unknown[]) ?? []
-    ) as DonationDetail["status_history"],
+): Promise<ActionResult<PublicDonationTracking>> {
+  const result = await lookupPublicDonation<PublicDonationTracking>(reference, "get_public_donation_tracking");
+  if (!result.success) return result;
+  const row = result.data;
+  return {
+    success: true,
+    data: {
+      ...toPublicReceipt(row),
+      method: row.method,
+      created_at: row.created_at,
+      collection_point: row.collection_point ? {
+        name: row.collection_point.name,
+        address: row.collection_point.address,
+        district: row.collection_point.district,
+        city: row.collection_point.city,
+        operating_hours: row.collection_point.operating_hours,
+      } : null,
+      status_history: (row.status_history ?? []).map((event) => ({
+        to_status: event.to_status,
+        created_at: event.created_at,
+      })),
+    },
   };
-
-  return { success: true, data: result };
 }
-
-// Re-export for client convenience
-export { randomUUID };

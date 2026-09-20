@@ -399,9 +399,12 @@ SUBMITTED
 → SORTED
 → PROCESSED
 → CONVERTED
+→ IMPACTED
 ```
 
 Not every donation must expose every internal state publicly.
+
+`CONVERTED` records conversion into a product; `IMPACTED` requires verified downstream impact records. Adding a lifecycle state does not automatically create those records or an impact summary.
 
 Internal states can be simplified for members, but the backend should retain enough information for traceability.
 

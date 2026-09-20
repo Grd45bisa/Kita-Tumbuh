@@ -3,6 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { env } from "@/lib/env";
+import { acceptedWastePreview as wasteTypes } from "@/lib/content/accepted-waste";
+import { homepageJourney as journey } from "@/lib/content/how-it-works";
+import { homepageGallery as galleryItems } from "@/lib/content/gallery";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -10,98 +13,6 @@ export const metadata: Metadata = {
   description:
     "Ubah minyak jelantah, sampah organik, dan plastik terpilah dari rumah menjadi karya bernilai yang mendukung ruang belajar dan kemandirian anak-anak difabel.",
 };
-
-const wasteTypes = [
-  {
-    icon: "drop",
-    title: "Minyak jelantah",
-    description: "Minyak bekas menggoreng dari rumah atau usaha kuliner.",
-    preparation: "Dinginkan, saring, lalu simpan dalam botol tertutup. Jangan dicampur air.",
-    tag: "Paling dibutuhkan",
-  },
-  {
-    icon: "leaf",
-    title: "Sampah organik",
-    description: "Kulit buah, sisa sayur mentah, ampas kopi, dan dedaunan.",
-    preparation: "Pisahkan dari kuah, plastik, dan bahan kimia. Simpan dalam wadah tertutup.",
-    tag: "Diterima terpilah",
-  },
-  {
-    icon: "bottle",
-    title: "Plastik tertentu",
-    description: "Botol PET bening dan jeriken plastik yang masih layak digunakan.",
-    preparation: "Kosongkan, bilas hingga bersih, lalu keringkan sebelum diserahkan.",
-    tag: "Sesuai kebutuhan",
-  },
-];
-
-const journey = [
-  {
-    number: "01",
-    title: "Pilah dari rumah",
-    description: "Satu botol jelantah atau satu wadah sampah terpilah sudah menjadi awal yang berarti.",
-  },
-  {
-    number: "02",
-    title: "Serahkan kepada kami",
-    description: "Isi formulir donasi agar tim dapat mengarahkan cara penyerahan yang tersedia.",
-  },
-  {
-    number: "03",
-    title: "Diolah bersama",
-    description: "Bahan dibersihkan, dipilah, lalu diolah menjadi produk berguna dan bahan pendukung kebun.",
-  },
-  {
-    number: "04",
-    title: "Manfaatnya kembali",
-    description: "Hasil pengolahan dan penjualan mendukung ruang belajar, berkarya, dan bertumbuh bersama.",
-  },
-];
-
-const galleryItems = [
-  {
-    src: "/images/data-difabel-workshop-jelantah.jpg",
-    alt: "Anak-anak difabel mengikuti kegiatan pengolahan minyak jelantah",
-    label: "Belajar mengolah bersama",
-    className: "galleryWide",
-  },
-  {
-    src: "/images/data-difabel-kompos-tanaman.jpg",
-    alt: "Anak-anak difabel merawat tanaman dengan kompos",
-    label: "Merawat kehidupan baru",
-    className: "galleryStandard",
-  },
-  {
-    src: "/images/data-difabel-smart-monitoring.jpg",
-    alt: "Anak difabel mempelajari teknologi pemantauan kebun",
-    label: "Mengenal teknologi kebun",
-    className: "galleryStandard",
-  },
-  {
-    src: "/images/data-difabel-panen-hidroponik.jpg",
-    alt: "Anak-anak difabel membawa hasil panen hidroponik",
-    label: "Bangga dengan hasil sendiri",
-    className: "galleryTall",
-  },
-  {
-    src: "/images/gallery-inclusive-workshop.jpg",
-    alt: "Kegiatan workshop inklusif bersama anak-anak difabel",
-    label: "Ruang belajar yang setara",
-    className: "galleryStandard",
-  },
-  {
-    src: "/images/gallery-smart-greenhouse.jpg",
-    alt: "Anak-anak berkegiatan di greenhouse komunitas",
-    label: "Tumbuh dekat dengan alam",
-    className: "galleryStandard",
-  },
-  {
-    src: "/images/impact-difabel-komunitas.jpg",
-    alt: "Anak-anak difabel dan pendamping berkegiatan bersama",
-    label: "Bertumbuh sebagai komunitas",
-    className: "galleryWide",
-  },
-];
 
 function WasteIcon({ name }: { name: string }) {
   if (name === "drop") {
