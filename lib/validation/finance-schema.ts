@@ -44,6 +44,10 @@ export const CreateSocialAllocationSchema = z.object({
     .trim()
     .min(3, "Nama program minimal 3 karakter.")
     .max(100, "Nama program maksimal 100 karakter."),
+  program_id: z
+    .union([z.string().uuid(), z.literal(""), z.null()])
+    .optional()
+    .transform((v) => (v === "" || v === null || v === undefined ? null : v)),
   funding_source_reference: z
     .string()
     .trim()

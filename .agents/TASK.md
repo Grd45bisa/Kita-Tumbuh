@@ -539,42 +539,46 @@ Payment provider selection is a separate decision and should not be hard-coded i
 
 # 10. Phase 7 — Social Program & Beneficiary
 
-## P0-701 — Social program management
+## P0-701 — Social program management — DONE
 
-- [ ] Program CRUD.
-- [ ] Goal.
-- [ ] Status.
-- [ ] Target amount if applicable.
-- [ ] Funding status.
-- [ ] Public/private visibility.
+- [x] Program CRUD. *(`supabase/migrations/014_social_programs.sql` tabel `social_programs`; `lib/domain/admin/social-programs.ts` `createSocialProgramAction`/`updateSocialProgramAction`; UI di `/admin/social/programs`).*
+- [x] Goal. *(Kolom `goal TEXT NOT NULL`, ditampilkan di form admin dan halaman publik program).*
+- [x] Status. *(Siklus hidup `DRAFT → REVIEW → APPROVED → ACTIVE → FUNDED/PARTIALLY_FUNDED → DISTRIBUTED → COMPLETED` sesuai ARSITEKTUR.md §7.4, CHECK constraint di migration 014).*
+- [x] Target amount if applicable. *(Kolom `target_amount BIGINT` nullable — program berkelanjutan tanpa target tetap boleh mengosongkannya).*
+- [x] Funding status. *(`allocated_amount` dihitung derivatif dari `SUM(social_allocations.amount WHERE approval_status = 'APPROVED')` per program, tidak pernah disimpan sebagai kolom — konsisten dengan prinsip ARSITEKTUR.md §3.1).*
+- [x] Public/private visibility. *(Kolom `public_status BOOLEAN`; RLS `social_programs_public_read` membatasi SELECT publik hanya ke baris `public_status = true`. Halaman `/program` menampilkan data nyata menggantikan ComingSoon, dengan fallback ComingSoon jujur jika belum ada program yang dipublikasikan).*
 
-## P0-702 — Beneficiary management
+**Catatan integrasi Phase 6:** `social_allocations.program_name` (TEXT, dibuat Phase 6 sebagai keterbatasan eksplisit) dipertahankan sebagai snapshot nama program saat alokasi dibuat; kolom `program_id` (FK opsional ke `social_programs`) ditambahkan di migration 014 tanpa menghapus/mengubah data lama.
 
-- [ ] Beneficiary record.
-- [ ] Category.
-- [ ] Need/assistance type.
-- [ ] Verification status.
-- [ ] Consent/privacy status.
-- [ ] Public display policy.
+## P0-702 — Beneficiary management — DONE
 
-## P0-703 — Distribution
+- [x] Beneficiary record. *(`supabase/migrations/015_beneficiaries.sql` tabel `beneficiaries`; admin-only, tidak ada policy SELECT publik sama sekali).*
+- [x] Category. *(`CHILD_WITH_DISABILITY`, `ELDERLY`, `FAMILY`, `OTHER` dengan CHECK constraint).*
+- [x] Need/assistance type. *(Kolom `need_type TEXT NOT NULL`).*
+- [x] Verification status. *(`PENDING`, `VERIFIED`, `REJECTED`; hanya penerima manfaat `VERIFIED` yang muncul di dropdown form distribusi).*
+- [x] Consent/privacy status. *(`consent_status`: `NOT_REQUESTED`/`PENDING`/`GRANTED`/`DECLINED`/`REVOKED`; `privacy_level`: `PRIVATE`/`ALIAS_ONLY`/`PUBLIC`. Validasi Zod + form UI menolak kombinasi `privacy_level = PUBLIC` tanpa `consent_status = GRANTED`).*
+- [x] Public display policy. *(Field `name_or_alias` memungkinkan alias jika consent nama asli belum ada. **Keterbatasan eksplisit:** proyeksi publik penerima manfaat belum dibangun di Phase 7 ini — Fase 8/Transparency Engine yang akan membangun view publik terbatas berdasarkan `privacy_level`; untuk saat ini `beneficiaries` murni data internal admin, tidak ada endpoint publik yang membacanya sama sekali, sehingga tidak ada risiko kebocoran).*
 
-- [ ] Create distribution.
-- [ ] Link to program.
-- [ ] Link to beneficiary.
-- [ ] Funding source.
-- [ ] Amount/item.
-- [ ] Date.
-- [ ] Evidence/document reference.
-- [ ] Approval/audit trail.
+## P0-703 — Distribution — DONE
 
-## P1-704 — Impact story publishing
+- [x] Create distribution. *(`supabase/migrations/016_distributions.sql` tabel `distributions`; `lib/domain/admin/distributions.ts` `createDistributionAction`).*
+- [x] Link to program. *(FK `program_id NOT NULL REFERENCES social_programs`).*
+- [x] Link to beneficiary. *(FK `beneficiary_id NOT NULL REFERENCES beneficiaries`).*
+- [x] Funding source. *(FK opsional `allocation_id REFERENCES social_allocations` — nullable untuk distribusi barang in-kind di luar alokasi dana).*
+- [x] Amount/item. *(`amount BIGINT` dan/atau `item_description TEXT`; CHECK constraint `distributions_amount_or_item` mewajibkan minimal salah satu diisi).*
+- [x] Date. *(`distributed_at DATE NOT NULL`).*
+- [x] Evidence/document reference. *(`evidence_url` + `evidence_notes`).*
+- [x] Approval/audit trail. *(`approval_status`, `approved_by`, `recorded_by`. Validasi saldo alokasi anti-defisit dilakukan atomik server-side via RPC `execute_distribution` yang mengunci baris alokasi `FOR UPDATE` dan menghitung ulang sisa saldo dalam satu transaksi — pola yang sama dengan `execute_social_allocation` [Phase 6] dan `execute_order_payment_confirmation` [Phase 6 audit fix], mencegah TOCTOU race antar-distribusi bersamaan terhadap alokasi yang sama).*
+
+## P1-704 — Impact story publishing — NOT STARTED
 
 - [ ] Story draft.
 - [ ] Review/approval.
 - [ ] Consent verification.
 - [ ] Publish/unpublish.
 - [ ] Link story to program/impact records where appropriate.
+
+**Catatan:** P1-704 sengaja tidak dikerjakan di iterasi Phase 7 ini — cakupan diprioritaskan pada P0-701/702/703 (fondasi program, penerima manfaat, dan distribusi) yang menjadi prasyarat data sebelum cerita dampak dapat dikaitkan ke program/distribusi nyata. Halaman `/cerita` tetap ComingSoon jujur dari Phase 2, konsisten dengan prinsip anti-fabrikasi.
 
 ---
 

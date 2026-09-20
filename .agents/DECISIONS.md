@@ -345,6 +345,54 @@ KITA TUMBUH
 
 ---
 
+## ADR-022 — Social Program Identity: FK + Retained Snapshot, Not a Breaking Migration
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** Phase 6 (`011_social_allocations.sql`) added `social_allocations.program_name TEXT` as an explicit, documented temporary limitation, because `social_programs` did not exist yet. Phase 7 now creates that table (`014_social_programs.sql`, P0-701). The question is how to link the two without breaking existing allocation rows or losing historical accuracy.
+
+**Decision:** Add a nullable `social_allocations.program_id UUID REFERENCES social_programs(id) ON DELETE SET NULL` alongside the existing `program_name TEXT` column. Keep `program_name` permanently — it is not deprecated or backfilled-then-dropped. New allocations created through the admin UI/RPC populate both fields; the RPC `execute_social_allocation` gained an optional `p_program_id` parameter with a default of `NULL` so existing callers keep working unmodified.
+
+**Why:** `program_name` at allocation time is a financial-record snapshot, the same pattern already used for `order_items.product_name_snapshot`/`product_price_snapshot` (P0-601) and consistent with DATABASE.md's "prefer append-only history for financial/audit events." If a program is later renamed, historical allocation records must keep reading the name as it was when the money was actually allocated — a live join through `program_id` would silently rewrite history. `ON DELETE SET NULL` (not `RESTRICT`) on `program_id` means a program record can be archived/removed later without blocking deletion or corrupting the allocation ledger, since `program_name` alone remains sufficient to read old records.
+
+**Consequences:** Every read of `social_allocations` for display purposes should prefer `program_name` (the snapshot) over a live join to `social_programs.name` through `program_id`, which exists only for filtering/relational queries (e.g. "sum allocated to program X") and UI convenience linking (e.g. deep-linking to the program's admin page).
+
+---
+
+## ADR-023 — Beneficiary Privacy Model: No Public Projection Yet, Admin-Only by Default
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** ARSITEKTUR.md §5.13 and §17.5 require that beneficiary data be strictly separated from any public projection, and DATABASE.md mandates RLS for beneficiary data. `beneficiaries` (P0-702) carries a `consent_status` and `privacy_level` schema (`PRIVATE`/`ALIAS_ONLY`/`PUBLIC`) intended to eventually gate what a future public-facing impact story or program page may show about a real person.
+
+**Decision:** For this Phase 7 iteration, `beneficiaries` has **no public SELECT RLS policy at all** — not even a narrowed one filtered by `privacy_level`/`consent_status`. Every read of this table goes through `requireAdmin()`-gated Server Actions only. The `privacy_level`/`consent_status` columns are captured now (so the data model doesn't need another breaking migration later) but are not yet wired to any public-facing query or page.
+
+**Why:** Building a "safe" public projection correctly (one that reliably never leaks `PRIVATE` or `NOT_REQUESTED`/`PENDING`/`DECLINED`/`REVOKED` consent records even under future refactors) deserves its own deliberate design pass — most naturally as part of Phase 8's "Transparency & Impact Engine," which already owns the public data pipeline (`Operational DB → Validation → Verified Metrics → Aggregation → Public Projection`, ARSITEKTUR.md §13). Wiring a narrow public view now, ahead of that pipeline, risks a privacy bug being introduced under schedule pressure without the review such sensitive data deserves. An admin-only table with zero public exposure is strictly safer than a partially-correct public view.
+
+**Consequences:** P1-704 (Impact story publishing) and any future public beneficiary-facing content must be built against a dedicated public projection (view or RPC) created in Phase 8, never a direct query against `beneficiaries`. This ADR should be revisited/superseded when that projection is built.
+
+---
+
+## ADR-024 — Distribution-Against-Allocation Balance Validation: Atomic RPC, Following the Established Pattern
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** P0-703 requires that a distribution's funding source be trackable back to a social allocation, and ARSITEKTUR.md §24 states allocation/distribution amounts must never exceed what is available. The Phase 6 audit (see the ADR-020 implementation note above) found that a naive application-level "read balance, then insert" pattern is vulnerable to a TOCTOU race between concurrent writes — first caught in `confirmOrderPaymentAction`'s stock decrement, after `execute_social_allocation` had already established the correct atomic pattern for allocation-vs-revenue balance checks.
+
+**Decision:** `distributions` validates its amount against the remaining balance of its linked `social_allocations` row (when one is set) via a single `SECURITY DEFINER` Postgres function, `execute_distribution` (`016_distributions.sql`), which locks the allocation row (`FOR UPDATE`) and recomputes `SUM(distributions.amount) WHERE allocation_id = ... AND approval_status = 'APPROVED'` within the same transaction before inserting.
+
+**Why:** Applies the lesson from the Phase 6 audit proactively instead of shipping the naive version and fixing it later. Two admins concurrently recording distributions against the same allocation must not both pass a stale balance check.
+
+**Consequences:** Any future domain logic that checks a derived balance before writing a dependent record (this codebase now has three instances: `execute_social_allocation` for revenue→allocation, `execute_order_payment_confirmation` for stock, `execute_distribution` for allocation→distribution) should default to this same locked-RPC shape rather than an application-level check-then-insert, unless a specific reason is documented for why the race is acceptable.
+
+---
+
 ## Agent Rule
 
 Before introducing a major architectural change, search this document first.

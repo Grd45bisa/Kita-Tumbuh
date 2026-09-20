@@ -273,6 +273,7 @@ export async function getAdminSocialAllocations(
     .select(`
       id,
       program_name,
+      program_id,
       funding_source_reference,
       amount,
       currency,
@@ -303,6 +304,7 @@ export async function getAdminSocialAllocations(
   type RawAllocation = {
     id: string;
     program_name: string;
+    program_id: string | null;
     funding_source_reference: string;
     amount: number | string;
     currency: string;
@@ -316,6 +318,7 @@ export async function getAdminSocialAllocations(
   const allocations: SocialAllocation[] = (data as unknown as RawAllocation[]).map((row) => ({
     id: row.id,
     program_name: row.program_name,
+    program_id: row.program_id,
     funding_source_reference: row.funding_source_reference,
     amount: Number(row.amount),
     currency: row.currency,
@@ -386,6 +389,7 @@ export async function allocateRevenueAction(
       p_amount: input.amount,
       p_notes: input.notes || null,
       p_approved_by: admin.id,
+      p_program_id: input.program_id || null,
     }
   );
 
@@ -411,6 +415,7 @@ export async function allocateRevenueAction(
     .from("social_allocations")
     .insert({
       program_name: input.program_name,
+      program_id: input.program_id || null,
       funding_source_reference: input.funding_source_reference,
       amount: input.amount,
       currency: "IDR",
@@ -436,6 +441,30 @@ export async function allocateRevenueAction(
     success: true,
     data: { allocationId: inserted.id },
   };
+}
+
+/**
+ * Lightweight lookup of approved allocations linked to a specific program,
+ * for the distribution form's "funding source" select (Phase 7, P0-703).
+ */
+export async function getApprovedAllocationsForProgram(
+  programId: string
+): Promise<Array<{ id: string; amount: number; allocated_at: string }>> {
+  await requireAdmin();
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("social_allocations")
+    .select("id, amount, allocated_at")
+    .eq("program_id", programId)
+    .eq("approval_status", "APPROVED")
+    .order("allocated_at", { ascending: false });
+
+  return (data || []).map((row) => ({
+    id: row.id,
+    amount: Number(row.amount),
+    allocated_at: row.allocated_at,
+  }));
 }
 
 export interface GetExpensesParams {

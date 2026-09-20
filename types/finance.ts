@@ -22,6 +22,7 @@ export interface RevenueEntry {
 export interface SocialAllocation {
   id: string;
   program_name: string;
+  program_id: string | null;
   funding_source_reference: string;
   amount: number;
   currency: string;

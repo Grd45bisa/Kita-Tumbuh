@@ -259,5 +259,124 @@ test("expenses.category values in finance-schema.ts exist in the migration 012 C
   }
 });
 
+test("social_programs.status values in social-schema.ts exist in the migration 014 CHECK constraint", () => {
+  const migration = readSource("supabase/migrations/014_social_programs.sql");
+  const validStatuses = extractCheckConstraintValues(migration, "status");
+
+  const schemaSource = readSource("lib/validation/social-schema.ts");
+  const stepsMatch = schemaSource.match(/SOCIAL_PROGRAM_STATUSES\s*=\s*\[([^\]]+)\]/);
+  assert.ok(stepsMatch, "Expected to find SOCIAL_PROGRAM_STATUSES array");
+  const usedStatuses = stepsMatch[1]
+    .split(",")
+    .map((v) => v.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
+
+  for (const status of usedStatuses) {
+    assert.ok(
+      validStatuses.includes(status),
+      `social-schema.ts uses social_programs.status "${status}" which is not in the migration 014 CHECK constraint: [${validStatuses.join(", ")}]`
+    );
+  }
+});
+
+test("beneficiaries.category values in social-schema.ts exist in the migration 015 CHECK constraint", () => {
+  const migration = readSource("supabase/migrations/015_beneficiaries.sql");
+  const validCategories = extractCheckConstraintValues(migration, "category");
+
+  const schemaSource = readSource("lib/validation/social-schema.ts");
+  const stepsMatch = schemaSource.match(/BENEFICIARY_CATEGORIES\s*=\s*\[([^\]]+)\]/);
+  assert.ok(stepsMatch, "Expected to find BENEFICIARY_CATEGORIES array");
+  const usedCategories = stepsMatch[1]
+    .split(",")
+    .map((v) => v.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
+
+  for (const category of usedCategories) {
+    assert.ok(
+      validCategories.includes(category),
+      `social-schema.ts uses beneficiaries.category "${category}" which is not in the migration 015 CHECK constraint: [${validCategories.join(", ")}]`
+    );
+  }
+});
+
+test("beneficiaries.verification_status values in social-schema.ts exist in the migration 015 CHECK constraint", () => {
+  const migration = readSource("supabase/migrations/015_beneficiaries.sql");
+  const validStatuses = extractCheckConstraintValues(migration, "verification_status");
+
+  const schemaSource = readSource("lib/validation/social-schema.ts");
+  const stepsMatch = schemaSource.match(/VERIFICATION_STATUSES\s*=\s*\[([^\]]+)\]/);
+  assert.ok(stepsMatch, "Expected to find VERIFICATION_STATUSES array");
+  const usedStatuses = stepsMatch[1]
+    .split(",")
+    .map((v) => v.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
+
+  for (const status of usedStatuses) {
+    assert.ok(
+      validStatuses.includes(status),
+      `social-schema.ts uses beneficiaries.verification_status "${status}" which is not in the migration 015 CHECK constraint: [${validStatuses.join(", ")}]`
+    );
+  }
+});
+
+test("beneficiaries.consent_status values in social-schema.ts exist in the migration 015 CHECK constraint", () => {
+  const migration = readSource("supabase/migrations/015_beneficiaries.sql");
+  const validStatuses = extractCheckConstraintValues(migration, "consent_status");
+
+  const schemaSource = readSource("lib/validation/social-schema.ts");
+  const stepsMatch = schemaSource.match(/CONSENT_STATUSES\s*=\s*\[([^\]]+)\]/);
+  assert.ok(stepsMatch, "Expected to find CONSENT_STATUSES array");
+  const usedStatuses = stepsMatch[1]
+    .split(",")
+    .map((v) => v.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
+
+  for (const status of usedStatuses) {
+    assert.ok(
+      validStatuses.includes(status),
+      `social-schema.ts uses beneficiaries.consent_status "${status}" which is not in the migration 015 CHECK constraint: [${validStatuses.join(", ")}]`
+    );
+  }
+});
+
+test("beneficiaries.privacy_level values in social-schema.ts exist in the migration 015 CHECK constraint", () => {
+  const migration = readSource("supabase/migrations/015_beneficiaries.sql");
+  const validLevels = extractCheckConstraintValues(migration, "privacy_level");
+
+  const schemaSource = readSource("lib/validation/social-schema.ts");
+  const stepsMatch = schemaSource.match(/PRIVACY_LEVELS\s*=\s*\[([^\]]+)\]/);
+  assert.ok(stepsMatch, "Expected to find PRIVACY_LEVELS array");
+  const usedLevels = stepsMatch[1]
+    .split(",")
+    .map((v) => v.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
+
+  for (const level of usedLevels) {
+    assert.ok(
+      validLevels.includes(level),
+      `social-schema.ts uses beneficiaries.privacy_level "${level}" which is not in the migration 015 CHECK constraint: [${validLevels.join(", ")}]`
+    );
+  }
+});
+
+test("distributions.approval_status values in social-schema.ts exist in the migration 016 CHECK constraint", () => {
+  const migration = readSource("supabase/migrations/016_distributions.sql");
+  const validStatuses = extractCheckConstraintValues(migration, "approval_status");
+
+  const schemaSource = readSource("lib/validation/social-schema.ts");
+  const stepsMatch = schemaSource.match(/DISTRIBUTION_APPROVAL_STATUSES\s*=\s*\[([^\]]+)\]/);
+  assert.ok(stepsMatch, "Expected to find DISTRIBUTION_APPROVAL_STATUSES array");
+  const usedStatuses = stepsMatch[1]
+    .split(",")
+    .map((v) => v.trim().replace(/^"|"$/g, ""))
+    .filter(Boolean);
+
+  for (const status of usedStatuses) {
+    assert.ok(
+      validStatuses.includes(status),
+      `social-schema.ts uses distributions.approval_status "${status}" which is not in the migration 016 CHECK constraint: [${validStatuses.join(", ")}]`
+    );
+  }
+});
 
 

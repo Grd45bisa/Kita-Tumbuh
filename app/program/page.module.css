@@ -44,3 +44,94 @@
   line-height: var(--line-height-body-l);
   margin: 0 0 var(--space-10);
 }
+
+.programGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .programGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .programGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.programCard {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--elevation-1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.programCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--elevation-2);
+}
+
+.programStatus {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-brand-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2);
+}
+
+.programName {
+  font-size: var(--font-size-title);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2);
+}
+
+.programGoal {
+  font-size: var(--font-size-body-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-3);
+}
+
+.programDescription {
+  font-size: var(--font-size-body-s);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-body-s);
+  margin: 0 0 var(--space-4);
+  flex-grow: 1;
+}
+
+.programFooter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-top: 1px solid var(--color-border-subtle);
+  padding-top: var(--space-4);
+  margin-top: auto;
+}
+
+.programAllocated {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-muted);
+}
+
+.programLink {
+  font-size: var(--font-size-body-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-brand-primary);
+  text-decoration: none;
+}
+
+.programLink:hover {
+  color: var(--color-brand-primary-hover);
+  text-decoration: underline;
+}
