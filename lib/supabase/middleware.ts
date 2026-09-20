@@ -44,7 +44,34 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+
+  // 1. Protected Member Area Routes
+  const isMemberRoute =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/riwayat") ||
+    pathname.startsWith("/profil") ||
+    pathname.startsWith("/impact") ||
+    pathname.startsWith("/pickup");
+
+  if (isMemberRoute && !user) {
+    const redirectUrl = new URL("/login", request.url);
+    const returnPath = pathname + request.nextUrl.search;
+    redirectUrl.searchParams.set("redirect", returnPath);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // 2. Auth Routes when already logged in
+  const isAuthRoute = pathname === "/login" || pathname === "/register";
+
+  if (isAuthRoute && user) {
+    const dashboardUrl = new URL("/dashboard", request.url);
+    return NextResponse.redirect(dashboardUrl);
+  }
 
   return supabaseResponse;
 }

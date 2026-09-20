@@ -80,7 +80,10 @@ export function StepReview({ data, serverError, isSubmitting }: StepReviewProps)
             <span className={styles.reviewValueHighlight}>
               <ScaleIcon size={16} />
               <span>
-                {data.estimated_quantity} {data.unit}
+                {new Intl.NumberFormat("id-ID", {
+                  maximumFractionDigits: 1,
+                }).format(data.estimated_quantity)}{" "}
+                {data.unit === "pcs" ? "wadah" : data.unit}
               </span>
             </span>
           </div>

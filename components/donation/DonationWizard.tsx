@@ -4,7 +4,7 @@ import React, { useState, useCallback, useRef } from "react";
 import styles from "./DonationWizard.module.css";
 import { DonationProgress } from "./DonationProgress";
 import { StepMaterial } from "./StepMaterial";
-import { StepQuantity } from "./StepQuantity";
+import { StepQuantity, getTierOptions } from "./StepQuantity";
 import { StepMethod } from "./StepMethod";
 import { StepReview } from "./StepReview";
 import { DonationSuccess } from "./DonationSuccess";
@@ -353,7 +353,10 @@ export function DonationWizard({ wasteTypes, collectionPoints }: DonationWizardP
               <div className={styles.liveSummaryRow}>
                 <span>Estimasi:</span>
                 <strong>
-                  {form.estimated_quantity} {form.unit}
+                  {new Intl.NumberFormat("id-ID", {
+                    maximumFractionDigits: 1,
+                  }).format(form.estimated_quantity)}{" "}
+                  {form.unit === "pcs" ? "wadah" : form.unit}
                 </strong>
               </div>
             )}
@@ -414,7 +417,12 @@ export function DonationWizard({ wasteTypes, collectionPoints }: DonationWizardP
                 <StepMaterial
                   wasteTypes={wasteTypes}
                   selectedId={form.waste_type_id}
-                  onSelect={(wt) =>
+                  onSelect={(wt) => {
+                    const defaultTier = getTierOptions(
+                      wt.unit,
+                      wt.min_quantity,
+                      wt.max_quantity
+                    )[0];
                     updateForm({
                       waste_type_id: wt.id,
                       waste_type_slug: wt.slug,
@@ -422,12 +430,11 @@ export function DonationWizard({ wasteTypes, collectionPoints }: DonationWizardP
                       unit: wt.unit,
                       min_quantity: wt.min_quantity,
                       max_quantity: wt.max_quantity,
-                      // Reset quantity when waste type changes — defaults to
-                      // the "Sedikit" tier value so StepQuantity shows a
-                      // pre-selected card instead of no selection at all.
-                      estimated_quantity: wt.min_quantity,
-                    })
-                  }
+                      // Reset quantity to the "Sedikit" tier value so it is clean,
+                      // rounded (genap), and pre-selected in StepQuantity.
+                      estimated_quantity: defaultTier ? defaultTier.value : wt.min_quantity,
+                    });
+                  }}
                   error={stepErrors.waste_type_id}
                 />
               )}

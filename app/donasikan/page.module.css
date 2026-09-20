@@ -3,4 +3,6 @@
   min-height: calc(100dvh - 76px);
   display: flex;
   flex-direction: column;
+  flex: 1;
+  width: 100%;
 }

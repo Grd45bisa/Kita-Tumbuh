@@ -90,7 +90,11 @@ export function StepMaterial({
                 <div className={styles.wasteCardTitleRow}>
                   <h3 className={styles.wasteName}>{wt.name}</h3>
                   <span className={styles.wasteMetaPill}>
-                    Min. {wt.min_quantity} {wt.unit}
+                    Min.{" "}
+                    {new Intl.NumberFormat("id-ID", {
+                      maximumFractionDigits: 1,
+                    }).format(wt.min_quantity)}{" "}
+                    {wt.unit === "pcs" ? "wadah" : wt.unit}
                   </span>
                 </div>
                 <p className={styles.wasteSnippet}>

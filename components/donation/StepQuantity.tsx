@@ -2,14 +2,35 @@ import React from "react";
 import styles from "./DonationWizard.module.css";
 import { CheckIcon, InfoCircleIcon, ScaleIcon } from "./DonationIcons";
 
-type QuantityTier = "SEDIKIT" | "SEDANG" | "BANYAK";
+export type QuantityTier = "SEDIKIT" | "SEDANG" | "BANYAK";
 
-interface QuantityTierOption {
+export interface QuantityTierOption {
   tier: QuantityTier;
   label: string;
   hint: string;
   /** Representative amount sent to the server for this tier. */
   value: number;
+}
+
+/**
+ * Helper to round arbitrary numbers into clean, natural human numbers (genap).
+ * Avoids raw floating point artifacts like 16.833333333333332 or 33.333333333333336.
+ */
+function roundToSensibleQuantity(val: number): number {
+  if (val <= 1) return 1;
+  if (val <= 3) return Math.round(val);
+  if (val <= 10) {
+    const m5 = Math.round(val / 5) * 5;
+    if (Math.abs(val - m5) <= 1.8) return m5;
+    return Math.round(val);
+  }
+  if (val <= 30) {
+    return Math.round(val / 5) * 5;
+  }
+  if (val <= 100) {
+    return Math.round(val / 10) * 10;
+  }
+  return Math.round(val / 25) * 25;
 }
 
 /**
@@ -20,38 +41,54 @@ interface QuantityTierOption {
  * copy). Values stay within each waste type's min/max quantity so server
  * validation (lib/validation/donation-schema.ts) keeps working unchanged.
  */
-function getTierOptions(
+export function getTierOptions(
   unit: string,
   minQuantity: number,
   maxQuantity: number | null
 ): QuantityTierOption[] {
   const ceiling = maxQuantity ?? Math.max(minQuantity * 20, 20);
 
-  const clamp = (val: number) => Math.min(Math.max(val, minQuantity), ceiling);
+  // Small tier: clean whole number (e.g. 1 L, 1 kg, 2 wadah)
+  let small =
+    unit === "pcs"
+      ? Math.max(2, Math.ceil(minQuantity))
+      : Math.max(1, Math.ceil(minQuantity));
 
-  const small = clamp(minQuantity);
-  const medium = clamp(Math.max(minQuantity * 3, (minQuantity + ceiling) / 3));
-  const large = clamp(Math.max(minQuantity * 8, (ceiling * 2) / 3));
+  // Medium tier: ~30% of the range, rounded to a clean multiple
+  let medium = roundToSensibleQuantity(small + (ceiling - small) * 0.3);
+  if (medium <= small) medium = small + 1;
+
+  // Large tier: ~62% of the range, rounded to a clean multiple
+  let large = roundToSensibleQuantity(small + (ceiling - small) * 0.62);
+  if (large <= medium) large = medium + (ceiling > medium ? 1 : 0);
+
+  // Clamp within bounds
+  const clamp = (val: number) => Math.min(Math.max(val, minQuantity), ceiling);
+  small = clamp(small);
+  medium = clamp(medium);
+  large = clamp(large);
 
   const unitLabel = unit === "pcs" ? "wadah" : unit;
+  const formatNum = (v: number) =>
+    new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 }).format(v);
 
   return [
     {
       tier: "SEDIKIT",
       label: "Sedikit",
-      hint: `Sekitar ${small} ${unitLabel} atau kurang`,
+      hint: `Sekitar ${formatNum(small)} ${unitLabel} atau kurang`,
       value: small,
     },
     {
       tier: "SEDANG",
       label: "Sedang",
-      hint: `Kira-kira ${medium} ${unitLabel}`,
+      hint: `Kira-kira ${formatNum(medium)} ${unitLabel}`,
       value: medium,
     },
     {
       tier: "BANYAK",
       label: "Banyak",
-      hint: `Lebih dari ${large} ${unitLabel}`,
+      hint: `Lebih dari ${formatNum(large)} ${unitLabel}`,
       value: large,
     },
   ];

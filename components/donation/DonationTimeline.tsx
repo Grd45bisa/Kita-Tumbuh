@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./DonationTimeline.module.css";
 import type { DonationStatus, DonationStatusHistory } from "@/types/donation";
+import { InfoCircleIcon } from "./DonationIcons";
 
 export const STATUS_LABELS: Record<DonationStatus, string> = {
   SUBMITTED: "Donasi Didaftarkan",
@@ -30,8 +31,10 @@ const STATUS_DESCRIPTIONS: Record<DonationStatus, string> = {
   COLLECTED: "Limbah telah kami terima secara fisik.",
   VERIFIED: "Berat dan kondisi limbah telah diverifikasi oleh tim kami.",
   SORTED: "Limbah telah dipilah sesuai kategori pengolahan.",
-  PROCESSED: "Limbah sedang dalam proses pengolahan menjadi produk atau kompos.",
-  CONVERTED: "Limbahmu telah diolah menjadi produk.",
+  PROCESSED:
+    "Limbah masuk ke tahap pengolahan terpadu. Pada tahap ini, material dapat digabungkan dengan donasi warga lain dalam satu batch produksi untuk efisiensi.",
+  CONVERTED:
+    "Pengolahan selesai. Batch material telah berhasil ditransformasikan menjadi produk bermanfaat yang siap dimanfaatkan atau didistribusikan.",
   IMPACTED: "Dampak dari donasi ini telah dicatat berdasarkan data yang terverifikasi.",
 };
 
@@ -67,7 +70,20 @@ export function DonationTimeline({
   });
 
   return (
-    <div className={styles.timeline}>
+    <div className={styles.timelineContainer}>
+      <div className={styles.transparencyNotice} role="note" aria-label="Informasi pelacakan donasi">
+        <span className={styles.noticeIcon} aria-hidden="true">
+          <InfoCircleIcon size={18} />
+        </span>
+        <div className={styles.noticeContent}>
+          <p className={styles.noticeTitle}>Pelacakan Individu &amp; Pengolahan Kolektif</p>
+          <p className={styles.noticeDescription}>
+            Lini masa ini memantau perjalanan donasi spesifik milikmu. Sejak tahap pemrosesan, material yang telah dipilah dapat digabungkan dengan donasi warga lain dalam satu batch produksi agar pengolahan berjalan efisien dan manfaatnya berkembang optimal.
+          </p>
+        </div>
+      </div>
+
+      <div className={styles.timeline}>
       {STATUS_ORDER.map((status, index) => {
         const isCompleted = index < currentIndex;
         const isCurrent = index === currentIndex;
@@ -116,6 +132,7 @@ export function DonationTimeline({
           </div>
         );
       })}
+      </div>
     </div>
   );
 }

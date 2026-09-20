@@ -12,6 +12,26 @@ export type DonationStatus =
   | "CONVERTED"
   | "IMPACTED";
 
+export const DONATION_STATUS_LABELS: Record<DonationStatus, string> = {
+  SUBMITTED: "Terkirim",
+  SCHEDULED: "Dijadwalkan",
+  COLLECTED: "Dijemput",
+  VERIFIED: "Terverifikasi",
+  SORTED: "Disortir",
+  PROCESSED: "Diproses",
+  CONVERTED: "Dikonversi",
+  IMPACTED: "Berdampak Sosial",
+};
+
+export const WASTE_TYPE_LABELS: Record<string, string> = {
+  used_cooking_oil: "Minyak Jelantah",
+  organic: "Sampah Organik",
+  plastic: "Plastik Daur Ulang",
+  "minyak-jelantah": "Minyak Jelantah",
+  "sampah-organik": "Sampah Organik",
+  "anorganik-daur-ulang": "Anorganik Daur Ulang",
+};
+
 export type DonationMethod = "DROP_OFF" | "PICKUP";
 
 export interface WasteType {

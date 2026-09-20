@@ -35,11 +35,11 @@ export default async function DonasikanPage() {
   ]);
 
   return (
-    <main id="main-content" className={styles.page}>
+    <div className={styles.page}>
       <DonationWizard
         wasteTypes={wasteTypes}
         collectionPoints={collectionPoints}
       />
-    </main>
+    </div>
   );
 }

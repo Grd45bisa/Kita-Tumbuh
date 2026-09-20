@@ -7,11 +7,13 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import styles from "./Header.module.css";
 import { Container } from "@/components/ui/Container";
+import { createClient } from "@/lib/supabase/client";
 
 export function Header() {
   const pathname = usePathname();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [user, setUser] = useState<{ email: string } | null>(null);
 
   // Marks a nav link active when it points to a real route (not a homepage
   // hash-anchor like "#cara-kerja") and that route is the current page.
@@ -22,6 +24,28 @@ export function Header() {
 
   useEffect(() => {
     setMounted(true);
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user) {
+        setUser({ email: data.user.email || "" });
+      } else {
+        setUser(null);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({ email: session.user.email || "" });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Close drawer on escape key
@@ -109,7 +133,20 @@ export function Header() {
             </nav>
 
             {/* Primary CTA (Desktop, >=1024px) */}
-            <div className={styles.desktopCta}>
+            <div className={styles.desktopCta} style={{ gap: "var(--space-3)" }}>
+              {user ? (
+                <Link href="/dashboard" className={styles.userChip} title={user.email}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  <span>Dashboard</span>
+                </Link>
+              ) : (
+                <Link href="/login" className={styles.authLink}>
+                  Masuk
+                </Link>
+              )}
               <Link
                 href="/donasikan"
                 className={styles.ctaButton}
@@ -277,6 +314,50 @@ export function Header() {
                       Transparansi
                     </Link>
                   </li>
+                </ul>
+              </div>
+
+              {/* Member Area in Drawer */}
+              <div className={styles.drawerNav} style={{ marginTop: "var(--space-4)" }}>
+                <div className={styles.drawerSectionTitle}>Area Member</div>
+                <ul className={styles.drawerList}>
+                  {user ? (
+                    <>
+                      <li>
+                        <Link href="/dashboard" className={styles.drawerLink} onClick={closeDrawer}>
+                          Dashboard ({user.email.split("@")[0]})
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/riwayat" className={styles.drawerLink} onClick={closeDrawer}>
+                          Riwayat Donasi
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/impact" className={styles.drawerLink} onClick={closeDrawer}>
+                          Dampak Saya
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/profil" className={styles.drawerLink} onClick={closeDrawer}>
+                          Pengaturan Akun
+                        </Link>
+                      </li>
+                    </>
+                  ) : (
+                    <>
+                      <li>
+                        <Link href="/login" className={styles.drawerLink} onClick={closeDrawer}>
+                          Masuk ke Akun
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/register" className={styles.drawerLink} onClick={closeDrawer}>
+                          Daftar Akun Baru
+                        </Link>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </div>
 

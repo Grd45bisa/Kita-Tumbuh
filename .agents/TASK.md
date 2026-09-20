@@ -385,48 +385,48 @@ Submitted
 
 # 7. Phase 4 — Authentication & Member Area
 
-## P0-401 — Authentication
+## P0-401 — Authentication — DONE
 
-- [ ] Sign up.
-- [ ] Sign in.
-- [ ] Sign out.
-- [ ] Session handling.
-- [ ] Password reset if password auth is enabled.
-- [ ] Email verification if required.
+- [x] Sign up. *(`app/register/page.tsx` + `components/auth/RegisterForm.tsx` calling `signUpAction` via Supabase Auth + fallback upsert to `profiles` table.)*
+- [x] Sign in. *(`app/login/page.tsx` + `components/auth/LoginForm.tsx` calling `signInAction` via Supabase Auth email/password. No OAuth per ADR-016.)*
+- [x] Sign out. *(`signOutAction` clearing session cookies and redirecting to `/login`.)*
+- [x] Session handling. *(`lib/supabase/middleware.ts` updating cookies & protecting `/dashboard`, `/riwayat`, `/profil`, `/impact`, `/pickup`, plus `lib/auth/session.ts` `requireUser()` for Server Components.)*
+- [x] Password reset if password auth is enabled. *(`app/reset-password/page.tsx` + `ResetPasswordForm.tsx` supporting email request and recovery password update via Supabase Auth.)*
+- [x] Email verification if required. *(`RegisterForm.tsx` detects Supabase unconfirmed sessions and presents clear "Periksa kotak masuk email kamu" verification state without fabricating behavior.)*
 
-Prefer Supabase Auth rather than custom password handling.
+Prefer Supabase Auth rather than custom password handling. *(Terpenuhi: memakai `@supabase/ssr` murni tanpa library auth eksternal, email + password only per ADR-016. Donasi publik di `/donasikan` tetap 100% anonim dan tidak diwajibkan login).*
 
-## P0-402 — Member dashboard
+## P0-402 — Member dashboard — DONE
 
-- [ ] Personal greeting.
-- [ ] Total contribution.
-- [ ] Donation count.
-- [ ] Verified impact.
-- [ ] Recent donations.
-- [ ] Active pickup.
-- [ ] Clear CTA to donate again.
+- [x] Personal greeting. *(`app/dashboard/page.tsx` menyapa dengan nama dari `profiles` atau email pengguna.)*
+- [x] Total contribution. *(Menghitung total donasi dan akumulasi liter/kg secara riil dari tabel `donations` dengan filter `.eq("user_id", user.id)`.)*
+- [x] Donation count. *(Jumlah donasi riil terdaftar milik user.)*
+- [x] Verified impact. *(Menampilkan volume fisik terverifikasi tim penimbangan; jika belum, estimasi awal ditandai bintang `*` secara jujur.)*
+- [x] Recent donations. *(List 5 donasi terakhir dengan status badge dan tautan ke `/donasi/[reference]`.)*
+- [x] Active pickup. *(Banner penjemputan aktif jika ada donasi metode PICKUP berstatus SUBMITTED/SCHEDULED.)*
+- [x] Clear CTA to donate again. *(Tautan jelas ke `/donasikan` baik di header, banner, maupun `EmptyState`.)*
 
-## P0-403 — Donation history
+## P0-403 — Donation history — DONE
 
-- [ ] List donations.
-- [ ] Filter by status/type/date.
-- [ ] Open donation detail.
-- [ ] Pagination or cursor pagination.
+- [x] List donations. *(`app/riwayat/page.tsx` merender seluruh donasi pengguna.)*
+- [x] Filter by status/type/date. *(Filter form berbasis server `searchParams` untuk status, waste_type, dan delivery_method).*
+- [x] Open donation detail. *(Setiap baris menautkan ke `/donasi/[reference]` lengkap dengan tracking timeline).*
+- [x] Pagination or cursor pagination. *(Pagination numerik 10 item per halaman dengan navigasi halaman sebelumnya/selanjutnya).*
 
-## P0-404 — Personal impact
+## P0-404 — Personal impact — PARTIAL
 
-- [ ] Waste contribution totals.
-- [ ] Material breakdown.
-- [ ] Derived product impact where data is available.
-- [ ] Social impact attribution where methodology supports it.
-- [ ] Explain metric definitions.
+- [x] Waste contribution totals. *(`app/impact/page.tsx` mengelompokkan total fisik limbah yang telah didonasikan).*
+- [x] Material breakdown. *(Pemisahan liter/kg per jenis limbah: minyak jelantah, organik, anorganik).*
+- [ ] Derived product impact where data is available. — **ComingSoon**: tabel batch produksi (`production_batches`) belum ada di DB (Phase 5 belum dikerjakan); menampilkannya akan melanggar aturan integritas data AGENTS.md §4.3. Ditampilkan kartu `ComingSoon` jujur.
+- [ ] Social impact attribution where methodology supports it. — **ComingSoon**: keterkaitan penjualan produk ke alokasi sosial lansia belum terhubung ke database. Ditampilkan kartu `ComingSoon` jujur.
+- [x] Explain metric definitions. *(Kartu transparansi menjelaskan perbedaan volume terverifikasi tim vs estimasi mandiri donatur).*
 
-## P1-405 — Profile
+## P1-405 — Profile — PARTIAL
 
-- [ ] Personal information.
-- [ ] Contact details.
-- [ ] Pickup addresses if supported.
-- [ ] Privacy settings.
+- [x] Personal information. *(`app/profil/page.tsx` + `ProfileForms.tsx` untuk mengubah nama lengkap di tabel `profiles`).*
+- [x] Contact details. *(Mengubah nomor telepon/WhatsApp di tabel `profiles`).*
+- [ ] Pickup addresses if supported. — **Ditunda ke Phase 5 (ADR-017)**: saat ini alamat penjemputan dimasukkan langsung pada form wizard donasi untuk menghindari skema premature sebelum modul dispatch/routing operasional dibangun.
+- [x] Privacy settings. *(Form ubah kata sandi akun via Supabase Auth + penjelasan pengelolaan data kontak).*
 
 ---
 

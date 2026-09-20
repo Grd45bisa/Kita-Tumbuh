@@ -244,6 +244,38 @@ KITA TUMBUH
 
 ---
 
+## ADR-016 — Email and Password Authentication Only (No OAuth in Phase 4)
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** The member area needs authentication for donation tracking, member dashboards, and personal impact. WIREFRAME.md §13 mentioned OAuth options as conditional ("jika disetujui").
+
+**Decision:** Use email and password exclusively via Supabase Auth. Do not implement or expose OAuth providers (Google, Facebook, GitHub, etc.) during Phase 4. Donation submission at `/donasikan` remains 100% accessible to anonymous users without requiring login.
+
+**Why:** Keeps dependencies minimal (`@supabase/ssr` only), eliminates third-party provider credential friction and privacy liabilities for donors, and avoids premature OAuth configuration before legal/consent policies are settled.
+
+**Consequences:** Users authenticate using email and password. Sessions are tracked via secure HTTP-only cookies in Next.js middleware and SSR helpers. Unauthenticated visitors can donate without logging in.
+
+---
+
+## ADR-017 — Postponement of Multi-Address Management to Phase 5
+
+**Status:** Accepted
+
+**Date:** 2026-09-20
+
+**Context:** P1-405 mentions "pickup addresses if supported" for member profiles. The existing donation flow captures pickup address fields directly inside the `pickup_requests` table during each donation wizard submission.
+
+**Decision:** Postpone dedicated saved multi-address management (`profiles_addresses` or user address book CRUD) to Phase 5 (Core Operational System). In Phase 4 MVP, members update their primary contact information (full name and phone) on `/profil`. When scheduling pickups, they provide the pickup address in the donation wizard.
+
+**Why:** Prevents premature schema bloat and complex address-selection UI before the operational dispatch and collection routing domain (Phase 5) is established.
+
+**Consequences:** No separate saved-addresses table is introduced in migration `003`. Profile page includes an honest explanation that saved multi-address support will arrive in Phase 5.
+
+---
+
 ## Agent Rule
 
 Before introducing a major architectural change, search this document first.
