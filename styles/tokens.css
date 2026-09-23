@@ -1,5 +1,5 @@
 /**
- * KAMPUNG SMART FARMING - DESIGN TOKENS
+ * SEMAI - DESIGN TOKENS
  * Single source of truth for design tokens matching .agents/DESIGN_SYSTEM.md
  */
 
@@ -98,9 +98,8 @@
   /* ==========================================================================
      2. TYPOGRAPHY
      ========================================================================== */
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  --font-serif: "Newsreader", "Georgia", "Cambria", "Times New Roman", Times, serif;
+  --font-sans: var(--font-sans-google), "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: var(--font-serif-google), "Newsreader", "Georgia", "Cambria", serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Font sizes and line heights */

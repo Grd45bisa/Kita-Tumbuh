@@ -11,16 +11,16 @@ import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Program Sosial — Kampung Setara Smart Farming",
+  title: "Program Sosial — SEMAI",
   description:
-    "Program pemberdayaan sosial yang didukung oleh hasil ekonomi Kampung Setara Smart Farming.",
+    "Program pemberdayaan sosial yang didukung oleh hasil ekonomi SEMAI.",
   alternates: {
     canonical: `${env.siteUrl}/program`,
   },
   openGraph: {
-    title: "Program Sosial — Kampung Setara Smart Farming",
+    title: "Program Sosial — SEMAI",
     description:
-      "Program pemberdayaan sosial yang didukung oleh hasil ekonomi Kampung Setara Smart Farming.",
+      "Program pemberdayaan sosial yang didukung oleh hasil ekonomi SEMAI.",
     url: `${env.siteUrl}/program`,
     type: "website",
   },
@@ -45,7 +45,7 @@ export default async function ProgramPage() {
         <Container>
           <div className={styles.heroInner}>
             <Breadcrumb items={breadcrumbItems} />
-            <p className={styles.eyebrow}>KITA TUMBUH — KAMPUNG SETARA SMART FARMING</p>
+            <p className={styles.eyebrow}>SEMAI · INCLUSIVE CIRCULAR SMART FARMING</p>
             <h1 className={styles.title}>Program Sosial</h1>
             <p className={styles.lead}>
               Hasil ekonomi dari pengolahan limbah dan kebun smart farming kami arahkan untuk

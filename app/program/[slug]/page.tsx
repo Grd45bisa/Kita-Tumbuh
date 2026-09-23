@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!program) {
     return {
-      title: "Program Tidak Ditemukan — Kampung Smart Farming",
+      title: "Program Tidak Ditemukan — SEMAI",
       robots: { index: false, follow: false },
     };
   }
@@ -27,13 +27,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const canonicalUrl = `${env.siteUrl}/program/${encodeURIComponent(slug)}`;
 
   return {
-    title: `${program.name} — Program Sosial KITA TUMBUH`,
+    title: `${program.name} — Program Sosial SEMAI`,
     description: program.description,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: `${program.name} — Program Sosial KITA TUMBUH`,
+      title: `${program.name} — Program Sosial SEMAI`,
       description: program.description,
       url: canonicalUrl,
       type: "website",
@@ -111,7 +111,7 @@ export default async function ProgramDetailPage({ params }: Props) {
               )}
 
               <p className={styles.fundingNote}>
-                Dana ini bersumber dari alokasi pendapatan penjualan produk hasil olahan limbah sirkular KITA TUMBUH.
+                Dana ini bersumber dari alokasi pendapatan penjualan produk hasil olahan limbah sirkular SEMAI.
               </p>
             </aside>
           </div>

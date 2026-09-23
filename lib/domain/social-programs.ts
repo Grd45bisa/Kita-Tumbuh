@@ -31,34 +31,38 @@ export async function getPublicPrograms(): Promise<PublicSocialProgram[]> {
     .order("created_at", { ascending: false });
 
   const rows = (data as unknown as RawPublicProgram[]) || [];
+  if (rows.length === 0) return [];
 
-  const programs = await Promise.all(
-    rows.map(async (row) => {
-      const { data: allocRows } = await supabase
-        .from("social_allocations")
-        .select("amount")
-        .eq("program_id", row.id)
-        .eq("approval_status", "APPROVED");
+  // Fetch allocations for every program in a single query (IN-clause) instead
+  // of one query per program — the previous Promise.all(rows.map(...)) shape
+  // sent N sequential-per-row round trips to the DB (an N+1 query), which
+  // scales linearly with the number of programs and was the main source of
+  // slow loads on this page as more programs got added.
+  const { data: allocRows } = await supabase
+    .from("social_allocations")
+    .select("program_id, amount")
+    .in("program_id", rows.map((row) => row.id))
+    .eq("approval_status", "APPROVED");
 
-      const allocated_amount = (allocRows || []).reduce((acc, curr) => acc + Number(curr.amount), 0);
+  const allocatedByProgram = new Map<string, number>();
+  for (const alloc of allocRows || []) {
+    const current = allocatedByProgram.get(alloc.program_id) || 0;
+    allocatedByProgram.set(alloc.program_id, current + Number(alloc.amount));
+  }
 
-      return {
-        id: row.id,
-        name: row.name,
-        slug: row.slug,
-        description: row.description,
-        goal: row.goal,
-        status: row.status,
-        target_amount: row.target_amount === null ? null : Number(row.target_amount),
-        currency: row.currency,
-        start_date: row.start_date,
-        end_date: row.end_date,
-        allocated_amount,
-      };
-    })
-  );
-
-  return programs;
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    description: row.description,
+    goal: row.goal,
+    status: row.status,
+    target_amount: row.target_amount === null ? null : Number(row.target_amount),
+    currency: row.currency,
+    start_date: row.start_date,
+    end_date: row.end_date,
+    allocated_amount: allocatedByProgram.get(row.id) || 0,
+  }));
 }
 
 export async function getPublicProgramBySlug(slug: string): Promise<PublicSocialProgram | null> {

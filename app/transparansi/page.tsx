@@ -13,14 +13,14 @@ import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Transparansi — Kampung Smart Farming | KITA TUMBUH",
+  title: "Transparansi — SEMAI · Room to Grow",
   description:
-    "Prinsip pencatatan dan ringkasan operasional Kampung Smart Farming — setiap angka dapat ditelusuri ke sumbernya.",
+    "Prinsip pencatatan dan ringkasan operasional SEMAI — setiap angka dapat ditelusuri ke sumbernya.",
   alternates: {
     canonical: `${env.siteUrl}/transparansi`,
   },
   openGraph: {
-    title: "Transparansi — Kampung Smart Farming",
+    title: "Transparansi — SEMAI",
     description:
       "Kami memisahkan estimasi dari verifikasi, operasional dari sosial, dan mempublikasikan hanya angka yang dapat diverifikasi.",
     url: `${env.siteUrl}/transparansi`,
@@ -335,7 +335,7 @@ export default async function TransparansiPage() {
         <Container>
           <div className={styles.heroInner}>
             <Breadcrumb items={breadcrumbItems} />
-            <p className={styles.eyebrow}>KITA TUMBUH — KAMPUNG SMART FARMING</p>
+            <p className={styles.eyebrow}>SEMAI · INCLUSIVE CIRCULAR SMART FARMING</p>
             <h1 className={styles.title}>Transparansi</h1>
             <p className={styles.lead}>
               Kami berkomitmen mempublikasikan hanya angka yang dapat

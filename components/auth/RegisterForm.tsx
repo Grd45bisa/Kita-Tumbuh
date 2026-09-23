@@ -86,7 +86,7 @@ export function RegisterForm() {
             <div className={styles.brandBadge}>Pendaftaran Berhasil</div>
             <h1 className={styles.title}>Akun Berhasil Dibuat!</h1>
             <p className={styles.subtitle}>
-              Selamat bergabung di gerakan sirkular KITA TUMBUH. Kamu sekarang dapat masuk ke akunmu.
+              Selamat bergabung di gerakan sirkular SEMAI. Kamu sekarang dapat masuk ke akunmu.
             </p>
           </div>
           <Link href="/login">
@@ -141,6 +141,7 @@ export function RegisterForm() {
             required
             autoComplete="email"
             disabled={isPending}
+            helperText="Sudah pernah donasi tanpa akun dengan email ini? Riwayat donasimu otomatis tertaut ke akun barumu setelah email ini terverifikasi."
           />
 
           <Input

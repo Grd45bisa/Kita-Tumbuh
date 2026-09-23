@@ -6,7 +6,7 @@ import { ProgramForm } from "@/components/admin/ProgramForm";
 import { requirePermission } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Program Baru | Admin KITA TUMBUH",
+  title: "Program Baru | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

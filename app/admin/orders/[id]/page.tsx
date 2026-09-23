@@ -14,7 +14,7 @@ import {
 import { OrderActions } from "@/components/admin/OrderActions";
 
 export const metadata: Metadata = {
-  title: "Detail Pesanan | Admin KITA TUMBUH",
+  title: "Detail Pesanan | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

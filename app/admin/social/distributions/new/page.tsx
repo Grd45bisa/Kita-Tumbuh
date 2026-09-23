@@ -8,7 +8,7 @@ import { getAdminBeneficiaryOptions } from "@/lib/domain/admin/beneficiaries";
 import { requirePermission } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Catat Distribusi | Admin KITA TUMBUH",
+  title: "Catat Distribusi | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

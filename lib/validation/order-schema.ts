@@ -23,7 +23,7 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, { label: string; descripti
   },
   PROCESSING: {
     label: "Sedang Diproses",
-    description: "Produk sedang disiapkan dan dikemas di workshop Kampung Smart Farming.",
+    description: "Produk sedang disiapkan dan dikemas di workshop SEMAI.",
   },
   SHIPPED: {
     label: "Dalam Pengiriman",
@@ -31,7 +31,7 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, { label: string; descripti
   },
   READY_FOR_PICKUP: {
     label: "Siap Diambil",
-    description: "Pesanan siap diambil di pos Kampung Smart Farming.",
+    description: "Pesanan siap diambil di pos SEMAI.",
   },
   COMPLETED: {
     label: "Selesai",

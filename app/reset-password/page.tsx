@@ -4,8 +4,8 @@ import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 import { Spinner } from "@/components/ui/Spinner";
 
 export const metadata: Metadata = {
-  title: "Atur Ulang Kata Sandi | KITA TUMBUH",
-  description: "Reset kata sandi akun KITA TUMBUH Anda.",
+  title: "Atur Ulang Kata Sandi | SEMAI",
+  description: "Reset kata sandi akun SEMAI Anda.",
   robots: {
     index: false,
     follow: false,

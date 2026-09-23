@@ -13,14 +13,14 @@ import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Dampak — Kampung Smart Farming | KITA TUMBUH",
+  title: "Dampak — SEMAI · Room to Grow",
   description:
-    "Ringkasan dampak terverifikasi Kampung Smart Farming — limbah diterima, diolah, produk dihasilkan, dan alokasi sosial berdasarkan data operasional nyata.",
+    "Ringkasan dampak terverifikasi SEMAI — limbah diterima, diolah, produk dihasilkan, dan alokasi sosial berdasarkan data operasional nyata.",
   alternates: {
     canonical: `${env.siteUrl}/dampak`,
   },
   openGraph: {
-    title: "Dampak — Kampung Smart Farming",
+    title: "Dampak — SEMAI · Room to Grow",
     description:
       "Angka dampak yang kami tampilkan berasal dari data operasional terverifikasi, bukan perkiraan.",
     url: `${env.siteUrl}/dampak`,
@@ -158,7 +158,7 @@ export default async function DampakPage() {
         <Container>
           <div className={styles.heroInner}>
             <Breadcrumb items={breadcrumbItems} />
-            <p className={styles.eyebrow}>KITA TUMBUH — KAMPUNG SMART FARMING</p>
+            <p className={styles.eyebrow}>SEMAI · INCLUSIVE CIRCULAR SMART FARMING</p>
             <h1 className={styles.title}>Dampak</h1>
             <p className={styles.lead}>
               Setiap angka di halaman ini berasal dari data operasional yang

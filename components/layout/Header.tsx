@@ -79,56 +79,56 @@ export function Header() {
         <Container>
           <div className={styles.inner}>
             {/* Brand Wordmark with Logo */}
-            <Link href="/" className={styles.brand} aria-label="Beranda KITA TUMBUH">
+            <Link href="/" className={styles.brand} aria-label="Beranda SEMAI">
               <Image
-                src="/images/Logo.png"
-                alt="Logo KITA TUMBUH"
+                src="/images/semai-logo.png"
+                alt="Logo SEMAI"
                 width={38}
                 height={38}
                 className={styles.brandLogo}
                 priority
               />
               <div className={styles.brandText}>
-                <span className={styles.brandTitle}>KITA TUMBUH</span>
-                <span className={styles.brandSubtitle}>KAMPUNG SETARA SMART FARMING</span>
+                <span className={styles.brandTitle}>SEMAI</span>
+                <span className={styles.brandSubtitle}>ROOM TO GROW</span>
               </div>
             </Link>
 
             {/* Tablet Navigation (compact links, 768–1023px) */}
             <nav className={styles.tabletNav} aria-label="Navigasi Utama">
-              <Link href="#galeri" className={styles.navLink}>
-                Galeri
+              <Link href="#tentang" className={styles.navLink}>
+                Tentang
               </Link>
-              <Link href="#kategori-limbah" className={styles.navLink}>
-                Donasi
+              <Link href="#ruang-tumbuh" className={styles.navLink}>
+                Ruang Tumbuh
               </Link>
               <Link href="#cara-kerja" className={styles.navLink}>
                 Cara Kerja
               </Link>
-              <Link href="#dampak-sosial" className={styles.navLink}>
-                Dampak
+              <Link href="#jejak-tumbuh" className={styles.navLink}>
+                Jejak Tumbuh
               </Link>
-              <Link href="#transparansi" className={styles.navLink}>
-                Transparansi
+              <Link href="#dampak" className={styles.navLink}>
+                Dampak
               </Link>
             </nav>
 
             {/* Desktop Navigation */}
             <nav className={styles.desktopNav} aria-label="Navigasi Utama">
-              <Link href="#galeri" className={styles.navLink}>
-                Galeri
+              <Link href="#tentang" className={styles.navLink}>
+                Tentang
               </Link>
-              <Link href="#kategori-limbah" className={styles.navLink}>
-                Bisa Didonasikan
+              <Link href="#ruang-tumbuh" className={styles.navLink}>
+                Ruang Tumbuh
               </Link>
               <Link href="#cara-kerja" className={styles.navLink}>
                 Cara Kerja
               </Link>
-              <Link href="#dampak-sosial" className={styles.navLink}>
-                Dampak
+              <Link href="#jejak-tumbuh" className={styles.navLink}>
+                Jejak Tumbuh
               </Link>
-              <Link href="#transparansi" className={styles.navLink}>
-                Transparansi
+              <Link href="#dampak" className={styles.navLink}>
+                Dampak
               </Link>
             </nav>
 
@@ -251,15 +251,15 @@ export function Header() {
               <div className={styles.drawerHeader}>
                 <div className={styles.drawerBrand}>
                   <Image
-                    src="/images/Logo.png"
-                    alt="Logo KITA TUMBUH"
+                    src="/images/semai-logo.png"
+                    alt="Logo SEMAI"
                     width={34}
                     height={34}
                     className={styles.drawerLogo}
                   />
                   <div>
-                    <span className={styles.drawerBrandTitle}>KITA TUMBUH</span>
-                    <span className={styles.drawerBrandSubtitle}>Kampung Setara Smart Farming</span>
+                    <span className={styles.drawerBrandTitle}>SEMAI</span>
+                    <span className={styles.drawerBrandSubtitle}>Room to Grow</span>
                   </div>
                 </div>
                 <button
@@ -290,13 +290,13 @@ export function Header() {
                 <div className={styles.drawerSectionTitle}>Menu Navigasi</div>
                 <ul className={styles.drawerList}>
                   <li>
-                    <Link href="#galeri" className={styles.drawerLink} onClick={closeDrawer}>
-                      Galeri Kegiatan
+                    <Link href="#tentang" className={styles.drawerLink} onClick={closeDrawer}>
+                      Tentang SEMAI
                     </Link>
                   </li>
                   <li>
-                    <Link href="#kategori-limbah" className={styles.drawerLink} onClick={closeDrawer}>
-                      Bisa Didonasikan
+                    <Link href="#ruang-tumbuh" className={styles.drawerLink} onClick={closeDrawer}>
+                      Ruang Tumbuh (The Four Rooms)
                     </Link>
                   </li>
                   <li>
@@ -305,13 +305,13 @@ export function Header() {
                     </Link>
                   </li>
                   <li>
-                    <Link href="#dampak-sosial" className={styles.drawerLink} onClick={closeDrawer}>
-                      Dampak untuk Anak Difabel
+                    <Link href="#jejak-tumbuh" className={styles.drawerLink} onClick={closeDrawer}>
+                      Jejak Tumbuh
                     </Link>
                   </li>
                   <li>
-                    <Link href="#transparansi" className={styles.drawerLink} onClick={closeDrawer}>
-                      Transparansi
+                    <Link href="#dampak" className={styles.drawerLink} onClick={closeDrawer}>
+                      Dampak & Cerita
                     </Link>
                   </li>
                 </ul>

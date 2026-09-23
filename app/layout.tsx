@@ -1,33 +1,51 @@
 import type { Metadata } from "next";
+import { Plus_Jakarta_Sans, Newsreader } from "next/font/google";
 import "@/styles/globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { IntroLoader } from "@/components/layout/IntroLoader";
 
+const sans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-sans-google",
+  display: "swap",
+});
+
+const serif = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-serif-google",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: {
-    default: "KITA TUMBUH — Dari Limbah, Tumbuh Manfaat",
-    template: "%s | KITA TUMBUH",
+    default: "SEMAI — Room to Grow | Inclusive Circular Smart Farming",
+    template: "%s | SEMAI",
   },
   description:
-    "Gerakan donasi sampah terpilah yang mengubah minyak jelantah, sampah organik, dan plastik menjadi karya bernilai untuk mendukung anak-anak difabel.",
+    "Sebab setiap potensi butuh ruang untuk bermula. Di SEMAI, sisa organik dari rumah kembali ke siklus, kebun menjadi ruang belajar dan berkarya, dan setiap orang mendapat kesempatan mengambil bagian secara setara.",
   keywords: [
-    "KITA TUMBUH",
-    "donasi sampah",
-    "donasi minyak jelantah",
+    "SEMAI",
+    "Room to Grow",
+    "donasi sampah terpilah",
+    "minyak jelantah",
+    "sampah organik",
+    "kebun inklusif",
+    "smart farming",
     "anak difabel berdaya",
     "ekonomi sirkular",
-    "pengolahan sampah organik",
-    "Kampung Setara Smart Farming",
   ],
-  authors: [{ name: "KITA TUMBUH" }],
-  creator: "KITA TUMBUH",
-  publisher: "KITA TUMBUH",
+  authors: [{ name: "SEMAI" }],
+  creator: "SEMAI",
+  publisher: "SEMAI",
   icons: {
-    icon: "/images/Logo.png",
-    shortcut: "/images/Logo.png",
-    apple: "/images/Logo.png",
+    icon: "/images/semai-logo.png",
+    shortcut: "/images/semai-logo.png",
+    apple: "/images/semai-logo.png",
   },
   formatDetection: {
     email: false,
@@ -38,16 +56,16 @@ export const metadata: Metadata = {
     type: "website",
     locale: "id_ID",
     url: "/",
-    siteName: "KITA TUMBUH",
-    title: "KITA TUMBUH — Dari Limbah, Tumbuh Manfaat",
+    siteName: "SEMAI",
+    title: "SEMAI — Room to Grow | Inclusive Circular Smart Farming",
     description:
-      "Ubah sampah terpilah dari rumah menjadi karya bernilai dan ruang tumbuh bagi anak-anak difabel.",
+      "Beri ruang. Lihat apa yang bisa tumbuh. Bersama SEMAI, sisa organik dan limbah rumah tangga membuka ruang belajar, karya, dan kemandirian nyata.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "KITA TUMBUH — Dari Limbah, Tumbuh Manfaat",
+    title: "SEMAI — Room to Grow | Inclusive Circular Smart Farming",
     description:
-      "Ubah sampah terpilah dari rumah menjadi karya bernilai dan ruang tumbuh bagi anak-anak difabel.",
+      "Beri ruang. Lihat apa yang bisa tumbuh. Bersama SEMAI, sisa organik dan limbah rumah tangga membuka ruang belajar, karya, dan kemandirian nyata.",
   },
   robots: {
     index: true,
@@ -61,7 +79,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
+    <html lang="id" className={`${sans.variable} ${serif.variable}`}>
       <body>
         <IntroLoader />
         <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>

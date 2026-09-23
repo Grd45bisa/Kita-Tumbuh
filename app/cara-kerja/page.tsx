@@ -11,14 +11,14 @@ import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Cara Kerja — Kampung Setara Smart Farming",
+  title: "Cara Kerja — SEMAI · Room to Grow",
   description:
     "Pelajari alur donasi limbah dari rumah hingga menjadi produk bernilai dan dukungan bagi anak-anak difabel: donasikan, verifikasi, olah, jual, dan alokasikan ke program sosial.",
   alternates: {
     canonical: `${env.siteUrl}/cara-kerja`,
   },
   openGraph: {
-    title: "Cara Kerja — Kampung Setara Smart Farming",
+    title: "Cara Kerja — SEMAI · Room to Grow",
     description:
       "Lihat bagaimana limbah dari rumahmu diproses menjadi produk bernilai dan manfaat sosial nyata.",
     url: `${env.siteUrl}/cara-kerja`,
@@ -52,7 +52,7 @@ export default async function CaraKerjaPage() {
         <Container>
           <div className={styles.heroInner}>
             <Breadcrumb items={breadcrumbItems} />
-            <p className={styles.eyebrow}>KITA TUMBUH — KAMPUNG SETARA SMART FARMING</p>
+            <p className={styles.eyebrow}>SEMAI · INCLUSIVE CIRCULAR SMART FARMING</p>
             <h1 className={styles.title}>Cara Kerja</h1>
             <p className={styles.lead}>
               Limbah yang kamu serahkan menempuh proses yang jelas dan dapat dilacak — dari

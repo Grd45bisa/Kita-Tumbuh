@@ -13,14 +13,14 @@ import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Titik Penyerahan Limbah — Kampung Setara Smart Farming",
+  title: "Titik Penyerahan Limbah — SEMAI · Room to Grow",
   description:
     "Temukan titik penyerahan (collection point) untuk mengantarkan minyak jelantah, limbah organik, dan plastik terpilah secara langsung.",
   alternates: {
     canonical: `${env.siteUrl}/collection-point`,
   },
   openGraph: {
-    title: "Titik Penyerahan Limbah — Kampung Setara Smart Farming",
+    title: "Titik Penyerahan Limbah — SEMAI · Room to Grow",
     description:
       "Temukan lokasi terdekat untuk mengantarkan limbah rumah tanggamu secara langsung.",
     url: `${env.siteUrl}/collection-point`,
@@ -67,7 +67,7 @@ export default async function CollectionPointPage({ searchParams }: Props) {
         <Container>
           <div className={styles.heroInner}>
             <Breadcrumb items={breadcrumbItems} />
-            <p className={styles.eyebrow}>KITA TUMBUH — KAMPUNG SETARA SMART FARMING</p>
+            <p className={styles.eyebrow}>SEMAI · INCLUSIVE CIRCULAR SMART FARMING</p>
             <h1 className={styles.title}>Titik Penyerahan Limbah</h1>
             <p className={styles.lead}>
               Tidak sempat menunggu jadwal pickup? Antarkan langsung limbahmu ke salah satu

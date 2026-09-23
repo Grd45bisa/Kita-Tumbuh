@@ -4,11 +4,12 @@ import { requireUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { MemberLayout } from "@/components/member/MemberLayout";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { formatWasteUnitLabel } from "@/types/donation";
 import styles from "@/components/member/MemberArea.module.css";
 
 export const metadata: Metadata = {
-  title: "Dampak Saya | KITA TUMBUH",
-  description: "Ringkasan kontribusi sirkular Anda di KITA TUMBUH.",
+  title: "Dampak Saya | SEMAI",
+  description: "Ringkasan kontribusi sirkular Anda di SEMAI.",
   robots: { index: false, follow: false },
 };
 
@@ -75,7 +76,7 @@ export default async function MemberImpactPage() {
                     <span className={styles.statLabel}>{summary.name}</span>
                     <span className={styles.metricNote}>{summary.count} donasi</span>
                   </div>
-                  <strong className={styles.statValue}>{verified ? "" : "~"}{value.toFixed(1)} {summary.unit}</strong>
+                  <strong className={styles.statValue}>{verified ? "" : "~"}{value.toFixed(1)} {formatWasteUnitLabel(summary.unit)}</strong>
                   <span className={styles.statHint}>{verified ? "Sudah ditimbang" : "Masih estimasi"}</span>
                 </article>
               );
@@ -86,7 +87,7 @@ export default async function MemberImpactPage() {
             <strong>Cara membaca angka</strong>
             <p>Angka bertanda ~ masih berupa estimasi. Setelah petugas menimbang donasi, angka akan diperbarui otomatis.</p>
           </aside>
-          <Link href="/transparansi" className={styles.fullLink}>Lihat dampak KITA TUMBUH →</Link>
+          <Link href="/transparansi" className={styles.fullLink}>Lihat dampak SEMAI →</Link>
         </>
       )}
     </MemberLayout>

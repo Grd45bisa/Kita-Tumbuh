@@ -9,16 +9,16 @@ import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Pertanyaan Umum (FAQ) — Kampung Setara Smart Farming",
+  title: "Pertanyaan Umum (FAQ) — SEMAI",
   description:
     "Jawaban atas pertanyaan umum seputar donasi limbah, jenis limbah yang diterima, pickup/drop-off, pengolahan, dan privasi data.",
   alternates: {
     canonical: `${env.siteUrl}/faq`,
   },
   openGraph: {
-    title: "Pertanyaan Umum (FAQ) — Kampung Setara Smart Farming",
+    title: "Pertanyaan Umum (FAQ) — SEMAI",
     description:
-      "Jawaban atas pertanyaan umum seputar donasi limbah dan cara kerja Kampung Setara Smart Farming.",
+      "Jawaban atas pertanyaan umum seputar donasi limbah dan cara kerja SEMAI.",
     url: `${env.siteUrl}/faq`,
     type: "website",
   },
@@ -61,7 +61,7 @@ export default function FaqPage() {
         <Container>
           <div className={styles.heroInner}>
             <Breadcrumb items={breadcrumbItems} />
-            <p className={styles.eyebrow}>KITA TUMBUH — KAMPUNG SETARA SMART FARMING</p>
+            <p className={styles.eyebrow}>SEMAI · INCLUSIVE CIRCULAR SMART FARMING</p>
             <h1 className={styles.title}>Pertanyaan Umum</h1>
             <p className={styles.lead}>
               Jawaban singkat untuk pertanyaan yang paling sering muncul seputar donasi,

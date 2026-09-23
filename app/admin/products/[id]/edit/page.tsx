@@ -8,7 +8,7 @@ import { ProductForm, type BatchOption, type InitialProductData } from "@/compon
 import type { ProductCategory } from "@/lib/validation/product-schema";
 
 export const metadata: Metadata = {
-  title: "Edit Produk Sirkular | Admin KITA TUMBUH",
+  title: "Edit Produk Sirkular | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 
@@ -32,22 +32,21 @@ export default async function EditProductPage({ params }: PageProps) {
   const { id } = await params;
   const supabase = await createClient();
 
-  // 1. Fetch existing product
-  const { data: product, error: productError } = await supabase
-    .from("products")
-    .select("*")
-    .eq("id", id)
-    .single();
+  // Product lookup and the (unrelated) batches dropdown list are
+  // independent queries — run them concurrently. Fetching batches even
+  // when the product turns out not to exist is a small, acceptable cost
+  // against the common case (product found) resolving faster.
+  const [{ data: product, error: productError }, { data: rawBatches }] = await Promise.all([
+    supabase.from("products").select("*").eq("id", id).single(),
+    supabase
+      .from("production_batches")
+      .select("id, batch_number, title, target_output_type, actual_output_quantity, output_unit")
+      .order("created_at", { ascending: false }),
+  ]);
 
   if (productError || !product) {
     notFound();
   }
-
-  // 2. Fetch production batches
-  const { data: rawBatches } = await supabase
-    .from("production_batches")
-    .select("id, batch_number, title, target_output_type, actual_output_quantity, output_unit")
-    .order("created_at", { ascending: false });
 
   const batches: BatchOption[] = ((rawBatches as unknown as RawBatchRow[]) || []).map((b) => ({
     id: b.id,

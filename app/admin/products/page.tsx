@@ -14,7 +14,7 @@ import {
 } from "@/lib/validation/product-schema";
 
 export const metadata: Metadata = {
-  title: "Produk Sirkular | Admin KITA TUMBUH",
+  title: "Produk Sirkular | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 
@@ -66,16 +66,9 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
 
   const supabase = await createClient();
 
-  // 1. Fetch metric numbers
-  const { data: allProducts } = await supabase
-    .from("products")
-    .select("is_public, stock_quantity");
-
-  const totalCount = allProducts?.length || 0;
-  const publicCount = allProducts?.filter((p) => p.is_public).length || 0;
-  const totalStock = allProducts?.reduce((acc, p) => acc + Number(p.stock_quantity), 0) || 0;
-
-  // 2. Query filtered products
+  // Metric numbers and the filtered/paginated product list are independent
+  // queries against the same table with different projections — run them
+  // concurrently instead of one after the other.
   let query = supabase
     .from("products")
     .select("*, production_batches ( batch_number )", { count: "exact" })
@@ -93,7 +86,15 @@ export default async function AdminProductsPage({ searchParams }: PageProps) {
 
   const from = (currentPage - 1) * pageSize;
   const to = from + pageSize - 1;
-  const { data: rawProducts, count: filteredCount } = await query.range(from, to);
+
+  const [{ data: allProducts }, { data: rawProducts, count: filteredCount }] = await Promise.all([
+    supabase.from("products").select("is_public, stock_quantity"),
+    query.range(from, to),
+  ]);
+
+  const totalCount = allProducts?.length || 0;
+  const publicCount = allProducts?.filter((p) => p.is_public).length || 0;
+  const totalStock = allProducts?.reduce((acc, p) => acc + Number(p.stock_quantity), 0) || 0;
 
   const products: ProductItem[] = ((rawProducts as unknown as RawProductRow[]) || []).map((p) => ({
     id: p.id,

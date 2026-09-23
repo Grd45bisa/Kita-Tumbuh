@@ -16,6 +16,7 @@ import {
   type PendingDonationSubmission,
 } from "@/lib/donation-submission";
 import type { WasteType, CollectionPoint, PublicDonationReceipt } from "@/types/donation";
+import { formatWasteUnitLabel } from "@/types/donation";
 
 import {
   ArrowLeftIcon,
@@ -73,6 +74,7 @@ interface FormState {
   pickup_requested_slot: string;
   pickup_notes: string;
   donor_notes: string;
+  donor_email: string;
 }
 
 const initialFormState: FormState = {
@@ -93,6 +95,7 @@ const initialFormState: FormState = {
   pickup_requested_slot: "",
   pickup_notes: "",
   donor_notes: "",
+  donor_email: "",
 };
 
 interface SuccessState {
@@ -142,9 +145,9 @@ export function DonationWizard({ wasteTypes, collectionPoints }: DonationWizardP
       if (!form.estimated_quantity || form.estimated_quantity <= 0) {
         errors.estimated_quantity = "Masukkan jumlah yang valid (lebih dari 0).";
       } else if (form.estimated_quantity < form.min_quantity) {
-        errors.estimated_quantity = `Minimum ${form.min_quantity} ${form.unit}.`;
+        errors.estimated_quantity = `Minimum ${form.min_quantity} ${formatWasteUnitLabel(form.unit)}.`;
       } else if (form.max_quantity && form.estimated_quantity > form.max_quantity) {
-        errors.estimated_quantity = `Maksimum ${form.max_quantity} ${form.unit}.`;
+        errors.estimated_quantity = `Maksimum ${form.max_quantity} ${formatWasteUnitLabel(form.unit)}.`;
       }
     }
 
@@ -167,6 +170,11 @@ export function DonationWizard({ wasteTypes, collectionPoints }: DonationWizardP
             errors.pickup_requested_date = "Tanggal pickup minimal besok.";
           }
         }
+      }
+      // Optional field: only validated for format when the donor chooses to
+      // fill it in, never required.
+      if (form.donor_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.donor_email)) {
+        errors.donor_email = "Format email tidak valid.";
       }
     }
 
@@ -220,6 +228,7 @@ export function DonationWizard({ wasteTypes, collectionPoints }: DonationWizardP
         pickup_requested_slot: form.method === "PICKUP" ? form.pickup_requested_slot : undefined,
         pickup_notes: form.method === "PICKUP" ? form.pickup_notes : undefined,
         donor_notes: form.donor_notes,
+        donor_email: form.donor_email || undefined,
       };
       const pending = await prepareDonationSubmission(payload, pendingSubmissionRef.current);
       pendingSubmissionRef.current = pending;
@@ -296,15 +305,15 @@ export function DonationWizard({ wasteTypes, collectionPoints }: DonationWizardP
         <div className={styles.sidebarHeader}>
           <div className={styles.brandBadge}>
             <PlantLeafIcon size={14} className={styles.badgeIcon} />
-            <span>KITA TUMBUH · KAMPUNG SMART FARMING</span>
+            <span>SEMAI · ROOM TO GROW</span>
           </div>
 
           <h1 className={styles.sidebarTitle}>Donasikan Limbah Rumah Tangga</h1>
 
           <p className={styles.sidebarSubtitle}>
-            <strong>SAMPAH KALIAN SANGAT BERARTI BAGI KAMI.</strong> Salurkan
+            <strong>Sebab setiap potensi butuh ruang untuk bermula.</strong> Salurkan
             minyak jelantah, limbah organik, atau plastik dapurmu untuk diolah
-            menjadi produk berdaya guna dan dana sosial nyata.
+            menjadi produk berdaya guna dan ruang belajar yang nyata.
           </p>
         </div>
 
@@ -392,11 +401,11 @@ export function DonationWizard({ wasteTypes, collectionPoints }: DonationWizardP
         <div className={styles.mobileHeaderArea}>
           <div className={styles.mobileBrandBadge}>
             <PlantLeafIcon size={12} />
-            <span>KITA TUMBUH</span>
+            <span>SEMAI</span>
           </div>
           <h1 className={styles.mobileTitle}>Donasikan Limbah</h1>
           <p className={styles.mobileSubtitle}>
-            <strong>SAMPAH KALIAN SANGAT BERARTI BAGI KAMI.</strong>
+            <strong>Sebab setiap potensi butuh ruang untuk bermula.</strong>
           </p>
         </div>
 
@@ -464,6 +473,7 @@ export function DonationWizard({ wasteTypes, collectionPoints }: DonationWizardP
                     pickup_requested_slot: form.pickup_requested_slot,
                     pickup_notes: form.pickup_notes,
                     donor_notes: form.donor_notes,
+                    donor_email: form.donor_email,
                   }}
                   onChange={(patch) => updateForm(patch as Partial<FormState>)}
                   collectionPoints={collectionPoints}
@@ -483,6 +493,7 @@ export function DonationWizard({ wasteTypes, collectionPoints }: DonationWizardP
                     pickup_requested_date: form.pickup_requested_date,
                     pickup_requested_slot: form.pickup_requested_slot,
                     donor_notes: form.donor_notes,
+                    donor_email: form.donor_email,
                   }}
                   serverError={serverError}
                   isSubmitting={isSubmitting}

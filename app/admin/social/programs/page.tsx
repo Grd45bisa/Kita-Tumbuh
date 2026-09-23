@@ -13,7 +13,7 @@ import {
 import type { SocialProgram } from "@/types/social";
 
 export const metadata: Metadata = {
-  title: "Program Sosial | Admin KITA TUMBUH",
+  title: "Program Sosial | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

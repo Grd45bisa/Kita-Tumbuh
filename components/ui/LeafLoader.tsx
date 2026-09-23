@@ -27,9 +27,9 @@ export function LeafLoader() {
         </g>
         <g className={styles.stillLeaf} transform="translate(160 95) rotate(-15)"><Leaf /></g>
       </svg>
-      <p className={styles.brand}>KITA TUMBUH</p>
-      <p className={styles.tagline}>Dari limbah, tumbuh manfaat.</p>
-      <p className={styles.caption}>Sedang menyiapkan halaman<span className={styles.dots} aria-hidden="true">…</span></p>
+      <p className={styles.brand}>SEMAI</p>
+      <p className={styles.tagline}>Room to Grow</p>
+      <p className={styles.caption}>Sedang menyiapkan ruang tumbuh<span className={styles.dots} aria-hidden="true">…</span></p>
     </div>
   );
 }

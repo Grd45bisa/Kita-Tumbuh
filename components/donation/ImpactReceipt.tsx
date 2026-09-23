@@ -1,4 +1,5 @@
 import type { PublicDonationReceipt } from "@/types/donation";
+import { formatWasteUnitLabel } from "@/types/donation";
 import { STATUS_LABELS } from "./DonationTimeline";
 import styles from "./ImpactReceipt.module.css";
 
@@ -8,7 +9,7 @@ interface ImpactReceiptProps {
 
 export function ImpactReceipt({ donation }: ImpactReceiptProps) {
   const formatQuantity = (quantity: number) =>
-    `${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 2 }).format(quantity)} ${donation.unit}`;
+    `${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 2 }).format(quantity)} ${formatWasteUnitLabel(donation.unit)}`;
 
   return (
     <section className={styles.receipt} aria-label="Bukti donasi">

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getAuditLogs } from "@/lib/domain/admin/audit-logs";
 import styles from "@/components/admin/AuditLog.module.css";
 
-export const metadata: Metadata = { title: "Audit Log | Admin KITA TUMBUH", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Audit Log | Admin SEMAI", robots: { index: false, follow: false } };
 
 interface Props { searchParams: Promise<{ actor?: string; action?: string; entity?: string; from?: string; to?: string }> }
 

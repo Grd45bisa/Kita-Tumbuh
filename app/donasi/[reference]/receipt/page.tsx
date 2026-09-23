@@ -12,7 +12,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { reference } = await params;
-  const title = `Bukti Donasi ${reference} — KITA TUMBUH`;
+  const title = `Bukti Donasi ${reference} — SEMAI`;
   const description = "Lihat material, jumlah, dan status donasi limbah yang tercatat. Tanpa informasi pribadi donor.";
   const url = `${env.siteUrl}/donasi/${encodeURIComponent(reference)}/receipt`;
   return {
@@ -38,7 +38,7 @@ export default async function PublicDonationReceiptPage({ params }: Props) {
       <div className={styles.content}>
         <header>
           <h1 className={styles.heading}>Dari Limbah, Tumbuh Manfaat.</h1>
-          <p className={styles.intro}>Bukti donasi di KITA TUMBUH — Kampung Setara Smart Farming.</p>
+          <p className={styles.intro}>Bukti donasi di SEMAI — Room to Grow.</p>
         </header>
         <ImpactReceipt donation={result.data} />
         <p className={styles.note}>

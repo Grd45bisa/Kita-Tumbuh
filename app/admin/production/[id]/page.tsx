@@ -12,7 +12,7 @@ import { AddBatchInputForm, type AvailableLotOption } from "@/components/admin/A
 import type { ProductionBatchStatus } from "@/lib/validation/production-batch-schema";
 
 export const metadata: Metadata = {
-  title: "Detail Batch Produksi | Admin KITA TUMBUH",
+  title: "Detail Batch Produksi | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 
@@ -63,23 +63,32 @@ export default async function ProductionBatchDetailPage({ params }: PageProps) {
   const { id } = await params;
   const supabase = await createClient();
 
-  // 1. Fetch batch details
-  const { data: batch, error: batchError } = await supabase
-    .from("production_batches")
-    .select("*")
-    .eq("id", id)
-    .single();
+  // Batch details, allocated inputs, and the available-lots dropdown are
+  // three independent queries (inputs/available-lots don't depend on the
+  // batch row itself, only on `id` from params, already available) — run
+  // them concurrently instead of sequentially.
+  const [
+    { data: batch, error: batchError },
+    { data: rawInputs },
+    { data: rawAvailableLots },
+  ] = await Promise.all([
+    supabase.from("production_batches").select("*").eq("id", id).single(),
+    supabase
+      .from("batch_inputs")
+      .select("*, waste_lots ( id, lot_code, waste_types ( name ) )")
+      .eq("batch_id", id)
+      .order("added_at", { ascending: true }),
+    supabase
+      .from("waste_lots")
+      .select("id, lot_code, current_quantity, unit, quality_grade, waste_types ( name )")
+      .eq("status", "AVAILABLE")
+      .gt("current_quantity", 0)
+      .order("created_at", { ascending: false }),
+  ]);
 
   if (batchError || !batch) {
     notFound();
   }
-
-  // 2. Fetch allocated inputs
-  const { data: rawInputs } = await supabase
-    .from("batch_inputs")
-    .select("*, waste_lots ( id, lot_code, waste_types ( name ) )")
-    .eq("batch_id", id)
-    .order("added_at", { ascending: true });
 
   const inputs: BatchInputItem[] = ((rawInputs as unknown as RawInputRow[]) || []).map((inp) => ({
     id: inp.id,
@@ -90,14 +99,6 @@ export default async function ProductionBatchDetailPage({ params }: PageProps) {
     notes: inp.notes,
     added_at: inp.added_at,
   }));
-
-  // 3. Fetch available active waste lots for input addition
-  const { data: rawAvailableLots } = await supabase
-    .from("waste_lots")
-    .select("id, lot_code, current_quantity, unit, quality_grade, waste_types ( name )")
-    .eq("status", "AVAILABLE")
-    .gt("current_quantity", 0)
-    .order("created_at", { ascending: false });
 
   const availableLots: AvailableLotOption[] = ((rawAvailableLots as unknown as RawAvailableLot[]) || []).map((l) => ({
     id: l.id,

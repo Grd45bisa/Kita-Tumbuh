@@ -11,41 +11,41 @@ export function Footer() {
           <div className={styles.brandCol}>
             <div className={styles.brandRow}>
               <Image
-                src="/images/Logo.png"
-                alt="Logo KITA TUMBUH"
+                src="/images/semai-logo.png"
+                alt="Logo SEMAI"
                 width={48}
                 height={48}
                 className={styles.logo}
               />
               <div>
-                <span className={styles.brandTitle}>KITA TUMBUH</span>
-                <span className={styles.brandTagline}>Kampung Setara Smart Farming</span>
+                <span className={styles.brandTitle}>SEMAI</span>
+                <span className={styles.brandTagline}>Room to Grow</span>
               </div>
             </div>
             <p>
-              Gerakan gotong royong yang mengubah sampah terpilah menjadi ruang belajar, karya, dan kemandirian bagi anak-anak difabel.
+              Sebab setiap potensi butuh ruang untuk bermula. Mengolah sisa organik dan limbah rumah tangga menjadi nutrisi kebun, ruang belajar, dan karya nyata yang setara.
             </p>
           </div>
 
           <div className={styles.navCol}>
             <h2>Jelajahi</h2>
-            <Link href="#cara-kerja">Cara kerja</Link>
-            <Link href="#kategori-limbah">Sampah yang diterima</Link>
-            <Link href="#dampak-sosial">Dampak sosial</Link>
-            <Link href="#galeri">Galeri kegiatan</Link>
-            <Link href="#transparansi">Transparansi</Link>
+            <Link href="#tentang">Tentang SEMAI</Link>
+            <Link href="#ruang-tumbuh">The Four Rooms</Link>
+            <Link href="#cara-kerja">Cara Kerja</Link>
+            <Link href="#jejak-tumbuh">Jejak Tumbuh</Link>
+            <Link href="#dampak">Dampak & Cerita</Link>
           </div>
 
           <div className={styles.actionCol}>
-            <span>Punya sampah terpilah di rumah?</span>
-            <h2>Jangan dibuang. Mari tumbuhkan manfaatnya.</h2>
-            <Link href="/donasikan">Mulai berdonasi <span aria-hidden="true">→</span></Link>
+            <span>Beri ruang. Lihat apa yang bisa tumbuh.</span>
+            <h2>Satu tindakan kecil membuka ruang untuk banyak hal bertumbuh.</h2>
+            <Link href="/donasikan">Beri Ruang untuk Tumbuh <span aria-hidden="true">→</span></Link>
           </div>
         </div>
 
         <div className={styles.bottomBar}>
-          <p>© {new Date().getFullYear()} KITA TUMBUH — Kampung Setara Smart Farming.</p>
-          <p>Sampah kalian sangat berarti bagi kami.</p>
+          <p>© {new Date().getFullYear()} SEMAI — Inclusive Circular Smart Farming.</p>
+          <p>“Yang kami tumbuhkan bukan hanya tanaman.”</p>
         </div>
       </Container>
     </footer>

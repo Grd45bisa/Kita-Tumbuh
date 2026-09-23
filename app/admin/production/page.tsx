@@ -11,7 +11,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import type { ProductionBatchStatus } from "@/lib/validation/production-batch-schema";
 
 export const metadata: Metadata = {
-  title: "Batch Produksi | Admin KITA TUMBUH",
+  title: "Batch Produksi | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 
@@ -45,17 +45,9 @@ export default async function AdminProductionPage({ searchParams }: PageProps) {
 
   const supabase = await createClient();
 
-  // 1. Fetch metric counts
-  const { data: allBatches } = await supabase
-    .from("production_batches")
-    .select("status, target_quantity, actual_output_quantity");
-
-  const totalCount = allBatches?.length || 0;
-  const inProgressCount = allBatches?.filter((b) => b.status === "IN_PROGRESS" || b.status === "QC_REVIEW").length || 0;
-  const completedCount = allBatches?.filter((b) => b.status === "COMPLETED" || b.status === "RELEASED").length || 0;
-  const plannedCount = allBatches?.filter((b) => b.status === "PLANNED").length || 0;
-
-  // 2. Query filtered batches with pagination
+  // Metric counts and the filtered/paginated batch list are independent
+  // queries against the same table with different projections — run them
+  // concurrently instead of one after the other.
   let query = supabase
     .from("production_batches")
     .select("*", { count: "exact" })
@@ -67,7 +59,16 @@ export default async function AdminProductionPage({ searchParams }: PageProps) {
 
   const from = (currentPage - 1) * pageSize;
   const to = from + pageSize - 1;
-  const { data: rawBatches, count: filteredCount } = await query.range(from, to);
+
+  const [{ data: allBatches }, { data: rawBatches, count: filteredCount }] = await Promise.all([
+    supabase.from("production_batches").select("status, target_quantity, actual_output_quantity"),
+    query.range(from, to),
+  ]);
+
+  const totalCount = allBatches?.length || 0;
+  const inProgressCount = allBatches?.filter((b) => b.status === "IN_PROGRESS" || b.status === "QC_REVIEW").length || 0;
+  const completedCount = allBatches?.filter((b) => b.status === "COMPLETED" || b.status === "RELEASED").length || 0;
+  const plannedCount = allBatches?.filter((b) => b.status === "PLANNED").length || 0;
 
   const batches = (rawBatches as unknown as BatchRow[]) || [];
   const totalItems = filteredCount || 0;

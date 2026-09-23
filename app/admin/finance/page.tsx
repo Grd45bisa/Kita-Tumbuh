@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { getFinancialSummary } from "@/lib/domain/admin/finance";
 
 export const metadata: Metadata = {
-  title: "Keuangan & Alokasi Sosial | Admin KITA TUMBUH",
+  title: "Keuangan & Alokasi Sosial | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

@@ -4,26 +4,36 @@ import type { JourneyStep } from "./types";
  * Homepage "cara kerja" preview — the short 4-step version shown inline on
  * the homepage.
  */
+/**
+ * Homepage "cara kerja" preview — the 5-step SEMAI circular loop
+ * per SEMAI_Room_to_Grow_Website_Reference.md §06:
+ * Sisihkan -> Donasikan -> Kembalikan -> Tumbuhkan -> Lihat Hasilnya
+ */
 export const homepageJourney: JourneyStep[] = [
   {
     number: "01",
-    title: "Pilah dari rumah",
-    description: "Satu botol jelantah atau satu wadah sampah terpilah sudah menjadi awal yang berarti.",
+    title: "Sisihkan",
+    description: "Pisahkan sisa organik dapur, minyak jelantah, dan wadah plastik sesuai petunjuk dari rumah.",
   },
   {
     number: "02",
-    title: "Serahkan kepada kami",
-    description: "Isi formulir donasi agar tim dapat mengarahkan cara penyerahan yang tersedia.",
+    title: "Donasikan",
+    description: "Serahkan langsung ke titik pengumpulan SEMAI terdekat atau ajukan penjemputan berkala.",
   },
   {
     number: "03",
-    title: "Diolah bersama",
-    description: "Bahan dibersihkan, dipilah, lalu diolah menjadi produk berguna dan bahan pendukung kebun.",
+    title: "Kembalikan",
+    description: "Sisa organik diolah jadi kompos bernutrisi; jelantah dan plastik disalurkan ke mitra daur ulang resmi.",
   },
   {
     number: "04",
-    title: "Manfaatnya kembali",
-    description: "Hasil pengolahan dan penjualan mendukung ruang belajar, berkarya, dan bertumbuh bersama.",
+    title: "Tumbuhkan",
+    description: "Kompos menyuburkan kebun inklusif yang menjadi ruang nyata belajar, berlatih, dan berkarya bagi anak-anak.",
+  },
+  {
+    number: "05",
+    title: "Lihat Hasilnya",
+    description: "Pantau dampak kontribusimu secara transparan dari bobot timbangan hingga hasil panen lewat Jejak Tumbuh.",
   },
 ];
 

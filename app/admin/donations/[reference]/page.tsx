@@ -7,7 +7,8 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { DonationVerificationForm } from "@/components/admin/DonationVerificationForm";
 import { DonationStatusForm } from "@/components/admin/DonationStatusForm";
-import { DONATION_STATUS_LABELS, type DonationStatus } from "@/types/donation";
+import { DONATION_STATUS_LABELS, formatWasteUnitLabel, type DonationStatus } from "@/types/donation";
+import styles from "./DonationDetail.module.css";
 
 interface DonationDetailPageProps {
   params: Promise<{ reference: string }>;
@@ -29,50 +30,37 @@ export default async function AdminDonationDetailPage({ params }: DonationDetail
     notFound();
   }
 
-  // 2. Fetch pickup details if method is PICKUP
-  let pickupDetails = null;
-  if (rawDonation.method === "PICKUP") {
-    const { data: pickup } = await supabase
-      .from("pickup_requests")
+  // Pickup details (if applicable) and status history both depend only on
+  // rawDonation.id (already known), not on each other — fetch concurrently.
+  const [{ data: pickup }, { data: rawHistory }] = await Promise.all([
+    rawDonation.method === "PICKUP"
+      ? supabase.from("pickup_requests").select("*").eq("donation_id", rawDonation.id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    supabase
+      .from("donation_status_history")
       .select("*")
       .eq("donation_id", rawDonation.id)
-      .maybeSingle();
-    pickupDetails = pickup;
-  }
+      .order("created_at", { ascending: false }),
+  ]);
 
-  // 3. Fetch status history
-  const { data: rawHistory } = await supabase
-    .from("donation_status_history")
-    .select("*")
-    .eq("donation_id", rawDonation.id)
-    .order("created_at", { ascending: false });
-
+  const pickupDetails = pickup;
   const history = rawHistory || [];
 
   return (
-    <div style={{ maxWidth: "1000px" }}>
-      <div style={{ marginBottom: "var(--space-6)" }}>
+    <div className={styles.container}>
+      <header className={styles.header}>
         <Link
           href="/admin/donations"
-          style={{
-            fontSize: "var(--font-size-caption)",
-            color: "var(--color-brand-primary)",
-            fontWeight: 600,
-            textDecoration: "none",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "4px",
-            marginBottom: "var(--space-2)",
-          }}
+          className={styles.backLink}
         >
           ← Kembali ke Antrean Donasi
         </Link>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "var(--space-3)" }}>
+        <div className={styles.titleRow}>
           <div>
-            <h1 style={{ fontSize: "var(--font-size-heading-m)", fontWeight: 700, color: "var(--color-text-primary)", fontFamily: "var(--font-mono, monospace)" }}>
+            <h1 className={styles.title}>
               Donasi #{rawDonation.reference}
             </h1>
-            <p style={{ fontSize: "var(--font-size-body-s)", color: "var(--color-text-muted)", marginTop: "2px" }}>
+            <p className={styles.titleMeta}>
               Didaftarkan pada {new Date(rawDonation.created_at).toLocaleString("id-ID", { dateStyle: "full", timeStyle: "short" })}
             </p>
           </div>
@@ -80,43 +68,43 @@ export default async function AdminDonationDetailPage({ params }: DonationDetail
             Status: {DONATION_STATUS_LABELS[rawDonation.status as DonationStatus] || rawDonation.status}
           </Badge>
         </div>
-      </div>
+      </header>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-6)", marginBottom: "var(--space-6)" }}>
+      <div className={styles.infoGrid}>
         {/* Donor & Delivery Information */}
         <Card>
-          <h2 style={{ fontSize: "var(--font-size-body-m)", fontWeight: 600, color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
+          <h2 className={styles.cardTitle}>
             Informasi Donatur & Pengiriman
           </h2>
-          <dl style={{ display: "grid", gridTemplateColumns: "130px 1fr", gap: "var(--space-2)", fontSize: "var(--font-size-body-s)" }}>
-            <dt style={{ color: "var(--color-text-muted)" }}>Nama Donatur:</dt>
-            <dd style={{ fontWeight: 500 }}>{rawDonation.donor_name || "Anonim / Tamu"}</dd>
+          <dl className={styles.detailList}>
+            <dt>Nama Donatur</dt>
+            <dd>{rawDonation.donor_name || "Anonim / Tamu"}</dd>
 
-            <dt style={{ color: "var(--color-text-muted)" }}>Email:</dt>
-            <dd style={{ fontWeight: 500 }}>{rawDonation.donor_email || "—"}</dd>
+            <dt>Email</dt>
+            <dd>{rawDonation.donor_email || "—"}</dd>
 
-            <dt style={{ color: "var(--color-text-muted)" }}>Telepon/WA:</dt>
-            <dd style={{ fontWeight: 500 }}>{rawDonation.donor_phone || "—"}</dd>
+            <dt>Telepon/WA</dt>
+            <dd>{rawDonation.donor_phone || "—"}</dd>
 
-            <dt style={{ color: "var(--color-text-muted)" }}>Metode:</dt>
-            <dd style={{ fontWeight: 600, color: "var(--color-brand-primary)" }}>
+            <dt>Metode</dt>
+            <dd className={styles.accentValue}>
               {rawDonation.method === "PICKUP" ? "Penjemputan Armada (Pickup)" : "Antar Mandiri (Drop-off)"}
             </dd>
 
             {rawDonation.donor_notes && (
               <>
-                <dt style={{ color: "var(--color-text-muted)" }}>Catatan Donatur:</dt>
-                <dd style={{ fontStyle: "italic" }}>{rawDonation.donor_notes}</dd>
+                <dt>Catatan</dt>
+                <dd>{rawDonation.donor_notes}</dd>
               </>
             )}
           </dl>
 
           {pickupDetails && (
-            <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid var(--color-border-default)" }}>
-              <h3 style={{ fontSize: "var(--font-size-caption)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--color-text-muted)", marginBottom: "var(--space-2)" }}>
+            <div className={styles.pickupBlock}>
+              <h3 className={styles.pickupTitle}>
                 Alamat & Waktu Penjemputan
               </h3>
-              <p style={{ fontSize: "var(--font-size-body-s)", lineHeight: 1.5 }}>
+              <p className={styles.pickupAddress}>
                 {pickupDetails.address_line1}
                 {pickupDetails.address_line2 ? `, ${pickupDetails.address_line2}` : ""}
                 <br />
@@ -124,7 +112,7 @@ export default async function AdminDonationDetailPage({ params }: DonationDetail
                 {pickupDetails.city || ""}
               </p>
               {pickupDetails.requested_date && (
-                <p style={{ fontSize: "var(--font-size-caption)", color: "var(--color-brand-primary-hover)", marginTop: "var(--space-1)", fontWeight: 600 }}>
+                <p className={styles.pickupSchedule}>
                   Jadwal diminta: {pickupDetails.requested_date} ({pickupDetails.requested_slot || "Pagi/Siang"})
                 </p>
               )}
@@ -134,32 +122,32 @@ export default async function AdminDonationDetailPage({ params }: DonationDetail
 
         {/* Waste Specification Information */}
         <Card>
-          <h2 style={{ fontSize: "var(--font-size-body-m)", fontWeight: 600, color: "var(--color-text-primary)", marginBottom: "var(--space-3)" }}>
+          <h2 className={styles.cardTitle}>
             Data Fisik & Verifikasi
           </h2>
-          <dl style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: "var(--space-2)", fontSize: "var(--font-size-body-s)" }}>
-            <dt style={{ color: "var(--color-text-muted)" }}>Jenis Limbah:</dt>
-            <dd style={{ fontWeight: 600 }}>{rawDonation.waste_type_name}</dd>
+          <dl className={styles.detailList}>
+            <dt>Jenis Limbah</dt>
+            <dd>{rawDonation.waste_type_name}</dd>
 
-            <dt style={{ color: "var(--color-text-muted)" }}>Estimasi Donatur:</dt>
-            <dd>{rawDonation.estimated_quantity} {rawDonation.unit}</dd>
+            <dt>Estimasi</dt>
+            <dd>{rawDonation.estimated_quantity} {formatWasteUnitLabel(rawDonation.unit)}</dd>
 
-            <dt style={{ color: "var(--color-text-muted)" }}>Kuantitas Riil:</dt>
-            <dd style={{ fontWeight: 700, color: rawDonation.verified_quantity != null ? "var(--color-brand-primary-hover, #166534)" : "var(--color-text-muted)" }}>
-              {rawDonation.verified_quantity != null ? `${rawDonation.verified_quantity} ${rawDonation.unit} (Terverifikasi)` : "Belum diverifikasi"}
+            <dt>Kuantitas riil</dt>
+            <dd className={rawDonation.verified_quantity != null ? styles.accentValue : styles.mutedValue}>
+              {rawDonation.verified_quantity != null ? `${rawDonation.verified_quantity} ${formatWasteUnitLabel(rawDonation.unit)} (Terverifikasi)` : "Belum diverifikasi"}
             </dd>
 
             {rawDonation.verified_at && (
               <>
-                <dt style={{ color: "var(--color-text-muted)" }}>Waktu Verifikasi:</dt>
+                <dt>Diverifikasi</dt>
                 <dd>{new Date(rawDonation.verified_at).toLocaleString("id-ID")}</dd>
               </>
             )}
 
             {rawDonation.verification_notes && (
               <>
-                <dt style={{ color: "var(--color-text-muted)" }}>Catatan Tim:</dt>
-                <dd style={{ background: "var(--color-bg-canvas)", padding: "var(--space-2)", borderRadius: "var(--radius-sm)", fontSize: "var(--font-size-caption)" }}>
+                <dt>Catatan tim</dt>
+                <dd className={styles.noteValue}>
                   {rawDonation.verification_notes}
                 </dd>
               </>
@@ -169,7 +157,7 @@ export default async function AdminDonationDetailPage({ params }: DonationDetail
       </div>
 
       {/* Action Forms */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)", marginBottom: "var(--space-8)" }}>
+      <div className={styles.actionForms}>
         {/* Verification Form */}
         <DonationVerificationForm
           donationId={rawDonation.id}
@@ -191,47 +179,36 @@ export default async function AdminDonationDetailPage({ params }: DonationDetail
 
       {/* Status History Audit Trail */}
       <Card>
-        <h2 style={{ fontSize: "var(--font-size-body-m)", fontWeight: 600, color: "var(--color-text-primary)", marginBottom: "var(--space-4)" }}>
+        <h2 className={styles.cardTitle}>
           Audit Trail Riwayat Status
         </h2>
 
         {history.length === 0 ? (
-          <p style={{ fontSize: "var(--font-size-body-s)", color: "var(--color-text-muted)" }}>
+          <p className={styles.emptyHistory}>
             Belum ada catatan perubahan status pada sistem.
           </p>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+          <div className={styles.historyList}>
             {history.map((h) => (
-              <div
-                key={h.id}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "var(--space-3) var(--space-4)",
-                  background: "var(--color-bg-canvas)",
-                  borderRadius: "var(--radius-md)",
-                  fontSize: "var(--font-size-body-s)",
-                  border: "1px solid var(--color-border-default)",
-                }}
-              >
+              <div key={h.id} className={styles.historyItem}>
                 <div>
-                  <span style={{ fontWeight: 600, color: "var(--color-brand-primary)" }}>
+                  <span className={styles.historyStatus}>
                     {DONATION_STATUS_LABELS[h.to_status as DonationStatus] || h.to_status}
                   </span>
                   {h.from_status && (
-                    <span style={{ fontSize: "var(--font-size-caption)", color: "var(--color-text-muted)", marginLeft: "var(--space-2)" }}>
+                    <span className={styles.historyFrom}>
                       (dari {DONATION_STATUS_LABELS[h.from_status as DonationStatus] || h.from_status})
                     </span>
                   )}
                   {h.notes && (
-                    <p style={{ fontSize: "var(--font-size-caption)", color: "var(--color-text-muted)", marginTop: "2px" }}>
+                    <p className={styles.historyNote}>
                       {h.notes}
                     </p>
                   )}
                 </div>
-                <span style={{ fontSize: "var(--font-size-caption)", color: "var(--color-text-muted)" }}>
+                <time className={styles.historyDate} dateTime={h.created_at}>
                   {new Date(h.created_at).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" })}
-                </span>
+                </time>
               </div>
             ))}
           </div>

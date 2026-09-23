@@ -50,7 +50,7 @@ export function DataTable<T>({
         </thead>
         <tbody className={styles.tbody}>
           {data.length === 0 ? (
-            <tr>
+            <tr className={styles.emptyRow}>
               <td colSpan={columns.length} className={styles.emptyStateCell}>
                 {emptyMessage}
               </td>
@@ -65,6 +65,11 @@ export function DataTable<T>({
                     style={{
                       textAlign: col.align || "left",
                     }}
+                    data-label={
+                      typeof col.header === "string" || typeof col.header === "number"
+                        ? String(col.header)
+                        : col.key
+                    }
                   >
                     {col.render
                       ? col.render(item, index)

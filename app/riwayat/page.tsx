@@ -6,12 +6,12 @@ import { MemberLayout } from "@/components/member/MemberLayout";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { DONATION_STATUS_LABELS, type DonationStatus } from "@/types/donation";
+import { DONATION_STATUS_LABELS, formatWasteUnitLabel, type DonationStatus } from "@/types/donation";
 import styles from "@/components/member/MemberArea.module.css";
 
 export const metadata: Metadata = {
-  title: "Riwayat Donasi | KITA TUMBUH",
-  description: "Daftar riwayat donasi limbah yang pernah Anda salurkan melalui KITA TUMBUH.",
+  title: "Riwayat Donasi | SEMAI",
+  description: "Daftar riwayat donasi limbah yang pernah Anda salurkan melalui SEMAI.",
   robots: {
     index: false,
     follow: false,
@@ -47,7 +47,9 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
   // Waste types for the filter dropdown — fetched from the DB rather than
   // a hardcoded label map, so filter values always match real waste_type
   // slugs (see lib/domain/waste-types.ts for the same source of truth).
-  const { data: wasteTypes } = await supabase
+  // Started now but awaited together with the donations query below (they
+  // are independent), instead of blocking one on the other.
+  const wasteTypesPromise = supabase
     .from("waste_types")
     .select("slug, name")
     .order("sort_order", { ascending: true });
@@ -76,9 +78,10 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
     query = query.lte("created_at", `${currentTo}T23:59:59.999Z`);
   }
 
-  const { data: donations, count } = await query
-    .order("created_at", { ascending: false })
-    .range(offset, offset + pageSize - 1);
+  const [{ data: donations, count }, { data: wasteTypes }] = await Promise.all([
+    query.order("created_at", { ascending: false }).range(offset, offset + pageSize - 1),
+    wasteTypesPromise,
+  ]);
 
   const totalCount = count || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -249,8 +252,8 @@ export default async function RiwayatPage({ searchParams }: RiwayatPageProps) {
                 <div className={styles.donationStatusArea}>
                   <span className={styles.quantity}>
                     {d.verified_quantity != null
-                      ? `${d.verified_quantity} ${d.unit}`
-                      : `Est. ~${d.estimated_quantity} ${d.unit}`}
+                      ? `${d.verified_quantity} ${formatWasteUnitLabel(d.unit)}`
+                      : `Est. ~${d.estimated_quantity} ${formatWasteUnitLabel(d.unit)}`}
                   </span>
                   <Badge
                     variant={d.status === "IMPACTED" ? "success" : "neutral"}

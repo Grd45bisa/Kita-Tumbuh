@@ -8,7 +8,7 @@ import { DataTable, type Column } from "@/components/ui/DataTable";
 import { WasteLotsTable, type WasteLotItem } from "@/components/admin/WasteLotsTable";
 
 export const metadata: Metadata = {
-  title: "Inventaris Limbah | Admin KITA TUMBUH",
+  title: "Inventaris Limbah | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 
@@ -53,11 +53,20 @@ export default async function AdminInventoryPage() {
   await requirePermission("waste_inventory", "read");
   const supabase = await createClient();
 
-  // 1. Fetch waste lots with type details
-  const { data: rawLots } = await supabase
-    .from("waste_lots")
-    .select("*, waste_types ( name )")
-    .order("created_at", { ascending: false });
+  // Fetch waste lots and recent ledger transactions in parallel — they're
+  // independent queries against different tables, no reason to wait on one
+  // before starting the other.
+  const [{ data: rawLots }, { data: rawTx }] = await Promise.all([
+    supabase
+      .from("waste_lots")
+      .select("*, waste_types ( name )")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("inventory_transactions")
+      .select("*, waste_types ( name )")
+      .order("created_at", { ascending: false })
+      .limit(15),
+  ]);
 
   const lots: WasteLotItem[] = ((rawLots as unknown as RawLotRow[]) || []).map((l) => ({
     id: l.id,
@@ -86,13 +95,6 @@ export default async function AdminInventoryPage() {
       stockSummary[lot.waste_type_name].total += lot.current_quantity;
     }
   });
-
-  // 3. Fetch recent ledger transactions (audit trail)
-  const { data: rawTx } = await supabase
-    .from("inventory_transactions")
-    .select("*, waste_types ( name )")
-    .order("created_at", { ascending: false })
-    .limit(15);
 
   const transactions: TransactionItem[] = ((rawTx as unknown as RawTxRow[]) || []).map((t) => ({
     id: t.id,

@@ -96,21 +96,33 @@ export async function getAdminPrograms(
 
   // Enrich with allocated_amount, computed from social_allocations —
   // never stored on the program row (ARSITEKTUR.md §3.1 single source of truth).
-  const programs = await Promise.all(
-    (data as unknown as RawProgram[]).map(async (row) => {
-      const program = mapProgram(row);
-      const { data: allocRows } = await supabase
-        .from("social_allocations")
-        .select("amount")
-        .eq("program_id", row.id)
-        .eq("approval_status", "APPROVED");
-      program.allocated_amount = (allocRows || []).reduce(
-        (acc, curr) => acc + Number(curr.amount),
-        0
-      );
-      return program;
-    })
-  );
+  // Fetched as ONE query covering every program_id on this page (an "in"
+  // filter), instead of one query per row — the previous version issued up
+  // to `pageSize` (15) separate round trips per page load. Summed in
+  // memory here since the anon/authenticated Supabase client can't run a
+  // server-side GROUP BY through PostgREST directly.
+  const rows = data as unknown as RawProgram[];
+  const programIds = rows.map((row) => row.id);
+
+  const allocatedByProgram = new Map<string, number>();
+  if (programIds.length > 0) {
+    const { data: allocRows } = await supabase
+      .from("social_allocations")
+      .select("program_id, amount")
+      .in("program_id", programIds)
+      .eq("approval_status", "APPROVED");
+
+    for (const alloc of allocRows || []) {
+      const key = alloc.program_id as string;
+      allocatedByProgram.set(key, (allocatedByProgram.get(key) || 0) + Number(alloc.amount));
+    }
+  }
+
+  const programs = rows.map((row) => {
+    const program = mapProgram(row);
+    program.allocated_amount = allocatedByProgram.get(row.id) || 0;
+    return program;
+  });
 
   return { programs, totalCount, page, pageSize, totalPages };
 }

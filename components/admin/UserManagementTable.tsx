@@ -295,7 +295,7 @@ export function UserManagementTable({
       <div className={styles.topBar}>
         <div className={styles.titleArea}>
           <h2>Daftar Akun Pengguna & Admin</h2>
-          <p>Kelola hak akses wewenang operasional dan manajemen pengguna Kampung Smart Farming.</p>
+          <p>Kelola hak akses wewenang operasional dan manajemen pengguna SEMAI.</p>
         </div>
         {canWrite && (
           <Button variant="primary" onClick={() => setIsCreateOpen(true)}>
@@ -339,7 +339,7 @@ export function UserManagementTable({
               </button>
             </div>
 
-            <form onSubmit={handleUpdateRoleSubmit}>
+            <form onSubmit={handleUpdateRoleSubmit} className={styles.modalForm}>
               <div className={styles.modalBody}>
                 {editError && <div className={styles.errorMessage}>{editError}</div>}
 
@@ -444,7 +444,7 @@ export function UserManagementTable({
               </button>
             </div>
 
-            <form onSubmit={handleCreateSubmit}>
+            <form onSubmit={handleCreateSubmit} className={styles.modalForm}>
               <div className={styles.modalBody}>
                 <div className={styles.instantBadge}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -459,39 +459,44 @@ export function UserManagementTable({
 
                 {createError && <div className={styles.errorMessage}>{createError}</div>}
 
-                <Input
-                  label="Nama Lengkap"
-                  required
-                  placeholder="misal: Budi Santoso"
-                  value={createForm.fullName}
-                  onChange={(e) => setCreateForm({ ...createForm, fullName: e.target.value })}
-                />
+                {/* Input Grid 2 Kolom */}
+                <div className={styles.formGrid2Col}>
+                  <Input
+                    label="Nama Lengkap"
+                    required
+                    placeholder="misal: Budi Santoso"
+                    value={createForm.fullName}
+                    onChange={(e) => setCreateForm({ ...createForm, fullName: e.target.value })}
+                  />
 
-                <Input
-                  label="Alamat Email"
-                  type="email"
-                  required
-                  placeholder="admin@kitatumbuh.id"
-                  value={createForm.email}
-                  onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
-                />
+                  <Input
+                    label="Alamat Email"
+                    type="email"
+                    required
+                    placeholder="admin@kitatumbuh.id"
+                    value={createForm.email}
+                    onChange={(e) => setCreateForm({ ...createForm, email: e.target.value })}
+                  />
+                </div>
 
-                <Input
-                  label="Password Awal"
-                  type="password"
-                  required
-                  placeholder="Minimal 6 karakter"
-                  value={createForm.password}
-                  onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
-                />
+                <div className={styles.formGrid2Col}>
+                  <Input
+                    label="Password Awal"
+                    type="password"
+                    required
+                    placeholder="Minimal 6 karakter"
+                    value={createForm.password}
+                    onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
+                  />
 
-                <Input
-                  label="Nomor WhatsApp / Telepon (Opsional)"
-                  type="tel"
-                  placeholder="08123456789"
-                  value={createForm.phone}
-                  onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
-                />
+                  <Input
+                    label="Nomor WhatsApp / Telepon (Opsional)"
+                    type="tel"
+                    placeholder="08123456789"
+                    value={createForm.phone}
+                    onChange={(e) => setCreateForm({ ...createForm, phone: e.target.value })}
+                  />
+                </div>
 
                 {/* Role selection radio list */}
                 <div>
@@ -549,7 +554,7 @@ export function UserManagementTable({
           ==================================================================== */}
       {deleteTarget && (
         <div className={styles.modalOverlay} role="dialog" aria-modal="true">
-          <div className={styles.modalContent}>
+          <div className={`${styles.modalContent} ${styles.modalContentConfirm}`}>
             <div className={styles.modalHeader}>
               <div className={styles.headerTitleGroup}>
                 <div className={`${styles.headerIcon} ${styles.headerIconDanger}`}>

@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { updateDonationStatusAction } from "@/lib/domain/admin/donations";
 import { isValidDonationStatusTransition } from "@/lib/validation/admin-donation-schema";
 import { DONATION_STATUS_LABELS, type DonationStatus } from "@/types/donation";
+import styles from "./AdminDonationForms.module.css";
 
 interface DonationStatusFormProps {
   donationId: string;
@@ -70,68 +71,37 @@ export function DonationStatusForm({
 
   return (
     <Card>
-      <h2 style={{ fontSize: "var(--font-size-title)", fontWeight: 600, color: "var(--color-text-primary)", marginBottom: "var(--space-2)" }}>
+      <h2 className={styles.title}>
         Ubah Status Siklus Donasi
       </h2>
-      <p style={{ fontSize: "var(--font-size-caption)", color: "var(--color-text-muted)", marginBottom: "var(--space-4)" }}>
+      <p className={styles.description}>
         Perbarui tahapan donasi sepanjang rantai pemrosesan limbah (penjemputan, penyortiran, pengolahan, hingga dampak sosial).
       </p>
 
       {errorMessage && (
-        <div
-          role="alert"
-          style={{
-            padding: "var(--space-3) var(--space-4)",
-            borderRadius: "var(--radius-md)",
-            background: "var(--color-danger-bg, #fef2f2)",
-            color: "var(--color-danger-fg, #b91c1c)",
-            border: "1px solid var(--color-danger-border, #fecaca)",
-            fontSize: "var(--font-size-body-s)",
-            marginBottom: "var(--space-4)",
-          }}
-        >
+        <div role="alert" className={`${styles.message} ${styles.error}`}>
           {errorMessage}
         </div>
       )}
 
       {successMessage && (
-        <div
-          role="status"
-          style={{
-            padding: "var(--space-3) var(--space-4)",
-            borderRadius: "var(--radius-md)",
-            background: "var(--color-green-100)",
-            color: "var(--color-brand-primary-hover, #166534)",
-            border: "1px solid var(--color-green-200, #bbf7d0)",
-            fontSize: "var(--font-size-body-s)",
-            marginBottom: "var(--space-4)",
-          }}
-        >
+        <div role="status" className={`${styles.message} ${styles.success}`}>
           {successMessage}
         </div>
       )}
 
       {statuses.length === 0 ? (
-        <p style={{ fontSize: "var(--font-size-body-s)", color: "var(--color-text-muted)" }}>
+        <p className={styles.noStatus}>
           Donasi ini berada di status akhir ({DONATION_STATUS_LABELS[currentStatus]}) — tidak ada tahap lanjutan yang dapat dipilih.
         </p>
       ) : (
-        <form onSubmit={handleSubmit} style={{ display: "flex", gap: "var(--space-3)", alignItems: "center", flexWrap: "wrap" }}>
-          <div style={{ flex: "1", minWidth: "220px" }}>
+        <form onSubmit={handleSubmit} className={styles.statusForm}>
+          <div>
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value as DonationStatus)}
               disabled={isPending}
-              style={{
-                width: "100%",
-                height: "40px",
-                borderRadius: "var(--radius-md)",
-                border: "1px solid var(--color-border-default)",
-                padding: "0 var(--space-3)",
-                fontSize: "var(--font-size-body-s)",
-                background: "var(--color-bg-surface)",
-                color: "var(--color-text-primary)",
-              }}
+              className={styles.select}
             >
               <option value={currentStatus} disabled>
                 {DONATION_STATUS_LABELS[currentStatus]} ({currentStatus}) — status saat ini
@@ -144,7 +114,7 @@ export function DonationStatusForm({
             </select>
           </div>
 
-          <Button type="submit" variant="secondary" size="md" isLoading={isPending}>
+          <Button type="submit" variant="secondary" size="md" isLoading={isPending} className={styles.submitButton}>
             Simpan Status Baru
           </Button>
         </form>

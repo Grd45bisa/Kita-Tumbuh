@@ -20,6 +20,7 @@ interface ReviewData {
   pickup_requested_date?: string;
   pickup_requested_slot?: string;
   donor_notes?: string;
+  donor_email?: string;
 }
 
 interface StepReviewProps {
@@ -152,6 +153,16 @@ export function StepReview({ data, serverError, isSubmitting }: StepReviewProps)
             </>
           )}
 
+          {data.donor_email && (
+            <>
+              <div className={styles.reviewDivider} />
+              <div className={styles.reviewRow}>
+                <span className={styles.reviewLabel}>Kabar Progres ke Email</span>
+                <span className={styles.reviewValue}>{data.donor_email}</span>
+              </div>
+            </>
+          )}
+
           {data.donor_notes && (
             <>
               <div className={styles.reviewDivider} />
@@ -177,7 +188,7 @@ export function StepReview({ data, serverError, isSubmitting }: StepReviewProps)
 
       <p className={styles.reviewCommitment}>
         Dengan mengonfirmasi, kamu menyetujui bahwa limbah yang didaftarkan bebas
-        dari kontaminan berbahaya dan siap diolah oleh tim Kampung Smart Farming.
+        dari kontaminan berbahaya dan siap diolah oleh tim SEMAI.
       </p>
 
       {isSubmitting && (

@@ -5,7 +5,7 @@ import { ProductionBatchForm } from "@/components/admin/ProductionBatchForm";
 import { requirePermission } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
-  title: "Buat Batch Produksi Baru | Admin KITA TUMBUH",
+  title: "Buat Batch Produksi Baru | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

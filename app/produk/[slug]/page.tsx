@@ -27,22 +27,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!product) {
     return {
-      title: "Produk Tidak Ditemukan — Kampung Smart Farming",
+      title: "Produk Tidak Ditemukan — SEMAI",
       robots: { index: false, follow: false },
     };
   }
 
   const canonicalUrl = `${env.siteUrl}/produk/${encodeURIComponent(slug)}`;
-  const description = product.description || "Pesan produk hasil daur ulang limbah dari Kampung Smart Farming.";
+  const description = product.description || "Pesan produk hasil daur ulang limbah dari SEMAI.";
 
   return {
-    title: `${product.name} — Produk Hasil Olahan KITA TUMBUH`,
+    title: `${product.name} — Produk Hasil Olahan SEMAI`,
     description,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: `${product.name} — Produk Hasil Olahan KITA TUMBUH`,
+      title: `${product.name} — Produk Hasil Olahan SEMAI`,
       description,
       url: canonicalUrl,
       type: "website",

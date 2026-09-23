@@ -15,8 +15,8 @@
 .brandCol { max-width: 420px; }
 .brandRow { display: flex; align-items: center; gap: .85rem; margin-bottom: 1.2rem; }
 .logo { width: 48px; height: 48px; flex: 0 0 auto; object-fit: contain; border-radius: 12px; }
-.brandTitle { display: block; color: #fff; font-size: .98rem; font-weight: 800; letter-spacing: .05em; }
-.brandTagline { display: block; margin-top: .1rem; color: var(--color-earth-300); font-family: var(--font-serif); font-size: .9rem; }
+.brandTitle { display: block; color: #fff; font-size: 1.15rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-family: var(--font-sans); }
+.brandTagline { display: block; margin-top: .25rem; color: var(--color-earth-300); font-family: var(--font-sans); font-size: .66rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
 .brandCol > p { font-size: .88rem; line-height: 1.7; }
 
 .navCol { display: flex; flex-direction: column; align-items: flex-start; gap: .7rem; }
@@ -24,7 +24,7 @@
 .navCol a { font-size: .88rem; transition: color 150ms ease; }
 .navCol a:hover { color: #fff; }
 
-.actionCol h2 { margin: .65rem 0 1.2rem; color: #fff; font-family: var(--font-serif); font-size: clamp(1.5rem, 2.4vw, 2.15rem); font-weight: 500; line-height: 1.12; }
+.actionCol h2 { margin: .65rem 0 1.2rem; color: #fff; font-family: var(--font-sans); font-size: clamp(1.4rem, 2.2vw, 1.95rem); font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; }
 .actionCol a { display: inline-flex; align-items: center; gap: .7rem; padding-bottom: .35rem; border-bottom: 1px solid var(--color-earth-400); color: #fff; font-size: .9rem; font-weight: 700; }
 
 .bottomBar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,.1); font-size: .72rem; }

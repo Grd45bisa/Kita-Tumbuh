@@ -72,9 +72,12 @@ export async function getAdminRevenueEntries(
     query = query.eq("reconciliation_status", params.reconciliationStatus);
   }
 
-  const { data, count, error } = await query
-    .order("occurred_at", { ascending: false })
-    .range(offset, offset + pageSize - 1);
+  // The paginated/filtered list and the all-entries sum are independent
+  // queries — fetch concurrently instead of sequentially.
+  const [{ data, count, error }, { data: allAmounts }] = await Promise.all([
+    query.order("occurred_at", { ascending: false }).range(offset, offset + pageSize - 1),
+    supabase.from("revenue_entries").select("amount"),
+  ]);
 
   if (error || !data) {
     console.error("[getAdminRevenueEntries] Error fetching entries:", error);
@@ -117,11 +120,6 @@ export async function getAdminRevenueEntries(
     created_at: row.created_at,
   }));
 
-  // Aggregate total realized revenue
-  const { data: allAmounts } = await supabase
-    .from("revenue_entries")
-    .select("amount");
-
   const totalRevenueAmount = (allAmounts || []).reduce(
     (acc, curr) => acc + Number(curr.amount),
     0
@@ -145,50 +143,33 @@ export async function getFinancialSummary(): Promise<FinancialSummary> {
   await requirePermission("finance", "read");
   const supabase = await createClient();
 
-  // 1. Sum total revenue from append-only revenue entries
-  const { data: revData } = await supabase
-    .from("revenue_entries")
-    .select("amount");
+  // Three independent tables — fetch concurrently instead of sequentially.
+  const [revResult, allocResult, expResult] = await Promise.all([
+    supabase.from("revenue_entries").select("amount"),
+    supabase.from("social_allocations").select("amount").eq("approval_status", "APPROVED").then(
+      (res) => res,
+      () => ({ data: null }) // Table not created yet (Tahap D)
+    ),
+    supabase.from("expenses").select("amount").then(
+      (res) => res,
+      () => ({ data: null }) // Table not created yet (Tahap E)
+    ),
+  ]);
 
-  const totalRevenue = (revData || []).reduce(
+  const totalRevenue = (revResult.data || []).reduce(
     (acc, curr) => acc + Number(curr.amount),
     0
   );
 
-  // 2. Sum approved allocations (if table exists)
-  let totalAllocations = 0;
-  try {
-    const { data: allocData } = await supabase
-      .from("social_allocations")
-      .select("amount")
-      .eq("approval_status", "APPROVED");
+  const totalAllocations = (allocResult.data || []).reduce(
+    (acc, curr) => acc + Number(curr.amount),
+    0
+  );
 
-    if (allocData) {
-      totalAllocations = allocData.reduce(
-        (acc, curr) => acc + Number(curr.amount),
-        0
-      );
-    }
-  } catch {
-    // Table not created yet (Tahap D)
-  }
-
-  // 3. Sum expenses (if table exists)
-  let totalExpenses = 0;
-  try {
-    const { data: expData } = await supabase
-      .from("expenses")
-      .select("amount");
-
-    if (expData) {
-      totalExpenses = expData.reduce(
-        (acc, curr) => acc + Number(curr.amount),
-        0
-      );
-    }
-  } catch {
-    // Table not created yet (Tahap E)
-  }
+  const totalExpenses = (expResult.data || []).reduce(
+    (acc, curr) => acc + Number(curr.amount),
+    0
+  );
 
   const availableBalance = Math.max(0, totalRevenue - totalAllocations);
 
@@ -532,9 +513,12 @@ export async function getAdminExpenses(
     query = query.eq("category", params.category);
   }
 
-  const { data, count, error } = await query
-    .order("occurred_at", { ascending: false })
-    .range(offset, offset + pageSize - 1);
+  // The paginated/filtered list and the all-expenses sum are independent
+  // queries — fetch concurrently instead of sequentially.
+  const [{ data, count, error }, { data: allExpenses }] = await Promise.all([
+    query.order("occurred_at", { ascending: false }).range(offset, offset + pageSize - 1),
+    supabase.from("expenses").select("amount"),
+  ]);
 
   if (error || !data) {
     console.error("[getAdminExpenses] Error fetching expenses:", error);
@@ -574,10 +558,6 @@ export async function getAdminExpenses(
     recorded_by: row.recorded_by,
     created_at: row.created_at,
   }));
-
-  const { data: allExpenses } = await supabase
-    .from("expenses")
-    .select("amount");
 
   const totalExpenseAmount = (allExpenses || []).reduce(
     (acc, curr) => acc + Number(curr.amount),

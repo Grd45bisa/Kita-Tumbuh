@@ -17,7 +17,7 @@ import { AllocationForm } from "@/components/admin/AllocationForm";
 import type { SocialAllocation } from "@/types/finance";
 
 export const metadata: Metadata = {
-  title: "Alokasi Dana Sosial | Admin KITA TUMBUH",
+  title: "Alokasi Dana Sosial | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

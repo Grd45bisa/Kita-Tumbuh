@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { createWasteTypeAction, updateWasteTypeAction } from "@/lib/domain/admin/waste-types";
 import type { WasteType } from "@/types/donation";
+import styles from "./WasteTypeForm.module.css";
 
 interface WasteTypeFormProps {
   initialData?: WasteType;
@@ -82,25 +83,14 @@ export function WasteTypeForm({ initialData, isEdit = false }: WasteTypeFormProp
   };
 
   return (
-    <Card style={{ maxWidth: "720px" }}>
+    <Card className={styles.card}>
       {errorMessage && (
-        <div
-          role="alert"
-          style={{
-            padding: "var(--space-3) var(--space-4)",
-            borderRadius: "var(--radius-md)",
-            background: "var(--color-danger-bg, #fef2f2)",
-            color: "var(--color-danger-fg, #b91c1c)",
-            border: "1px solid var(--color-danger-border, #fecaca)",
-            fontSize: "var(--font-size-body-s)",
-            marginBottom: "var(--space-4)",
-          }}
-        >
+        <div role="alert" className={styles.errorMessage}>
           {errorMessage}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+      <form onSubmit={handleSubmit} className={styles.form}>
         <Input
           id="name"
           name="name"
@@ -112,7 +102,7 @@ export function WasteTypeForm({ initialData, isEdit = false }: WasteTypeFormProp
           disabled={isPending}
         />
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-4)" }}>
+        <div className={styles.twoColumns}>
           <Input
             id="slug"
             name="slug"
@@ -137,7 +127,7 @@ export function WasteTypeForm({ initialData, isEdit = false }: WasteTypeFormProp
           />
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--space-4)" }}>
+        <div className={styles.threeColumns}>
           <Input
             id="min_quantity"
             name="min_quantity"
@@ -207,7 +197,7 @@ export function WasteTypeForm({ initialData, isEdit = false }: WasteTypeFormProp
           disabled={isPending}
         />
 
-        <div style={{ marginTop: "var(--space-2)" }}>
+        <div className={styles.checkboxRow}>
           <Checkbox
             id="is_active"
             label="Kategori limbah aktif dan dapat dipilih di form donasi"
@@ -217,7 +207,7 @@ export function WasteTypeForm({ initialData, isEdit = false }: WasteTypeFormProp
           />
         </div>
 
-        <div style={{ display: "flex", gap: "var(--space-3)", marginTop: "var(--space-4)" }}>
+        <div className={styles.actions}>
           <Button type="submit" variant="primary" size="md" isLoading={isPending}>
             {isEdit ? "Simpan Perubahan" : "Tambah Jenis Limbah"}
           </Button>

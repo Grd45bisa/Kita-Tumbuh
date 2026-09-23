@@ -1,5 +1,5 @@
 // =============================================================================
-// KAMPUNG SMART FARMING — DONATION DOMAIN TYPES
+// SEMAI — DONATION DOMAIN TYPES
 // =============================================================================
 
 export type DonationStatus =
@@ -33,6 +33,22 @@ export const WASTE_TYPE_LABELS: Record<string, string> = {
   "sampah-organik": "Sampah Organik",
   "anorganik-daur-ulang": "Anorganik Daur Ulang",
 };
+
+/**
+ * Human-readable label for a waste type's raw storage unit.
+ *
+ * `waste_types.unit` stores short technical codes ("L", "kg", "pcs" — see
+ * migration 001_donation_foundation.sql). The donation wizard has always
+ * translated "pcs" to the donor-facing word "wadah" (StepMaterial,
+ * StepQuantity, StepReview); admin screens rendered the raw "pcs" code
+ * instead, so the same donation showed two different units depending on
+ * where you looked. Centralize the translation here (a plain, dependency-free
+ * function safe to import from both client and server components) so every
+ * screen stays in sync.
+ */
+export function formatWasteUnitLabel(unit: string): string {
+  return unit === "pcs" ? "wadah" : unit;
+}
 
 export type DonationMethod = "DROP_OFF" | "PICKUP";
 

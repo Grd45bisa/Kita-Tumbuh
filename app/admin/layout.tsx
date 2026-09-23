@@ -5,8 +5,8 @@ import { AdminNav } from "@/components/admin/AdminNav";
 import styles from "@/components/admin/AdminLayout.module.css";
 
 export const metadata: Metadata = {
-  title: "Admin Operasional | KITA TUMBUH",
-  description: "Portal operasional Kampung Smart Farming untuk pengelolaan limbah, inventaris, dan produksi.",
+  title: "Admin Operasional | SEMAI",
+  description: "Portal operasional SEMAI untuk pengelolaan limbah, inventaris, dan produksi.",
   robots: {
     index: false,
     follow: false,

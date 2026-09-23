@@ -5,8 +5,8 @@ import { ProfileForms } from "@/components/member/ProfileForms";
 import styles from "@/components/member/MemberArea.module.css";
 
 export const metadata: Metadata = {
-  title: "Pengaturan Profil | KITA TUMBUH",
-  description: "Kelola profil dan keamanan akun member KITA TUMBUH.",
+  title: "Pengaturan Profil | SEMAI",
+  description: "Kelola profil dan keamanan akun member SEMAI.",
   robots: {
     index: false,
     follow: false,

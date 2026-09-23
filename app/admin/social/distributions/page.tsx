@@ -10,7 +10,7 @@ import { DISTRIBUTION_APPROVAL_LABELS, type DistributionApprovalStatus } from "@
 import type { Distribution } from "@/types/social";
 
 export const metadata: Metadata = {
-  title: "Distribusi Program Sosial | Admin KITA TUMBUH",
+  title: "Distribusi Program Sosial | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

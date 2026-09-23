@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { LeafLoader } from "@/components/ui/LeafLoader";
 import styles from "./IntroLoader.module.css";
 
-const SESSION_KEY = "kt-leaf-intro-seen-v2";
+const SESSION_KEY = "semai-leaf-intro-seen-v2";
 const MIN_DISPLAY_MS = 2000;
 const EXIT_MS = 350;
 // Safety net: don't wait forever for an animationiteration event that

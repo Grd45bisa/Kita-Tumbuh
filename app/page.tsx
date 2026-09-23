@@ -3,22 +3,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { env } from "@/lib/env";
+import { heroContent } from "@/lib/content/hero";
+import { fourRoomsContent } from "@/lib/content/four-rooms";
+import { jejakTumbuhContent } from "@/lib/content/jejak-tumbuh";
 import { acceptedWastePreview as wasteTypes } from "@/lib/content/accepted-waste";
 import { homepageJourney as journey } from "@/lib/content/how-it-works";
 import { homepageGallery as galleryItems } from "@/lib/content/gallery";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Donasi Sampah untuk Anak Difabel",
+  title: "SEMAI — Room to Grow | Inclusive Circular Smart Farming",
   description:
-    "Ubah minyak jelantah, sampah organik, dan plastik terpilah dari rumah menjadi karya bernilai yang mendukung ruang belajar dan kemandirian anak-anak difabel.",
+    "Sebab setiap potensi butuh ruang untuk bermula. Ubah sisa organik dan limbah rumah tangga menjadi nutrisi kebun, ruang belajar, dan karya nyata anak-anak difabel.",
   alternates: {
     canonical: env.siteUrl,
   },
   openGraph: {
-    title: "KITA TUMBUH — Kampung Smart Farming",
+    title: "SEMAI — Room to Grow",
     description:
-      "Ubah minyak jelantah, sampah organik, dan plastik terpilah dari rumah menjadi karya bernilai yang mendukung ruang belajar dan kemandirian anak-anak difabel.",
+      "Beri ruang. Lihat apa yang bisa tumbuh. Bersama SEMAI, sisa organik dan limbah rumah tangga membuka ruang belajar, karya, dan kemandirian nyata.",
     url: env.siteUrl,
     type: "website",
   },
@@ -51,24 +54,55 @@ function WasteIcon({ name }: { name: string }) {
   );
 }
 
+function RoomIcon({ name }: { name: string }) {
+  if (name === "leaf") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+      </svg>
+    );
+  }
+  if (name === "book-open") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+      </svg>
+    );
+  }
+  if (name === "sparkles") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+      </svg>
+    );
+  }
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
 export default function HomePage() {
   const organizationJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "KITA TUMBUH — Kampung Setara Smart Farming",
+    name: "SEMAI — Inclusive Circular Smart Farming",
     url: env.siteUrl,
-    slogan: "Dari Limbah, Tumbuh Manfaat.",
+    slogan: "Sebab setiap potensi butuh ruang untuk bermula.",
     description:
-      "Gerakan donasi sampah terpilah yang mengolah limbah rumah tangga menjadi karya bernilai untuk mendukung ruang tumbuh anak-anak difabel.",
+      "SEMAI membuka ruang bagi sumber daya, proses belajar, karya nyata, dan partisipasi setara melalui pengolahan sisa organik dan kebun inklusif.",
   };
 
-  // WebSite schema — distinct from Organization, describes the site itself
-  // rather than the entity behind it (P0-1004). No SearchAction is included
-  // because there is no site-wide search feature to genuinely represent.
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "KITA TUMBUH — Kampung Setara Smart Farming",
+    name: "SEMAI — Room to Grow",
     url: env.siteUrl,
   };
 
@@ -83,44 +117,46 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
       />
 
-      <section className={styles.hero} aria-labelledby="hero-title">
+      {/* 01 — HERO SECTION */}
+      <section className={styles.hero} id="hero" aria-labelledby="hero-title">
         <Container>
           <div className={styles.heroGrid}>
             <div className={styles.heroCopy}>
-              <p className={styles.heroBrand}>KITA TUMBUH · KAMPUNG SETARA SMART FARMING</p>
+              <p className={styles.heroBrand}>{heroContent.brandLine}</p>
               <div className={styles.eyebrow}>
                 <span className={styles.eyebrowDot} aria-hidden="true" />
-                Donasi tanpa uang, tetap penuh makna
+                {heroContent.eyebrow}
               </div>
               <h1 id="hero-title">
-                Sampah dari rumahmu bisa <em>menumbuhkan harapan.</em>
+                {heroContent.headline}
+                <em>{heroContent.headlineEmphasis}</em>
               </h1>
-              <p className={styles.coreStatement}>Sampah kalian sangat berarti bagi kami.</p>
-              <p className={styles.heroLead}>
-                Minyak jelantah, sisa organik, dan plastik terpilah yang tak lagi kamu gunakan dapat kami olah menjadi barang bernilai. Hasilnya membantu menghadirkan ruang belajar, berkarya, dan bertumbuh bagi anak-anak difabel.
-              </p>
+              <p className={styles.coreStatement}>{heroContent.tagline}</p>
+              <p className={styles.heroLead}>{heroContent.lead}</p>
 
               <div className={styles.heroActions}>
                 <Link href="/donasikan" className={styles.primaryButton}>
-                  Donasikan sampahmu
+                  {heroContent.primaryCtaLabel}
                   <span aria-hidden="true">→</span>
                 </Link>
-                <Link href="#cara-kerja" className={styles.textLink}>
-                  Lihat cara kerjanya
+                <Link href="#ruang-tumbuh" className={styles.textLink}>
+                  {heroContent.secondaryCtaLabel}
                 </Link>
               </div>
 
               <div className={styles.heroNote}>
                 <span className={styles.noteIcon} aria-hidden="true">✓</span>
-                <p><strong>Tidak perlu menunggu banyak.</strong> Mulailah dari yang ada di rumah hari ini.</p>
+                <p>
+                  <strong>{heroContent.noteHighlight}</strong> {heroContent.noteText}
+                </p>
               </div>
             </div>
 
             <div className={styles.heroVisual}>
               <div className={styles.heroImageWrap}>
                 <Image
-                  src="/images/hero-difabel-smart-farming.jpg"
-                  alt="Anak-anak difabel belajar dan berkarya bersama di kebun hidroponik"
+                  src={heroContent.imageSrc}
+                  alt={heroContent.imageAlt}
                   fill
                   priority
                   sizes="(max-width: 899px) 100vw, 50vw"
@@ -129,35 +165,268 @@ export default function HomePage() {
               </div>
               <div className={styles.quoteCard}>
                 <span aria-hidden="true">“</span>
-                <p>Sampah kalian sangat berarti bagi kami.</p>
+                <p>{heroContent.quote}</p>
               </div>
               <div className={styles.visualLabel}>
                 <span aria-hidden="true">↗</span>
-                Dari limbah, tumbuh kemampuan dan kemandirian
+                {heroContent.visualLabel}
               </div>
             </div>
           </div>
         </Container>
       </section>
 
-      <section className={styles.promiseBar} aria-label="Prinsip gerakan KITA TUMBUH">
+      {/* 02 — PROMISE BAR */}
+      <section className={styles.promiseBar} aria-label="Prinsip SEMAI Room to Grow">
         <Container>
           <div className={styles.promiseGrid}>
-            <div><strong>Mudah dimulai</strong><span>Dari sampah rumah tangga sehari-hari</span></div>
-            <div><strong>Diolah dengan layak</strong><span>Dipilah dan dimanfaatkan kembali</span></div>
-            <div><strong>Bertumbuh bersama</strong><span>Untuk ruang belajar dan karya yang inklusif</span></div>
+            <div>
+              <strong>Room for Nature</strong>
+              <span>Sisa organik kembali ke siklus nutrisi</span>
+            </div>
+            <div>
+              <strong>Room to Learn & Create</strong>
+              <span>Ruang belajar terarah menghasilkan karya nyata</span>
+            </div>
+            <div>
+              <strong>Room to Belong</strong>
+              <span>Partisipasi setara dalam ekosistem sirkular</span>
+            </div>
           </div>
         </Container>
       </section>
 
-      <section className={styles.gallerySection} id="galeri">
+      {/* 03 — OPENING SECTION */}
+      <section className={styles.openingSection} id="tentang" aria-label="Filosofi SEMAI">
+        <Container>
+          <div className={styles.openingGrid}>
+            <div>
+              <span className={styles.sectionLabel}>Filosofi Kami</span>
+              <h2 className={styles.openingQuote}>
+                Setiap pertumbuhan butuh ruang. <em>SEMAI menciptakan ruang itu.</em>
+              </h2>
+            </div>
+            <div>
+              <p className={styles.openingLead}>
+                SEMAI bukan sekadar mengajak orang berdonasi limbah. SEMAI mengajak kita membuka ruang: agar sesuatu yang tersisih dapat kembali ke alam, menjadi media belajar dan berkarya, dan menghubungkan semua peran secara setara.
+              </p>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* 04 — THE FOUR ROOMS (SIGNATURE SECTION) */}
+      <section className={styles.fourRoomsSection} id="ruang-tumbuh" aria-labelledby="four-rooms-title">
+        <Container>
+          <div className={styles.fourRoomsIntro}>
+            <span className={styles.sectionLabel}>{fourRoomsContent.eyebrow}</span>
+            <h2 id="four-rooms-title">{fourRoomsContent.title}</h2>
+            <p>{fourRoomsContent.lead}</p>
+          </div>
+
+          <div className={styles.fourRoomsGrid}>
+            {fourRoomsContent.rooms.map((room) => (
+              <article className={styles.roomCard} key={room.id}>
+                <div className={styles.roomCardTop}>
+                  <span className={styles.roomTag}>{room.tag}</span>
+                  <div className={styles.roomIconBox}>
+                    <RoomIcon name={room.iconName} />
+                  </div>
+                </div>
+                <h3>{room.title}</h3>
+                <span className={styles.roomSubtitle}>{room.subtitle}</span>
+                <p className={styles.roomDesc}>{room.description}</p>
+                <div className={styles.roomBadge}>{room.badge}</div>
+              </article>
+            ))}
+          </div>
+
+          <div className={styles.fourRoomsBanner}>
+            <div className={styles.fourRoomsBannerText}>
+              <div className={styles.fourRoomsBannerIcon} aria-hidden="true">★</div>
+              <div>
+                <strong>ROOM TO GROW</strong>
+                <p>{fourRoomsContent.closingQuote}</p>
+              </div>
+            </div>
+            <Link href="/donasikan" className={styles.secondaryButton}>
+              Buka Ruang Sekarang <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </Container>
+      </section>
+
+      {/* 05 — CARA KERJA (5 TAHAP SEMAI) */}
+      <section className={styles.journeySection} id="cara-kerja" aria-labelledby="journey-title">
+        <Container>
+          <div className={styles.sectionIntro}>
+            <div>
+              <span className={styles.sectionLabel}>Alur Sirkular</span>
+              <h2 id="journey-title">Dari rumahmu, perjalanan itu bermula.</h2>
+            </div>
+            <p>Mekanisme sederhana yang menghubungkan sisa rumah tangga dengan proses tumbuh di kebun.</p>
+          </div>
+
+          <ol className={styles.journeyList}>
+            {journey.map((item) => (
+              <li key={item.number}>
+                <span className={styles.stepNumber}>{item.number}</span>
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <div className={styles.journeyAction}>
+            <p>
+              <strong>Kamu menyisihkan sampahnya.</strong> Kami membuka ruang dan meneruskan manfaatnya.
+            </p>
+            <Link href="/donasikan" className={styles.secondaryButton}>
+              Mulai Sisihkan Limbah <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </Container>
+      </section>
+
+      {/* 06 — KATEGORI BAHAN YANG DITERIMA */}
+      <section className={styles.wasteSection} id="kategori-limbah" aria-labelledby="waste-title">
+        <Container>
+          <div className={styles.sectionIntro}>
+            <div>
+              <span className={styles.sectionLabel}>Mulai dari rumah</span>
+              <h2 id="waste-title">Apa yang bisa kamu donasikan?</h2>
+            </div>
+            <p>Pastikan setiap bahan dipisahkan dan disiapkan dengan benar agar aman diterima serta mudah diolah.</p>
+          </div>
+
+          <div className={styles.wasteGrid}>
+            {wasteTypes.map((waste) => (
+              <article className={styles.wasteCard} key={waste.title}>
+                <div className={styles.wasteCardTop}>
+                  <div className={styles.iconBox}>
+                    <WasteIcon name={waste.icon} />
+                  </div>
+                  <span className={styles.wasteTag}>{waste.tag}</span>
+                </div>
+                <h3>{waste.title}</h3>
+                <p>{waste.description}</p>
+                <div className={styles.preparation}>
+                  <span>Siapkan seperti ini</span>
+                  <p>{waste.preparation}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <span className={styles.wasteSwipeHint}>Geser untuk lihat semua →</span>
+
+          <div className={styles.safetyNote}>
+            <div className={styles.safetyIcon} aria-hidden="true">!</div>
+            <p>
+              <strong>Mohon tidak mencampur bahan.</strong> Kami belum dapat menerima limbah medis, oli kendaraan, cairan kimia, kemasan bahan berbahaya, atau sampah rumah tangga campur.
+            </p>
+          </div>
+        </Container>
+      </section>
+
+      {/* 07 — JEJAK TUMBUH (PROOF MECHANISM) */}
+      <section className={styles.transparencySection} id="jejak-tumbuh" aria-labelledby="jejak-title">
+        <Container>
+          <div className={styles.transparencyCard}>
+            <div className={styles.transparencyHeader}>
+              <span className={styles.sectionLabel}>
+                <span className={styles.eyebrowDot} aria-hidden="true" />
+                {jejakTumbuhContent.eyebrow}
+              </span>
+              <h2 id="jejak-title" className={styles.transparencyTitle}>
+                {jejakTumbuhContent.title}
+                <em>{jejakTumbuhContent.headlineEmphasis}</em>
+              </h2>
+              <p className={styles.transparencyLead}>{jejakTumbuhContent.lead}</p>
+            </div>
+
+            {/* Metrik Konkrit Jejak Tumbuh */}
+            <div className={styles.metricGrid} aria-label="Ringkasan Data Dampak SEMAI">
+              {jejakTumbuhContent.metrics.map((metric) => (
+                <div className={styles.metricCard} key={metric.label}>
+                  <div className={styles.metricValueWrap}>
+                    <span className={styles.metricValue}>{metric.value}</span>
+                    <span className={styles.metricUnit}>{metric.unit}</span>
+                  </div>
+                  <div className={styles.metricLabel}>{metric.label}</div>
+                  <p className={styles.metricDesc}>{metric.description}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Pipeline Alur Pelacakan */}
+            <div className={styles.tracePipeline} aria-label="Alur pencatatan donasi Jejak Tumbuh">
+              {jejakTumbuhContent.steps.map((step) => (
+                <div className={styles.traceStep} key={step.step}>
+                  <div className={styles.traceStepHeader}>
+                    <span className={styles.traceStepBadge}>Tahap {step.step}</span>
+                    <div className={styles.traceStepIcon}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M12 22V12M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <h3 className={styles.traceStepName}>{step.title}</h3>
+                  <p className={styles.traceStepDesc}>{step.description}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className={styles.transparencyFooter}>
+              <div className={styles.transparencyFooterInfo}>
+                <span className={styles.transparencyCheckIcon} aria-hidden="true">✓</span>
+                <div>
+                  <strong>Bukti Nyata, Bukan Klaim Sepihak</strong>
+                  <p>{jejakTumbuhContent.note}</p>
+                </div>
+              </div>
+              <Link href="/donasikan" className={styles.transparencyLink}>
+                {jejakTumbuhContent.ctaLabel} <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* 08 — HUMAN STORY & AGENCY (BUKAN BELAS KASIHAN) */}
+      <section className={styles.storySection} id="dampak" aria-labelledby="story-title">
+        <Container>
+          <div className={styles.storyGrid}>
+            <div className={styles.storyHeading}>
+              <span className={styles.sectionLabel}>Agency & Martabat</span>
+              <h2 id="story-title">Kemampuan berbicara melalui proses dan karya nyata.</h2>
+            </div>
+            <div className={styles.storyBody}>
+              <p className={styles.storyLead}>
+                “Di SEMAI, kami tidak ingin menceritakan apa yang seseorang tidak bisa lakukan. Kami ingin memberi ruang agar apa yang bisa mereka lakukan berbicara melalui karya.”
+              </p>
+              <p>
+                Belajar membutuhkan ruang untuk memegang bibit, mencampur kompos, mencoba, gagal, mengulang, dan akhirnya mandiri. Dari sisa organik yang kamu sisihkan, tercipta ruang tempat anak-anak difabel menunjukkan ketekunan, rasa bangga, dan kemampuan yang setara.
+              </p>
+              <div className={styles.storySignature}>
+                “Yang kami tumbuhkan bukan hanya tanaman.”
+              </div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* 09 — GALERI PROSES & KEGIATAN */}
+      <section className={styles.gallerySection} id="galeri" aria-labelledby="gallery-title">
         <Container>
           <div className={styles.galleryIntro}>
             <div>
               <span className={styles.sectionLabel}>Wajah-wajah yang bertumbuh</span>
-              <h2>Setiap foto menyimpan proses, keberanian, dan rasa bangga.</h2>
+              <h2 id="gallery-title">Setiap momen menyimpan ketekunan, proses, dan rasa bangga.</h2>
             </div>
-            <p>Inilah gambaran ruang belajar dan berkarya yang ingin terus kita tumbuhkan bersama.</p>
+            <p>Inilah potret nyata ruang belajar, berkarya, dan kebersamaan yang terus kita kembangkan di kebun inklusif SEMAI.</p>
           </div>
 
           <div className={styles.galleryGrid}>
@@ -176,142 +445,62 @@ export default function HomePage() {
         </Container>
       </section>
 
-      <section className={styles.storySection} id="tentang">
-        <Container>
-          <div className={styles.storyGrid}>
-            <div className={styles.storyHeading}>
-              <span className={styles.sectionLabel}>Mengapa ini berarti</span>
-              <h2>Yang sering kita buang, bisa menjadi awal bagi mereka untuk berkarya.</h2>
-            </div>
-            <div className={styles.storyBody}>
-              <p className={styles.storyLead}>
-                Kami percaya anak-anak difabel bukan penerima belas kasihan. Mereka adalah pribadi dengan kemampuan, ketekunan, dan mimpi yang layak mendapat ruang untuk tumbuh.
-              </p>
-              <p>
-                Karena itu, sampah yang kamu pilah tidak berhenti sebagai sumbangan. Ia menjadi bahan belajar, kesempatan berlatih, dan karya yang dapat dibanggakan. Dari kebiasaan kecil di rumah, kita membangun lingkungan yang lebih bersih sekaligus masa depan yang lebih setara.
-              </p>
-              <div className={styles.storySignature}>Kecil bagimu. Besar artinya bagi perjalanan mereka.</div>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      <section className={styles.wasteSection} id="kategori-limbah">
-        <Container>
-          <div className={styles.sectionIntro}>
-            <div>
-              <span className={styles.sectionLabel}>Mulai dari rumah</span>
-              <h2>Apa yang bisa kamu donasikan?</h2>
-            </div>
-            <p>Pastikan setiap bahan dipisahkan dan disiapkan dengan benar agar aman diterima serta mudah diolah.</p>
-          </div>
-
-          <div className={styles.wasteGrid}>
-            {wasteTypes.map((waste) => (
-              <article className={styles.wasteCard} key={waste.title}>
-                <div className={styles.wasteCardTop}>
-                  <div className={styles.iconBox}><WasteIcon name={waste.icon} /></div>
-                  <span className={styles.wasteTag}>{waste.tag}</span>
-                </div>
-                <h3>{waste.title}</h3>
-                <p>{waste.description}</p>
-                <div className={styles.preparation}>
-                  <span>Siapkan seperti ini</span>
-                  <p>{waste.preparation}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <span className={styles.wasteSwipeHint}>Geser untuk lihat semua →</span>
-
-          <div className={styles.safetyNote}>
-            <div className={styles.safetyIcon} aria-hidden="true">!</div>
-            <p><strong>Mohon tidak mencampur bahan.</strong> Kami belum dapat menerima limbah medis, oli kendaraan, cairan kimia, kemasan bahan berbahaya, atau sampah rumah tangga yang tercampur.</p>
-          </div>
-        </Container>
-      </section>
-
-      <section className={styles.journeySection} id="cara-kerja">
-        <Container>
-          <div className={styles.sectionIntro}>
-            <div>
-              <span className={styles.sectionLabel}>Satu alur, banyak kebaikan</span>
-              <h2>Perjalanan sampahmu tidak berakhir di tempat sampah.</h2>
-            </div>
-            <p>Kami membuat prosesnya sederhana agar siapa pun bisa ikut mengambil bagian.</p>
-          </div>
-
-          <ol className={styles.journeyList}>
-            {journey.map((item) => (
-              <li key={item.number}>
-                <span className={styles.stepNumber}>{item.number}</span>
-                <div><h3>{item.title}</h3><p>{item.description}</p></div>
-              </li>
-            ))}
-          </ol>
-
-          <div className={styles.journeyAction}>
-            <p><strong>Kamu menyiapkan sampahnya.</strong> Kami membantu meneruskan manfaatnya.</p>
-            <Link href="/donasikan" className={styles.secondaryButton}>Mulai donasi <span aria-hidden="true">→</span></Link>
-          </div>
-        </Container>
-      </section>
-
-      <section className={styles.impactSection} id="dampak-sosial">
-        <Container>
-          <div className={styles.impactGrid}>
-            <div className={styles.impactVisual}>
-              <Image
-                src="/images/impact-difabel-komunitas.jpg"
-                alt="Anak-anak difabel dan pendamping menikmati kegiatan berkebun bersama"
-                fill
-                sizes="(max-width: 899px) 100vw, 50vw"
-                className={styles.impactImage}
-              />
-              <div className={styles.impactCaption}>Tumbuh bukan karena dikasihani, tetapi karena diberi kesempatan.</div>
-            </div>
-            <div className={styles.impactContent}>
-              <span className={styles.sectionLabel}>Dampak yang ingin kita tumbuhkan</span>
-              <h2>Bukan sekadar bantuan. Ini tentang ruang untuk menjadi berdaya.</h2>
-              <p>Sampah yang diolah membuka rangkaian kegiatan yang memberi anak-anak difabel kesempatan untuk belajar, mencoba, bekerja sama, dan melihat karya mereka memiliki nilai.</p>
-
-              <ul className={styles.impactList}>
-                <li><span>01</span><div><strong>Ruang belajar yang ramah</strong><p>Kegiatan disusun agar setiap anak dapat bertumbuh sesuai kemampuan dan ritmenya.</p></div></li>
-                <li><span>02</span><div><strong>Keterampilan yang bermakna</strong><p>Belajar mengolah bahan, merawat tanaman, dan menghasilkan karya yang berguna.</p></div></li>
-                <li><span>03</span><div><strong>Kepercayaan diri dan kemandirian</strong><p>Setiap proses menjadi kesempatan untuk merasa mampu, dihargai, dan dibutuhkan.</p></div></li>
-              </ul>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      <section className={styles.resultsSection} id="hasil-olahan">
+      {/* 10 — HASIL OLAHAN & KARYA NYATA */}
+      <section className={styles.resultsSection} id="hasil-olahan" aria-labelledby="results-title">
         <Container>
           <div className={styles.centerIntro}>
-            <span className={styles.sectionLabel}>Dari bahan sisa menjadi berguna</span>
-            <h2>Di tangan yang tekun, sampah menemukan arti baru.</h2>
-            <p>Setiap jenis bahan menempuh proses berbeda, tetapi semuanya diarahkan untuk menghasilkan manfaat yang dapat terus berputar.</p>
+            <span className={styles.sectionLabel}>Dari bahan sisa menjadi bernilai</span>
+            <h2 id="results-title">Di tangan yang tekun, sisa dapur menemukan arti baru.</h2>
+            <p>Setiap jenis bahan diarahkan untuk menghasilkan nutrisi kebun dan karya bernilai guna yang terus berputar dalam ekosistem.</p>
           </div>
 
           <div className={styles.resultGrid}>
             <article className={styles.resultCard}>
               <div className={styles.resultImage}>
-                <Image src="/images/gallery-handcrafted-products.jpg" alt="Contoh produk kerajinan hasil pengolahan bahan sisa" fill sizes="(max-width: 699px) 82vw, 33vw" />
+                <Image
+                  src="/images/gallery-handcrafted-products.jpg"
+                  alt="Produk lilin aromaterapi dan sabun ramah lingkungan dari jelantah terolah"
+                  fill
+                  sizes="(max-width: 699px) 82vw, 33vw"
+                />
               </div>
-              <div><span>Minyak jelantah</span><h3>Produk olahan bernilai guna</h3><p>Diolah melalui proses yang sesuai menjadi karya yang dapat dipasarkan.</p></div>
+              <div>
+                <span>Minyak Jelantah</span>
+                <h3>Produk Olahan Bernilai</h3>
+                <p>Diolah melalui proses aman bersama peserta menjadi lilin aromaterapi dan produk bernilai jual.</p>
+              </div>
             </article>
+
             <article className={styles.resultCard}>
               <div className={styles.resultImage}>
-                <Image src="/images/data-difabel-kompos-tanaman.jpg" alt="Kegiatan mengolah sampah organik untuk tanaman" fill sizes="(max-width: 699px) 82vw, 33vw" />
+                <Image
+                  src="/images/data-difabel-kompos-tanaman.jpg"
+                  alt="Peserta difabel memanfaatkan kompos organik untuk menyuburkan tanaman"
+                  fill
+                  sizes="(max-width: 699px) 82vw, 33vw"
+                />
               </div>
-              <div><span>Sampah organik</span><h3>Nutrisi untuk kebun</h3><p>Diubah menjadi bahan pendukung tanaman agar sisa dapur kembali ke siklus kehidupan.</p></div>
+              <div>
+                <span>Sampah Organik</span>
+                <h3>Nutrisi Kebun Subur</h3>
+                <p>Difermentasi menjadi kompos alami penyubur tanah, mengembalikan unsur hara ke siklus tanaman.</p>
+              </div>
             </article>
+
             <article className={styles.resultCard}>
               <div className={styles.resultImage}>
-                <Image src="/images/data-difabel-panen-hidroponik.jpg" alt="Anak-anak membawa hasil kebun hidroponik" fill sizes="(max-width: 699px) 82vw, 33vw" />
+                <Image
+                  src="/images/data-difabel-panen-hidroponik.jpg"
+                  alt="Peserta dengan bangga menunjukkan sayuran segar hasil panen kebun inklusif"
+                  fill
+                  sizes="(max-width: 699px) 82vw, 33vw"
+                />
               </div>
-              <div><span>Hasil bersama</span><h3>Karya, pangan, dan kesempatan</h3><p>Nilai yang tercipta diputar kembali untuk mendukung kegiatan komunitas yang inklusif.</p></div>
+              <div>
+                <span>Kebun Inklusif</span>
+                <h3>Pangan Segar & Kemandirian</h3>
+                <p>Hasil panen sayuran segar dikonsumsi bersama dan dipasarkan untuk mendukung keberlanjutan ruang belajar.</p>
+              </div>
             </article>
           </div>
 
@@ -319,121 +508,19 @@ export default function HomePage() {
         </Container>
       </section>
 
-      <section className={styles.transparencySection} id="transparansi">
-        <Container>
-          <div className={styles.transparencyCard}>
-            <div className={styles.transparencyHeader}>
-              <span className={styles.sectionLabel}>
-                <span className={styles.eyebrowDot} aria-hidden="true" />
-                Jejak Terbuka & Akuntabel
-              </span>
-              <h2 className={styles.transparencyTitle}>
-                Setiap donasi layak punya jejak yang jelas.
-              </h2>
-              <p className={styles.transparencyLead}>
-                Kami berkomitmen memisahkan perkiraan awal donatur dari hasil penimbangan aktual, lalu mencatat perjalanan bahan secara terbuka dari saat diterima hingga menjadi produk bernilai dan manfaat nyata bagi anak-anak difabel.
-              </p>
-            </div>
-
-            <div className={styles.tracePipeline} aria-label="Alur pencatatan donasi">
-              <div className={styles.traceStep}>
-                <div className={styles.traceStepHeader}>
-                  <span className={styles.traceStepBadge}>Tahap 01</span>
-                  <div className={styles.traceStepIcon}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
-                      <path d="m3.3 7 8.7 5 8.7-5"/>
-                      <path d="M12 22V12"/>
-                    </svg>
-                  </div>
-                </div>
-                <h3 className={styles.traceStepName}>Diterima</h3>
-                <p className={styles.traceStepDesc}>
-                  Bahan donasi dicatat dengan nomor unik pelacakan dan bukti serah terima digital bagi donatur.
-                </p>
-              </div>
-
-              <div className={styles.traceStep}>
-                <div className={styles.traceStepHeader}>
-                  <span className={styles.traceStepBadge}>Tahap 02</span>
-                  <div className={styles.traceStepIcon}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
-                      <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
-                      <path d="M7 21h10"/>
-                      <path d="M12 3v18"/>
-                      <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
-                    </svg>
-                  </div>
-                </div>
-                <h3 className={styles.traceStepName}>Ditimbang</h3>
-                <p className={styles.traceStepDesc}>
-                  Volume atau berat riil diverifikasi dengan timbangan terkalibrasi, memvalidasi estimasi donatur.
-                </p>
-              </div>
-
-              <div className={styles.traceStep}>
-                <div className={styles.traceStepHeader}>
-                  <span className={styles.traceStepBadge}>Tahap 03</span>
-                  <div className={styles.traceStepIcon}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M12 2v8"/>
-                      <path d="m4.93 10.93 1.41 1.41"/>
-                      <path d="M2 18h2"/>
-                      <path d="M20 18h2"/>
-                      <path d="m19.07 10.93-1.41 1.41"/>
-                      <path d="M22 22H2"/>
-                      <path d="m8 22 4-10 4 10"/>
-                    </svg>
-                  </div>
-                </div>
-                <h3 className={styles.traceStepName}>Diolah</h3>
-                <p className={styles.traceStepDesc}>
-                  Diolah telaten bersama anak-anak difabel menjadi lilin aromaterapi, sabun alami, & pupuk kompos.
-                </p>
-              </div>
-
-              <div className={styles.traceStep}>
-                <div className={styles.traceStepHeader}>
-                  <span className={styles.traceStepBadge}>Tahap 04</span>
-                  <div className={styles.traceStepIcon}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
-                      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
-                    </svg>
-                  </div>
-                </div>
-                <h3 className={styles.traceStepName}>Dimanfaatkan</h3>
-                <p className={styles.traceStepDesc}>
-                  Menumbuhkan pangan segar kebun cerdas dan mendanai beasiswa kemandirian anak-anak istimewa.
-                </p>
-              </div>
-            </div>
-
-            <div className={styles.transparencyFooter}>
-              <div className={styles.transparencyFooterInfo}>
-                <span className={styles.transparencyCheckIcon} aria-hidden="true">✓</span>
-                <div>
-                  <strong>Jaminan Integritas & Tanpa Klaim Palsu</strong>
-                  <p>Seluruh alur penerimaan fisik dan pengalokasian dampak tercatat secara jujur serta dapat diaudit publik.</p>
-                </div>
-              </div>
-              <Link href="/donasikan" className={styles.transparencyLink}>
-                Mulai Donasi Sekarang <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      <section className={styles.finalCta}>
+      {/* 11 — FINAL CTA */}
+      <section className={styles.finalCta} aria-label="Ajakan Berpartisipasi">
         <Container>
           <div className={styles.finalCtaInner}>
-            <span className={styles.finalKicker}>Hari ini, jangan buru-buru dibuang.</span>
-            <h2>Sisihkan. Pilahkan. Biarkan ia tumbuh menjadi harapan.</h2>
-            <p>Kamu tidak harus menunggu punya banyak untuk mulai berbuat baik. Satu langkah kecil dari rumah bisa menjadi bagian dari perjalanan besar mereka.</p>
-            <Link href="/donasikan" className={styles.lightButton}>Donasikan sampah sekarang <span aria-hidden="true">→</span></Link>
-            <span className={styles.finalNote}>Dari limbah, tumbuh manfaat. Dari kepedulian, tumbuh kemandirian.</span>
+            <span className={styles.finalKicker}>Beri ruang. Lihat apa yang bisa tumbuh.</span>
+            <h2>Satu tindakan kecil bisa membuka ruang untuk banyak hal tumbuh.</h2>
+            <p>Kamu tidak perlu menunggu punya banyak untuk mulai membuka ruang. Sisihkan sisa dapur dan limbah terpilah hari ini, dan biarkan ia bertumbuh menjadi karya nyata.</p>
+            <Link href="/donasikan" className={styles.lightButton}>
+              Beri Ruang untuk Tumbuh <span aria-hidden="true">→</span>
+            </Link>
+            <span className={styles.finalNote}>
+              “Yang kami tumbuhkan bukan hanya tanaman.”
+            </span>
           </div>
         </Container>
       </section>

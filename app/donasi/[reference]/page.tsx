@@ -14,7 +14,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { reference } = await params;
   return {
-    title: `Donasi ${reference} — Kampung Setara Smart Farming`,
+    title: `Donasi ${reference} — SEMAI`,
     description: `Lacak status donasi limbahmu dengan referensi ${reference}.`,
     alternates: { canonical: `${env.siteUrl}/donasi/${encodeURIComponent(reference)}` },
     robots: { index: false, follow: false },

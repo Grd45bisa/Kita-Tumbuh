@@ -10,8 +10,8 @@ import { DONATION_STATUS_LABELS, type DonationStatus } from "@/types/donation";
 import styles from "@/components/member/MemberArea.module.css";
 
 export const metadata: Metadata = {
-  title: "Dashboard Member | KITA TUMBUH",
-  description: "Pantau donasi dan kontribusi sirkularmu di KITA TUMBUH.",
+  title: "Dashboard Member | SEMAI",
+  description: "Pantau donasi dan kontribusi sirkularmu di SEMAI.",
   robots: { index: false, follow: false },
 };
 

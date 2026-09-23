@@ -10,7 +10,7 @@ import { ProgramForm } from "@/components/admin/ProgramForm";
 import type { Distribution } from "@/types/social";
 
 export const metadata: Metadata = {
-  title: "Detail Program Sosial | Admin KITA TUMBUH",
+  title: "Detail Program Sosial | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 
@@ -20,13 +20,17 @@ interface PageProps {
 
 export default async function ProgramDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const program = await getAdminProgramById(id);
+
+  // Independent of each other — both only need `id`, not each other's
+  // result — so fetch concurrently instead of sequentially.
+  const [program, { distributions }] = await Promise.all([
+    getAdminProgramById(id),
+    getAdminDistributions({ programId: id, pageSize: 20 }),
+  ]);
 
   if (!program) {
     notFound();
   }
-
-  const { distributions } = await getAdminDistributions({ programId: id, pageSize: 20 });
 
   const columns: Column<Distribution>[] = [
     {

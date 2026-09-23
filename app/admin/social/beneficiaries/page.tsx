@@ -17,7 +17,7 @@ import {
 import type { Beneficiary } from "@/types/social";
 
 export const metadata: Metadata = {
-  title: "Penerima Manfaat | Admin KITA TUMBUH",
+  title: "Penerima Manfaat | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

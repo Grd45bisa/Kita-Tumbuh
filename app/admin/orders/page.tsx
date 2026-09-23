@@ -15,7 +15,7 @@ import {
 import type { Order } from "@/types/orders";
 
 export const metadata: Metadata = {
-  title: "Kelola Pesanan | Admin KITA TUMBUH",
+  title: "Kelola Pesanan | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

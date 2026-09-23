@@ -14,7 +14,7 @@ import { ReconciliationButton } from "@/components/admin/ReconciliationButton";
 import type { RevenueEntry } from "@/types/finance";
 
 export const metadata: Metadata = {
-  title: "Buku Besar Pendapatan | Admin KITA TUMBUH",
+  title: "Buku Besar Pendapatan | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

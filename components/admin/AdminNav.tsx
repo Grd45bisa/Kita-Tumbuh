@@ -158,7 +158,7 @@ export function AdminNav({ user }: AdminNavProps) {
       <div className={styles.brandArea}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", marginBottom: "4px" }}>
-            <span className={styles.brandTitle}>KITA TUMBUH</span>
+            <span className={styles.brandTitle}>SEMAI</span>
             <span className={styles.brandBadge}>Admin</span>
           </div>
           <p className={styles.brandSubtitle}>Operasional</p>

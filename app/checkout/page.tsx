@@ -11,8 +11,8 @@ interface Props {
 }
 
 export const metadata: Metadata = {
-  title: "Konfirmasi Pesanan — Kampung Smart Farming",
-  description: "Instruksi pembayaran dan rincian pesanan produk sirkular KITA TUMBUH.",
+  title: "Konfirmasi Pesanan — SEMAI",
+  description: "Instruksi pembayaran dan rincian pesanan produk sirkular SEMAI.",
   robots: {
     index: false,
     follow: false,
@@ -109,14 +109,14 @@ export default async function CheckoutConfirmationPage({ searchParams }: Props) 
               <div className={styles.bankItem}>
                 <div>
                   <div className={styles.bankName}>Bank BCA</div>
-                  <div style={{ fontSize: "var(--font-size-caption)", color: "var(--color-text-muted)" }}>a.n. Yayasan Kampung Smart Farming</div>
+                  <div style={{ fontSize: "var(--font-size-caption)", color: "var(--color-text-muted)" }}>a.n. Yayasan SEMAI</div>
                 </div>
                 <div className={styles.bankAccount}>841-092-3481</div>
               </div>
               <div className={styles.bankItem}>
                 <div>
                   <div className={styles.bankName}>Bank Mandiri</div>
-                  <div style={{ fontSize: "var(--font-size-caption)", color: "var(--color-text-muted)" }}>a.n. Yayasan Kampung Smart Farming</div>
+                  <div style={{ fontSize: "var(--font-size-caption)", color: "var(--color-text-muted)" }}>a.n. Yayasan SEMAI</div>
                 </div>
                 <div className={styles.bankAccount}>137-00-1982734-5</div>
               </div>

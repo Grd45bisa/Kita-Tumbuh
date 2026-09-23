@@ -12,7 +12,7 @@ export const organizationContent: OrganizationContent = {
   mission:
     "Mengubah limbah rumah tangga yang masih bisa dikelola — minyak jelantah, sisa organik dapur, dan plastik tertentu — menjadi produk bernilai, sekaligus menjadikan proses pengolahannya sebagai ruang belajar, berkarya, dan bertumbuh bagi anak-anak difabel.",
   vision:
-    "Sampah kalian sangat berarti bagi kami: bahwa sesuatu yang tidak lagi bernilai bagi satu orang bisa menjadi sumber daya dan kesempatan bagi orang lain.",
+    "Sebab setiap potensi butuh ruang untuk bermula: bahwa yang kami tumbuhkan bukan hanya tanaman, melainkan ruang belajar, karya nyata, dan kemandirian yang setara.",
   values: [
     {
       title: "Martabat, bukan belas kasihan",

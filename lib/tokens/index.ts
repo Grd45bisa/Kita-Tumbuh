@@ -1,5 +1,5 @@
 /**
- * Typed Design Tokens for Kampung Smart Farming
+ * Typed Design Tokens for SEMAI
  * Mirrors values defined in styles/tokens.css
  */
 
@@ -98,7 +98,7 @@ export const breakpoints = {
 } as const;
 
 export const brand = {
-  name: "KAMPUNG SETARA SMART FARMING",
-  tagline: "Dari Limbah, Tumbuh Manfaat.",
-  statement: "SAMPAH KALIAN SANGAT BERARTI BAGI KAMI",
+  name: "SEMAI",
+  tagline: "Room to Grow",
+  statement: "Sebab setiap potensi butuh ruang untuk bermula.",
 } as const;

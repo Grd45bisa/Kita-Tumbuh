@@ -88,6 +88,12 @@ Validasi dilakukan dua kali: di browser (untuk pengalaman langsung) dan **diulan
 
 **Halaman yang ditampilkan setelah sukses** (`components/donation/DonationSuccess.tsx`): bukti donasi ringkas, langkah selanjutnya (beda teks untuk drop-off vs pickup), dan tiga tombol: lacak status, bagikan bukti donasi, atau kembali ke beranda.
 
+### Email opsional untuk kabar progres (bukan akun)
+
+Di Step 3, donor boleh mengisi alamat email tanpa membuat akun sama sekali. Ini **bukan** klaim "lihat hasil donasimu jadi produk apa" — sistem sengaja tidak bisa membuat klaim itu (lihat [Mengapa Tidak Ada Pelacakan 1:1](#mengapa-tidak-ada-pelacakan-11)). Yang genuinely terjadi: setiap kali status donasi *itu sendiri* berubah, sebuah baris notifikasi disiapkan di database (tabel `notifications`, migration `022_donation_notifications_and_claim.sql`) untuk dikirim ke email tersebut.
+
+Pengiriman email sungguhan **belum aktif** — project ini belum memasang provider email apa pun (lihat `README.md`). Baris notifikasi tersimpan dengan status `PENDING`, siap diproses begitu provider dipilih dan dipasang; tidak ada email yang benar-benar terkirim maupun diklaim terkirim saat ini.
+
 ---
 
 ## Tahap 2 — Verifikasi Fisik oleh Operator
@@ -196,6 +202,14 @@ Setiap kali halaman `/dampak` atau `/transparansi` dibuka, sistem menghitung ula
 | Donasi terverifikasi | Jumlah donasi yang sudah lolos verifikasi fisik |
 
 Kalau data untuk suatu metrik belum ada, halaman menampilkan "Belum ada data" — **tidak pernah** menampilkan angka nol yang bisa disalahartikan sebagai hasil hitungan nyata. Perkiraan donor (`estimated_quantity`) tidak pernah dipakai untuk angka ini, hanya hasil verifikasi fisik yang boleh.
+
+---
+
+## Donasi Anonim yang Kemudian Mendaftar Akun
+
+Donor yang sebelumnya berdonasi tanpa akun (mengisi email opsional di Step 3) dan kemudian mendaftar akun dengan **alamat email yang sama persis**, riwayat donasi lamanya otomatis tertaut ke akun barunya — tidak perlu klaim manual.
+
+**Kapan tepatnya ini terjadi:** hanya setelah alamat email akun baru **genuinely terverifikasi** oleh Supabase Auth (`email_confirmed_at` terisi) — bukan langsung saat form pendaftaran dikirim. Ini disengaja: mengaitkan riwayat donasi langsung saat pendaftaran (sebelum verifikasi) akan membuka celah — siapa pun bisa mendaftar memakai email orang lain yang belum tentu mereka kuasai, dan langsung melihat riwayat donasi milik orang itu. Logikanya ada di `supabase/migrations/022_donation_notifications_and_claim.sql`, dipicu oleh trigger terpisah pada `auth.users` yang khusus memantau perubahan status verifikasi email.
 
 ---
 

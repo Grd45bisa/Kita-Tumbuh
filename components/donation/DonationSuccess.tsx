@@ -28,7 +28,7 @@ export function DonationSuccess({
       </h2>
 
       <p className={styles.successSubtitle}>
-        Terima kasih. <strong>SAMPAH KALIAN SANGAT BERARTI BAGI KAMI.</strong>
+        Terima kasih. <strong>Kamu baru saja membuka ruang untuk tumbuh.</strong>
       </p>
 
       <ImpactReceipt donation={donation} />

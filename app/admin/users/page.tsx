@@ -6,8 +6,8 @@ import { getUsersList } from "@/lib/domain/admin/users";
 import { UserManagementTable } from "@/components/admin/UserManagementTable";
 
 export const metadata: Metadata = {
-  title: "Manajemen Akun & Role — Admin KITA TUMBUH",
-  description: "Kelola pengguna, administrator, dan hak akses peran operasional Kampung Smart Farming.",
+  title: "Manajemen Akun & Role — Admin SEMAI",
+  description: "Kelola pengguna, administrator, dan hak akses peran operasional SEMAI.",
 };
 
 export default async function AdminUsersPage() {

@@ -7,7 +7,7 @@ import { Pagination } from "@/components/ui/Pagination";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { DONATION_STATUS_LABELS, type DonationStatus } from "@/types/donation";
+import { DONATION_STATUS_LABELS, formatWasteUnitLabel, type DonationStatus } from "@/types/donation";
 
 interface DonationListItem {
   id: string;
@@ -48,13 +48,16 @@ export default async function AdminDonationsPage({ searchParams }: AdminDonation
 
   const supabase = await createClient();
 
-  // 1. Fetch waste types for filter dropdown
-  const { data: wasteTypes } = await supabase
+  // Start the waste-types dropdown query now but don't await it yet — it's
+  // independent of the (conditionally-built) donations query below, so
+  // both run concurrently instead of the dropdown blocking the donations
+  // fetch for no reason.
+  const wasteTypesPromise = supabase
     .from("waste_types")
     .select("slug, name")
     .order("sort_order", { ascending: true });
 
-  // 2. Query donations with filters
+  // Query donations with filters
   let query = supabase
     .from("donations")
     .select(
@@ -78,9 +81,10 @@ export default async function AdminDonationsPage({ searchParams }: AdminDonation
     );
   }
 
-  const { data: rawDonations, count } = await query
-    .order("created_at", { ascending: false })
-    .range(offset, offset + pageSize - 1);
+  const [{ data: rawDonations, count }, { data: wasteTypes }] = await Promise.all([
+    query.order("created_at", { ascending: false }).range(offset, offset + pageSize - 1),
+    wasteTypesPromise,
+  ]);
 
   const donations = (rawDonations || []) as DonationListItem[];
   const totalCount = count || 0;
@@ -146,13 +150,13 @@ export default async function AdminDonationsPage({ searchParams }: AdminDonation
           {item.verified_quantity != null ? (
             <div>
               <strong style={{ color: "var(--color-brand-primary-hover, #166534)" }}>
-                {item.verified_quantity} {item.unit} (Riil)
+                {item.verified_quantity} {formatWasteUnitLabel(item.unit)} (Riil)
               </strong>
-              <div style={{ color: "var(--color-text-muted)" }}>Est: ~{item.estimated_quantity} {item.unit}</div>
+              <div style={{ color: "var(--color-text-muted)" }}>Est: ~{item.estimated_quantity} {formatWasteUnitLabel(item.unit)}</div>
             </div>
           ) : (
             <span style={{ color: "var(--color-text-muted)" }}>
-              Est: ~{item.estimated_quantity} {item.unit} (Belum ditimbang)
+              Est: ~{item.estimated_quantity} {formatWasteUnitLabel(item.unit)} (Belum ditimbang)
             </span>
           )}
         </div>

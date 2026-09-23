@@ -8,16 +8,16 @@ import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Cerita — Kampung Setara Smart Farming",
+  title: "Cerita — SEMAI · Room to Grow",
   description:
-    "Cerita dari perjalanan donasi limbah dan proses berkarya anak-anak difabel di Kampung Setara Smart Farming — sedang kami siapkan.",
+    "Cerita dari perjalanan donasi limbah dan proses berkarya anak-anak difabel di SEMAI — sedang kami siapkan.",
   alternates: {
     canonical: `${env.siteUrl}/cerita`,
   },
   openGraph: {
-    title: "Cerita — Kampung Setara Smart Farming",
+    title: "Cerita — SEMAI · Room to Grow",
     description:
-      "Cerita dari perjalanan donasi limbah dan proses berkarya anak-anak difabel di Kampung Setara Smart Farming.",
+      "Cerita dari perjalanan donasi limbah dan proses berkarya anak-anak difabel di SEMAI.",
     url: `${env.siteUrl}/cerita`,
     type: "website",
   },
@@ -39,7 +39,7 @@ export default function CeritaPage() {
         <Container>
           <div className={styles.heroInner}>
             <Breadcrumb items={breadcrumbItems} />
-            <p className={styles.eyebrow}>KITA TUMBUH — KAMPUNG SETARA SMART FARMING</p>
+            <p className={styles.eyebrow}>SEMAI · INCLUSIVE CIRCULAR SMART FARMING</p>
             <h1 className={styles.title}>Cerita</h1>
             <p className={styles.lead}>
               Kisah nyata di balik proses donasi limbah dan kegiatan berkarya anak-anak

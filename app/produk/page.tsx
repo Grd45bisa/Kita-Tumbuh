@@ -14,16 +14,16 @@ import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Produk Hasil Olahan — Kampung Setara Smart Farming",
+  title: "Produk Hasil Olahan — SEMAI",
   description:
-    "Produk hasil olahan limbah sirkular dari Kampung Smart Farming — lilin aromaterapi, sabun alami, dan kompos.",
+    "Produk hasil olahan limbah sirkular dari SEMAI — lilin aromaterapi, sabun alami, dan kompos.",
   alternates: {
     canonical: `${env.siteUrl}/produk`,
   },
   openGraph: {
-    title: "Produk Hasil Olahan — Kampung Setara Smart Farming",
+    title: "Produk Hasil Olahan — SEMAI",
     description:
-      "Produk hasil olahan limbah sirkular dari Kampung Smart Farming — lilin aromaterapi, sabun alami, dan kompos.",
+      "Produk hasil olahan limbah sirkular dari SEMAI — lilin aromaterapi, sabun alami, dan kompos.",
     url: `${env.siteUrl}/produk`,
     type: "website",
   },
@@ -84,7 +84,7 @@ export default async function ProdukPage() {
         <Container>
           <div className={styles.heroInner}>
             <Breadcrumb items={breadcrumbItems} />
-            <p className={styles.eyebrow}>KITA TUMBUH — KAMPUNG SETARA SMART FARMING</p>
+            <p className={styles.eyebrow}>SEMAI · INCLUSIVE CIRCULAR SMART FARMING</p>
             <h1 className={styles.title}>Produk Hasil Olahan</h1>
             <p className={styles.lead}>
               Limbah yang didonasikan diarahkan menjadi produk bernilai. Berikut jenis produk

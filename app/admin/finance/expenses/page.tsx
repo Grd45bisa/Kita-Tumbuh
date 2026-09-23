@@ -13,7 +13,7 @@ import { ExpenseForm } from "@/components/admin/ExpenseForm";
 import type { Expense } from "@/types/finance";
 
 export const metadata: Metadata = {
-  title: "Biaya Operasional | Admin KITA TUMBUH",
+  title: "Biaya Operasional | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

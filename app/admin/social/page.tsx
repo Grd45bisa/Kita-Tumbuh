@@ -5,7 +5,7 @@ import { hasPermission } from "@/lib/auth/permissions";
 import { getAdminPrograms } from "@/lib/domain/admin/social-programs";
 import { getAdminBeneficiaries } from "@/lib/domain/admin/beneficiaries";
 
-export const metadata: Metadata = { title: "Program Sosial | Admin KITA TUMBUH", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "Program Sosial | Admin SEMAI", robots: { index: false, follow: false } };
 
 export default async function AdminSocialHubPage() {
   const user = await requirePermission("social_programs", "read");

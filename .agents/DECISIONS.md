@@ -511,6 +511,24 @@ This directly undermined the page's own stated purpose ("every number here is re
 
 ---
 
+## ADR-032 — Donor Email Notifications: Durable Outbox Now, Provider Later; Account Claim Gated on Verified Email
+
+**Status:** Accepted
+
+**Date:** 2026-09-21
+
+**Context:** The product owner asked for two related capabilities: (1) an anonymous donor may leave an email address to be told when their donation's status advances, explicitly *not* a claim about which product it became (the system's pooled-accounting design, see ADR-003/ADR-007 and `docs/ALUR_DONASI.md`, deliberately cannot make that claim); (2) if that same email is later used to register a member account, the donor's prior anonymous donations should automatically become visible in that account without a manual claim step. Neither capability had any existing infrastructure: no email provider/API key is installed in this project (`package.json` has no Resend/SendGrid/etc.), and `donations.donor_email` was already a column but was never actually collected by the donation wizard UI.
+
+**Decision — notifications:** Rather than picking a provider unilaterally or faking a "sent" state, `022_donation_notifications_and_claim.sql` adds a `notifications` table as a durable, provider-agnostic outbox. A trigger on `donations` (`queue_donation_status_notification`) inserts a `PENDING` row with structured JSON payload (not a pre-rendered email body) whenever a donation's status genuinely changes and `donor_email` is set. No row is ever marked `SENT` by this codebase — that only happens once a real provider is chosen and a sending worker is built to consume `PENDING` rows via service-role.
+
+**Decision — account claim:** The obvious-looking implementation — claim matching donations inside `handle_new_user()`, which fires at `auth.users` `INSERT` — was rejected after review: that insert happens the instant `signUp()` is called, before any confirmation link is clicked, and whether the row already carries a confirmed email at that point is a per-project Supabase dashboard setting ("Confirm email"), not something this codebase controls. Claiming at that point would let anyone register with a stranger's unverified email address and immediately see that stranger's private donation history. Instead, a dedicated trigger (`claim_donations_on_email_verified`) fires on `auth.users` `UPDATE OF email_confirmed_at`, and only acts when that column transitions from `NULL` to set — the one moment that is unambiguously true regardless of the dashboard setting, since Supabase itself (never this codebase) sets that column. `handle_new_user()` still claims immediately as a fallback, but only in the (dashboard-setting-dependent) case where the inserted row already arrives with `email_confirmed_at` non-null.
+
+**Why:** Durable-outbox-over-fake-send follows the same anti-fabrication principle (AGENTS.md §4.3, ADR-007) already applied to impact metrics — the system must never claim an action happened (an email was sent) that didn't genuinely happen. The verified-email gate on account claiming closes what would otherwise be a real account-enumeration/history-disclosure bug, not just a theoretical edge case, and reuses the exact trust boundary already established for `app/auth/confirm/route.ts` (PKCE code exchange only proceeds after Supabase's own verification).
+
+**Consequences:** No email is actually sent by the system today; `notifications.status` will remain permanently `PENDING` until a provider is chosen and a sending worker (cron/Edge Function) is built to consume the outbox — this is tracked as follow-up work, not hidden. Any future direct-email feature (order confirmations, etc.) should reuse this same `notifications` table (`event_type` is deliberately an extensible `CHECK` list) rather than inventing a parallel mechanism. `tests/donation-email-claim.test.mjs` guards the verified-email gate specifically, validated by deliberately reintroducing the unguarded-claim bug and confirming the test fails before reverting.
+
+---
+
 ## Agent Rule
 
 Before introducing a major architectural change, search this document first.

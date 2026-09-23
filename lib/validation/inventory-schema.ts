@@ -31,7 +31,7 @@ export const CreateWasteLotSchema = z.object({
     .positive("Kuantitas awal harus lebih dari 0."),
   unit: z.string().trim().min(1, "Satuan takaran wajib diisi."),
   quality_grade: z.enum(["GRADE_A", "STANDARD", "GRADE_C"]).default("STANDARD"),
-  storage_location: z.string().trim().max(100).default("Gudang Utama Kampung Smart Farming"),
+  storage_location: z.string().trim().max(100).default("Gudang Utama SEMAI"),
   notes: z.string().trim().max(500).optional().default(""),
 });
 

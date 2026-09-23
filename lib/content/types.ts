@@ -34,6 +34,7 @@ export interface HeroContent {
   eyebrow: string;
   headline: string;
   headlineEmphasis: string;
+  tagline?: string;
   coreStatement: string;
   lead: string;
   primaryCtaLabel: string;
@@ -64,4 +65,28 @@ export interface OrganizationContent {
   vision: string;
   values: Array<{ title: string; description: string }>;
   operationalApproach: string;
+}
+
+export interface FourRoomItem {
+  id: "nature" | "learn" | "create" | "belong";
+  tag: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  badge: string;
+  iconName: string;
+}
+
+export interface JejakTumbuhMetric {
+  value: string;
+  unit: string;
+  label: string;
+  description: string;
+}
+
+export interface JejakTumbuhStep {
+  step: string;
+  title: string;
+  description: string;
+  detail: string;
 }

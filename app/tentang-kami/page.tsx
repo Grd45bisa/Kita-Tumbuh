@@ -9,16 +9,16 @@ import { buildBreadcrumbJsonLd } from "@/lib/content/structured-data";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Tentang Kami — Kampung Setara Smart Farming",
+  title: "Tentang Kami — SEMAI",
   description:
-    "KITA TUMBUH — Kampung Setara Smart Farming mengolah limbah rumah tangga menjadi produk bernilai dan ruang belajar bagi anak-anak difabel.",
+    "SEMAI mengolah limbah rumah tangga menjadi produk bernilai dan ruang belajar bagi anak-anak difabel.",
   alternates: {
     canonical: `${env.siteUrl}/tentang-kami`,
   },
   openGraph: {
-    title: "Tentang Kami — Kampung Setara Smart Farming",
+    title: "Tentang Kami — SEMAI",
     description:
-      "Kenali misi, visi, dan nilai yang menggerakkan Kampung Setara Smart Farming.",
+      "Kenali misi, visi, dan nilai yang menggerakkan SEMAI.",
     url: `${env.siteUrl}/tentang-kami`,
     type: "website",
   },
@@ -40,11 +40,11 @@ export default function TentangKamiPage() {
         <Container>
           <div className={styles.heroInner}>
             <Breadcrumb items={breadcrumbItems} />
-            <p className={styles.eyebrow}>KITA TUMBUH — KAMPUNG SETARA SMART FARMING</p>
+            <p className={styles.eyebrow}>SEMAI · INCLUSIVE CIRCULAR SMART FARMING</p>
             <h1 className={styles.title}>Tentang Kami</h1>
             <p className={styles.lead}>
-              Sampah kalian sangat berarti bagi kami — karena yang tersisa di rumahmu masih
-              bisa menjadi sesuatu yang berarti bagi orang lain.
+              Sebab setiap potensi butuh ruang untuk bermula — sisa yang masih ada di rumahmu
+              bisa membuka ruang belajar dan berkarya bagi orang lain.
             </p>
           </div>
         </Container>

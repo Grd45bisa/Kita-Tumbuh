@@ -6,7 +6,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ProductForm, type BatchOption } from "@/components/admin/ProductForm";
 
 export const metadata: Metadata = {
-  title: "Tambah Produk Sirkular | Admin KITA TUMBUH",
+  title: "Tambah Produk Sirkular | Admin SEMAI",
   robots: { index: false, follow: false },
 };
 

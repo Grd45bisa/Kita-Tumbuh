@@ -89,7 +89,7 @@ export function ResetPasswordForm({ isRecoverySession = false }: ResetPasswordFo
             <div className={styles.brandBadge}>Atur Sandi Baru</div>
             <h1 className={styles.title}>Buat Kata Sandi Baru</h1>
             <p className={styles.subtitle}>
-              Masukkan kata sandi baru yang aman untuk akun KITA TUMBUH kamu.
+              Masukkan kata sandi baru yang aman untuk akun SEMAI kamu.
             </p>
           </div>
 

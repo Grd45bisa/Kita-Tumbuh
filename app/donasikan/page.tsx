@@ -7,16 +7,16 @@ import { env } from "@/lib/env";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Donasikan Limbah — Kampung Setara Smart Farming",
+  title: "Donasikan Limbah — SEMAI · Room to Grow",
   description:
-    "Donasikan minyak jelantah, limbah organik, atau plastik dapur kamu. Limbahmu akan kami olah bersama anak-anak difabel menjadi produk bernilai dan manfaat sosial nyata bagi komunitas.",
+    "Donasikan minyak jelantah, limbah organik, atau plastik dapur kamu. Sisa yang kamu sisihkan hari ini kembali ke siklus dan membuka ruang belajar serta karya nyata di SEMAI.",
   alternates: {
     canonical: `${env.siteUrl}/donasikan`,
   },
   openGraph: {
-    title: "Donasikan Limbah — Kampung Setara Smart Farming",
+    title: "Donasikan Limbah — SEMAI · Room to Grow",
     description:
-      "Mulai donasi limbah dapur kamu. Gratis, mudah, dan langsung berdampak.",
+      "Beri ruang. Lihat apa yang bisa tumbuh. Mulai donasi limbah dapurmu — gratis, mudah, dan langsung membuka ruang untuk tumbuh.",
     url: `${env.siteUrl}/donasikan`,
     type: "website",
   },

@@ -116,64 +116,68 @@
 
 .brandTitle {
   font-family: var(--font-sans);
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   color: var(--color-green-800);
-  line-height: 1.2;
+  line-height: 1.05;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 40vw;
+  text-transform: uppercase;
 }
 
 .brandSubtitle {
+  font-family: var(--font-sans);
   font-size: 0.6rem;
-  color: var(--color-earth-600);
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  margin-top: 1px;
+  color: var(--color-earth-700);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  margin-top: 3px;
+  line-height: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 40vw;
+  text-transform: uppercase;
 }
 
 @media (min-width: 400px) {
   .brandTitle {
-    font-size: 0.92rem;
+    font-size: 1.08rem;
     max-width: none;
   }
   .brandSubtitle {
-    font-size: 0.66rem;
+    font-size: 0.64rem;
     max-width: none;
   }
 }
 
 @media (min-width: 768px) {
   .brandTitle {
-    font-size: 1rem;
+    font-size: 1.16rem;
+    letter-spacing: 0.09em;
   }
   .brandSubtitle {
-    font-size: 0.7rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
   }
 }
 
 @media (min-width: 1024px) {
   .brandTitle {
-    font-size: 1.05rem;
+    font-size: 1.2rem;
   }
   .brandSubtitle {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
   }
 }
 
 @media (min-width: 1440px) {
   .brandTitle {
-    font-size: 1.15rem;
+    font-size: 1.26rem;
   }
   .brandSubtitle {
-    font-size: 0.76rem;
+    font-size: 0.72rem;
   }
 }
 
@@ -470,18 +474,25 @@
 
 .drawerBrandTitle {
   font-family: var(--font-sans);
-  font-size: 0.92rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   color: var(--color-green-800);
-  line-height: 1.2;
+  line-height: 1.05;
   display: block;
+  text-transform: uppercase;
 }
 
 .drawerBrandSubtitle {
-  font-size: 0.7rem;
-  color: var(--color-earth-600);
-  font-weight: 500;
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  color: var(--color-earth-700);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  margin-top: 3px;
+  line-height: 1;
   display: block;
+  text-transform: uppercase;
 }
 
 .closeButton {

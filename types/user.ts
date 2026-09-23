@@ -1,5 +1,5 @@
 // =============================================================================
-// KAMPUNG SMART FARMING — USER & AUTH DOMAIN TYPES
+// SEMAI — USER & AUTH DOMAIN TYPES
 // =============================================================================
 
 import type { User } from "@supabase/supabase-js";

@@ -28,6 +28,7 @@ interface MethodData {
   pickup_requested_slot: string;
   pickup_notes: string;
   donor_notes: string;
+  donor_email: string;
 }
 
 interface StepMethodProps {
@@ -334,6 +335,21 @@ export function StepMethod({
           </div>
         </div>
       )}
+
+      {/* Optional email for status notifications (shared, shown below both methods) */}
+      <div className={styles.donorNotesSection}>
+        <Input
+          type="email"
+          label="Email (opsional) — untuk kabar progres donasimu"
+          placeholder="namamu@email.com"
+          value={value.donor_email}
+          onChange={(e) => onChange({ donor_email: e.target.value })}
+          error={errors.donor_email}
+        />
+        <p className={styles.sectionSubtitle}>
+          Kalau diisi, kami kirim kabar setiap tahap donasimu berlanjut (misalnya saat diverifikasi atau diproses). Kami tidak mengirim promosi, dan tidak membagikan emailmu ke pihak lain. Ingin daftar akun? Gunakan email yang sama saat mendaftar dan riwayat donasi ini akan otomatis tertaut ke akunmu.
+        </p>
+      </div>
 
       {/* Donor notes (shared, shown below both methods) */}
       <div className={styles.donorNotesSection}>
