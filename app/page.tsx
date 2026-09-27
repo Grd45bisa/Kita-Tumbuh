@@ -27,6 +27,33 @@ export const metadata: Metadata = {
   },
 };
 
+const featuredProducts = [
+  {
+    name: "Lilin Aromaterapi",
+    material: "Dari minyak jelantah terolah",
+    description: "Lilin buatan tangan yang dikembangkan dalam proses belajar, produksi, dan quality control bersama pekerja difabel.",
+    image: "/produk/Lilin%20Aromaterapi.png",
+  },
+  {
+    name: "Media Tanam Organik",
+    material: "Dari organik terpilah",
+    description: "Media tanam kemasan untuk membantu tanaman rumahan tumbuh dengan nutrisi dari material organik yang kembali ke siklusnya.",
+    image: "/produk/Media%20Tanam%20Organik.png",
+  },
+  {
+    name: "Kompos Organik",
+    material: "Dari sisa dapur terolah",
+    description: "Kompos yang mengembalikan unsur hara ke tanah dan turut menyuburkan kebun inklusif SEMAI.",
+    image: "/produk/Kompos%20Organik.png",
+  },
+  {
+    name: "Panen Kebun Inklusif",
+    material: "Ditanam dengan nutrisi dari SEMAI",
+    description: "Hasil kebun segar yang dirawat sebagai bagian dari ruang belajar, kerja, dan kemandirian bersama.",
+    image: "/produk/Panen%20Kebun%20Inklusif.png",
+  },
+];
+
 function WasteIcon({ name }: { name: string }) {
   if (name === "drop") {
     return (
@@ -450,61 +477,49 @@ export default function HomePage() {
         <Container>
           <div className={styles.centerIntro}>
             <span className={styles.sectionLabel}>Dari bahan sisa menjadi bernilai</span>
-            <h2 id="results-title">Di tangan yang tekun, sisa dapur menemukan arti baru.</h2>
-            <p>Setiap jenis bahan diarahkan untuk menghasilkan nutrisi kebun dan karya bernilai guna yang terus berputar dalam ekosistem.</p>
+            <h2 id="results-title">Produk yang tumbuh dari siklus yang baik.</h2>
+            <p>Setiap produk lahir dari material terpilah, proses kerja inklusif, dan keinginan agar manfaatnya terus berputar di komunitas.</p>
           </div>
 
-          <div className={styles.resultGrid}>
-            <article className={styles.resultCard}>
-              <div className={styles.resultImage}>
-                <Image
-                  src="/images/gallery-handcrafted-products.jpg"
-                  alt="Produk lilin aromaterapi dan sabun ramah lingkungan dari jelantah terolah"
-                  fill
-                  sizes="(max-width: 699px) 82vw, 33vw"
-                />
-              </div>
-              <div>
-                <span>Minyak Jelantah</span>
-                <h3>Produk Olahan Bernilai</h3>
-                <p>Diolah melalui proses aman bersama peserta menjadi lilin aromaterapi dan produk bernilai jual.</p>
-              </div>
-            </article>
-
-            <article className={styles.resultCard}>
-              <div className={styles.resultImage}>
-                <Image
-                  src="/images/data-difabel-kompos-tanaman.jpg"
-                  alt="Peserta difabel memanfaatkan kompos organik untuk menyuburkan tanaman"
-                  fill
-                  sizes="(max-width: 699px) 82vw, 33vw"
-                />
-              </div>
-              <div>
-                <span>Sampah Organik</span>
-                <h3>Nutrisi Kebun Subur</h3>
-                <p>Difermentasi menjadi kompos alami penyubur tanah, mengembalikan unsur hara ke siklus tanaman.</p>
-              </div>
-            </article>
-
-            <article className={styles.resultCard}>
-              <div className={styles.resultImage}>
-                <Image
-                  src="/images/data-difabel-panen-hidroponik.jpg"
-                  alt="Peserta dengan bangga menunjukkan sayuran segar hasil panen kebun inklusif"
-                  fill
-                  sizes="(max-width: 699px) 82vw, 33vw"
-                />
-              </div>
-              <div>
-                <span>Kebun Inklusif</span>
-                <h3>Pangan Segar & Kemandirian</h3>
-                <p>Hasil panen sayuran segar dikonsumsi bersama dan dipasarkan untuk mendukung keberlanjutan ruang belajar.</p>
-              </div>
-            </article>
+          <div className={styles.productShowcaseGrid}>
+            {featuredProducts.map((product) => (
+              <article className={styles.productShowcaseCard} key={product.name}>
+                <div className={styles.productPhoto}>
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 699px) 44vw, (max-width: 1023px) 42vw, 25vw"
+                  />
+                </div>
+                <div className={styles.productShowcaseContent}>
+                  <span className={styles.productMaterial}>{product.material}</span>
+                  <h3>{product.name}</h3>
+                  <p>{product.description}</p>
+                  <div className={styles.productShowcaseFooter}>
+                    <span>Segera hadir</span>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
 
-          <span className={styles.resultsSwipeHint}>Geser untuk lihat semua →</span>
+          <div className={styles.circularImpact}>
+            <div className={styles.circularImpactIcon} aria-hidden="true">↻</div>
+            <div>
+              <span className={styles.circularImpactLabel}>Dampak dari siklus yang terus berjalan</span>
+              <h3>Ketika limbah diolah dan produknya dipilih, manfaatnya terus berputar.</h3>
+              <p>
+                Mengolah kembali material membantu menjaga limbah tetap berada dalam siklus guna,
+                bukan langsung menjadi sampah. Saat produk hasil olahan dipilih, proses ini turut
+                mendukung upaya mengurangi jejak lingkungan dan potensi emisi dari pembuangan yang tidak terkelola.
+              </p>
+              <p className={styles.circularImpactNote}>
+                Kami tidak menampilkan angka pengurangan karbon sebelum data dan metodenya terverifikasi.
+              </p>
+            </div>
+          </div>
+
         </Container>
       </section>
 
