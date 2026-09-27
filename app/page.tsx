@@ -496,16 +496,12 @@ export default function HomePage() {
                   <span className={styles.productMaterial}>{product.material}</span>
                   <h3>{product.name}</h3>
                   <p>{product.description}</p>
-                  <div className={styles.productShowcaseFooter}>
-                    <span>Segera hadir</span>
-                  </div>
                 </div>
               </article>
             ))}
           </div>
 
           <div className={styles.circularImpact}>
-            <div className={styles.circularImpactIcon} aria-hidden="true">↻</div>
             <div>
               <span className={styles.circularImpactLabel}>Dampak dari siklus yang terus berjalan</span>
               <h3>Ketika limbah diolah dan produknya dipilih, manfaatnya terus berputar.</h3>
